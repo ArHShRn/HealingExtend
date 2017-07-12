@@ -172,14 +172,14 @@ Event Tick(float DeltaTime)
 			(
 				Players[i].KFPM_Victim.Name
 				$" HZI_HEAD["
-				$Players[i].KFPM_Victim.HitZones[HZI_HEAD].bPlayedInjury
+				$Players[i].KFPM_Victim.HitZones[HZI_HEAD].GoreHealth
 				$"]"
 			); //For Debug
 				
 		if(bIsEnableDebugSolo)
 			DrawDebugSphere(Players[i].KFPM_Victim.Location, dDetectRadius, 10, 0, 255, 0);
 	
-		if(Players[i].KFPM_Victim.HitZones[HZI_HEAD].bPlayedInjury)
+		if(Players[i].KFPM_Victim.HitZones[HZI_HEAD].GoreHealth<=0)
 		{
 			/* 
 				A simulated function can't exec so I put it here for a short time
