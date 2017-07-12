@@ -20,7 +20,7 @@ class HeadshotRecover extends Mutator
 /* Every player in the game should have a Healing Extend structure
 	to restore the info he has
 */
-struct HEPlayer
+	struct HEPlayer
 {
 	var KFPlayerController		KFPC;					//	His KFPlayerController class
 	var Pawn					LastTarget;				//	His last zed target
@@ -30,21 +30,28 @@ struct HEPlayer
 	var int						HeadshotsInLogTime;		//  How many head shots are done by him in dLogTime
 };
 	//System
-	var config int				dLogTime;				// Set how much time to log the headshot been done and health been healed
-	var config bool				bEnableHeadshotCount;	// Set if it's enabled to see how many head shots are done by him every dLogTim
+var config int				dLogTime;				// Set how much time to log the headshot been done and health been healed
+var config bool				bEnableHeadshotMsg;		// Set if it's enabled to see a notification when he does a headshot
+var config bool				bEnableHeadshotCount;	// Set if it's enabled to see how many head shots are done by him every dLogTime
+var config bool				bEnableHeadshotSort;	// Set if it's enabled to sort and detect him who shoots most headshoots in dLogTime
+var config bool				bEnableFirstScoreBonus;	// Set if it's enabled to add bonus health to him who shoots most headshoots in dLogTime
+
 	
 	//Debug
-	var config float			dDetectRadius;			// Set this to detect per head shot
-	var config bool				bIsEnableDebugSolo;		// Set if it's enabled to see what target he's aiming at in SOLO game
+var config float			dDetectRadius;			// Set this to detect per head shot
+var config bool				bIsEnableDebugSolo;		// Set if it's enabled to see what target he's aiming at in SOLO game
+var config bool				bIsEnableDebugMsg;		// Set if it's enabled to see Debug Msg
+var config bool				bClearShotTarget;		// Set false to debug shot target
 
 	//GamePlay
-	var array<HEPlayer>			Players;
-	var int						PlayerNumber;			//How many players are in the game
-	
+var array<HEPlayer>			Players;
+var int						PlayerNumber;			// How many players are in the game
+	 
 	//Settings
-	var config int				HealthHealingAmount;
-	var config int				ArmourHealingAmount;
-	var config int				HealingMode;			// 0 for both, 1 for health only, 2 for armour only
+var config int				HealthHealingAmount;	// How much health to heal when he does a headshot
+var config int				ArmourHealingAmount;	// How much armour to heal when he does a headshot
+var config int				HealingMode;			// 0 for both, 1 for health only, 2 for armour only
+var config int				dFirstScoreBonus;		// Set bonus ammount
 	
 function PostBeginPlay()
 {
@@ -55,6 +62,7 @@ function PostBeginPlay()
 	
 	if(bEnableHeadshotCount)
 		SetTimer(dLogTime, True, 'LogHeadshots');
+	SetTimer(60, True, 'LogMutStat');
 	super.PostBeginPlay();
 }
 
@@ -80,6 +88,22 @@ function LogHeadshots()
 	}
 }
 
+function LogMutStat()
+{
+	`Log("[ArHShRn Mutators]HeadshotRecover: dLogTime="$dLogTime);
+	`Log("[ArHShRn Mutators]HeadshotRecover: bEnableHeadshotCount="$bEnableHeadshotCount);
+	`Log("[ArHShRn Mutators]HeadshotRecover: dDetectRadius="$dDetectRadius);
+	`Log("[ArHShRn Mutators]HeadshotRecover: bIsEnableDebugSolo="$bIsEnableDebugSolo);
+	`Log("[ArHShRn Mutators]HeadshotRecover: HealingMode="$HealingMode);
+	`Log("[ArHShRn Mutators]HeadshotRecover: HealthHealingAmount="$HealthHealingAmount);
+	`Log("[ArHShRn Mutators]HeadshotRecover: ArmourHealingAmount="$ArmourHealingAmount);
+	`Log("[ArHShRn Mutators]HeadshotRecover: bIsEnableDebugMsg="$bIsEnableDebugMsg);
+	`Log("[ArHShRn Mutators]HeadshotRecover: bEnableHeadshotMsg="$bEnableHeadshotMsg);
+	`Log("[ArHShRn Mutators]HeadshotRecover: bEnableHeadshotSort="$bEnableHeadshotSort);
+	`Log("[ArHShRn Mutators]HeadshotRecover: bEnableFirstScoreBonus="$bEnableFirstScoreBonus);
+	`Log("[ArHShRn Mutators]HeadshotRecover: dFirstScoreBonus="$dFirstScoreBonus);
+}
+
 function AddHimIntoPlayers(Pawn P)
 {
 	local HEPlayer				instance;
@@ -99,13 +123,13 @@ function AddHimIntoPlayers(Pawn P)
 	}
 	Players[PlayerIndex+1].KFPC.ServerSay
 		(
-		"The No."$PlayerIndex+1
-		$" Player"$Players[PlayerIndex+1].KFPC.PlayerReplicationInfo.PlayerName
-		$" Joins Game!"
+			"The No."$PlayerIndex+1
+			$" Player"$Players[PlayerIndex+1].KFPC.PlayerReplicationInfo.PlayerName
+			$" Joins Game!"
 		);
 }
 
-function InitPlayersArry()
+simulated function InitPlayersArry()
 {
 	local HEPlayer instance;
 	instance.KFPC=None;
@@ -116,14 +140,9 @@ function InitPlayersArry()
 	Players.AddItem(instance);
 }
 
-function bool isSameTarget(int PlayerIndex, Pawn P)
+simulated function bool isSameTarget(int PlayerIndex, Pawn P)
 {
 	return P==Players[PlayerIndex].LastTarget;
-}
-
-function bool isHeadBeenShot(KFPawn_Monster ThisMst)
-{
-	return ThisMst.HitZones[HZI_HEAD].bPlayedInjury;
 }
 
 Event Tick(float DeltaTime)
@@ -137,32 +156,49 @@ Event Tick(float DeltaTime)
 			
 		if(!isSameTarget(i, Players[i].pShotTarget))
 		{
-			if(bIsEnableDebugSolo)
+			if(bIsEnableDebugMsg)
 				Players[i].KFPC.ServerSay(Players[i].KFPC.PlayerReplicationInfo.PlayerName$" Aims ["$Players[i].pShotTarget$"]"); //For Debug
 			Players[i].LastTarget=Players[i].pShotTarget;
 		}
 		
 		Players[i].KFPM_Victim=KFPawn_Monster(Players[i].pShotTarget);
 		if(Players[i].KFPM_Victim==None)
+		{
 			return;
-			
+		}
+		
+		if(bIsEnableDebugMsg)
+			Players[i].KFPC.ServerSay
+			(
+				Players[i].KFPM_Victim.Name
+				$" HZI_HEAD["
+				$Players[i].KFPM_Victim.HitZones[HZI_HEAD].bPlayedInjury
+				$"]"
+			); //For Debug
+				
 		if(bIsEnableDebugSolo)
 			DrawDebugSphere(Players[i].KFPM_Victim.Location, dDetectRadius, 10, 0, 255, 0);
 	
-		if(isHeadBeenShot(Players[i].KFPM_Victim))
-			ProcessHeadShotEx(i, Players[i].KFPM_Victim, Players[i].KFPC);
+		if(Players[i].KFPM_Victim.HitZones[HZI_HEAD].bPlayedInjury)
+		{
+			/* 
+				A simulated function can't exec so I put it here for a short time
+			*/
+			if(bIsEnableDebugMsg)
+				Players[i].KFPC.ServerSay("Entered ProcessHeadShotEx()"); //For Debug
+			Players[i].KFPC.Pawn.Health=Min
+				(
+				Players[i].KFPC.Pawn.Health+HealthHealingAmount, 
+				Players[i].KFPC.Pawn.HealthMax
+				);
+			++Players[i].HeadshotsInLogTime;
+			Players[i].pShotTarget=None;
+			if(bClearShotTarget)
+				Players[i].KFPC.ShotTarget=None;	//Last Zed is killed, avoiding continiously healing
+		}
 	}
 	super.Tick(DeltaTime);
 }
-
-function ProcessHeadShotEx(int PlayerIndex, KFPawn_Monster Victim, KFPlayerController KFPC)
-{	
-	KFPC.Pawn.Health=Min(KFPC.Pawn.Health+HealthHealingAmount, KFPC.Pawn.HealthMax);
-	++Players[PlayerIndex].HeadshotsInLogTime;
-	Players[PlayerIndex].pShotTarget=None; 
-	Players[PlayerIndex].KFPC.ShotTarget=None;	//Last Zed is killed, avoiding continiously healing
-}
-
 
 defaultproperties
 {
