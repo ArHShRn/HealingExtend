@@ -1,3 +1,5 @@
+# Much Thx to Pharrahnox !
+
 # HealingExtend
 Now released Version.1 !
 A collection of healing stuffs containing in a small Mutator, intend to extend the original healing methods
