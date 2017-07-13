@@ -12,6 +12,23 @@ class InstantHealing extends Mutator
 	config(HealingExtend);
 
 	var config float					fCurrentRegenRate;
+	var config bool						bInitedConfig;
+
+function InitMutator(string Options, out string ErrorMessage)
+{
+	if(!bInitedConfig)
+	{
+		InitBasicMutatorValues();
+		SaveConfig();
+	}
+	super.InitMutator( Options, ErrorMessage );
+}
+
+function InitBasicMutatorValues()
+{
+	fCurrentRegenRate=40.0;
+	bInitedConfig=True;
+}
 
 function PostBeginPlay()
 {
