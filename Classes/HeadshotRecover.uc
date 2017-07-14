@@ -123,10 +123,10 @@ function PostBeginPlay()
 
 function ModifyPlayer(Pawn Other)
 {	
-	//Re-initialize Players Array, Check if he exists in the game
-	ReInitPlayersArry();
+	//1.Re-initialize Players Array, Check if he exists in the game
+	ReInitPlayersArry(Other);
 	
-	//Add this player in to Players array if he's new in this game
+	//2.Add this player in to Players array if he's new in this game
 	AddHimIntoPlayers(Other);
 	
 	super.ModifyPlayer(Other);
@@ -225,39 +225,69 @@ function LogMutStat()
 
 //Re-initialize Players Array
 //Check if there's player left the game
-function ReInitPlayersArry()
+function ReInitPlayersArry(Pawn P=None)
 {
-	local int						i;
-	local KFPlayerController		KFPC;
-
-	//1.Check if there's a player left game
-	for(i=1;i<Players.Length;++i)
-	{
-		//If there is, remove it
-		if(Players[i].KFPC==None)
-		{
-			Players.RemoveItem(Players[i]);
-			`Log("[ArHShRn Mutators]HeadshotRecover: Removed A Left Player");
-		}
-	}
+	//local int						i;
+	local int						InGamePlayerIndex;
+	local KFPawn_Human				PlayerKFPH;
+	//local KFPawn_Human				KFPH;
+	//local array<KFPawn_Human>		ArrayKFPH;
+	//local KFPlayerController		KFPC;
+	local KFPlayerController    	PlayerKFPC;
+	PlayerKFPH=KFPawn_Human(P);
+	PlayerKFPC=KFPlayerController(P.Controller);
 	
-	//Re-assign players' index
-	ForEach WorldInfo.AllControllers(class'KFPlayerController', KFPC)
+	////1.Add all KFPH in the world to ArrayKFPH
+	//ForEach WorldInfo.AllPawns(class'KFPawn_Human', KFPH)
+		//ArrayKFPH.AddItem(KFPH);
+		
+	//2.Update Player number each player restarted
+	//PlayerNumber=ArrayKFPH.Length;
+	
+	//When the function is called without Pawn, just do 1.2. stuffs
+	if(P!=None)
 	{
-		//ForEach HEPlayer in Players Array
-		for(i=1;i<Players.Length;++i)
+		//3.If player died last wave, update Player Info (Like KFPH)
+		if(isAlreadyInGame(P, InGamePlayerIndex)) //If his KFPC is already in game (like he died last wave)
 		{
-			//if find him in Players Array
-			if(KFPC==Players[i].KFPC)
-			{
-				Players[i].Index=i;
-				`Log("[ArHShRn Mutators]HeadshotRecover:"$Players[i].KFPC.PlayerReplicationInfo.PlayerName$"Re-Assigned Index With ["$i$"]");
-				break;
-			}
+			//Update his new KFPH into the array, to avoid failing
+			Players[InGamePlayerIndex].KFPH=PlayerKFPH;
+			`Log("["$InGamePlayerIndex$"]"$" Respawned and Pawn updated");
+			PlayerKFPC.ServerSay
+				(
+				"No."
+				$InGamePlayerIndex
+				$" Player Respawned "
+				);
 		}
+		
+		////4.Check if there's a player left game
+		//for(i=1;i<Players.Length;++i)
+		//{
+			////If there is, remove it
+			//if(ArrayKFPH.Find(,Players[i].KFPH)==-1)
+			//{
+				//Players.RemoveItem(Players[i]);
+				//`Log("[ArHShRn Mutators]HeadshotRecover: Removed A Left Player");
+			//}
+		//}
+	
+		////5.Re-assign players' index
+		//ForEach WorldInfo.AllControllers(class'KFPlayerController', KFPC)
+		//{
+			////ForEach HEPlayer in Players Array
+			//for(i=1;i<Players.Length;++i)
+			//{
+				////if find him in Players Array
+				//if(KFPC==Players[i].KFPC)
+				//{
+					//Players[i].Index=i;
+					//`Log("[ArHShRn Mutators]HeadshotRecover:"$Players[i].KFPC.PlayerReplicationInfo.PlayerName$"Re-Assigned Index With ["$i$"]");
+					//break;
+				//}
+			//}
+		//}
 	}
-	//Set how many players are at game
-	PlayerNumber=Players.Length-1;	//Because array[0] is an empty instance, player number should -1 of the length
 }
 
 //To add a new player into Players Array
@@ -276,21 +306,8 @@ function AddHimIntoPlayers(Pawn P)
 	if(PlayerKFPC==None || PlayerKFPH==None) //if he's not Human, return
 		return;
 	
-	//If player died last wave, update Player Info (Like KFPH)
 	if(isAlreadyInGame(P, InGamePlayerIndex)) //If his KFPC is already in game (like he died last wave)
-	{
-		//Update his new KFPH into the array, to avoid failing
-		Players[InGamePlayerIndex].KFPH=PlayerKFPH;
-		`Log("["$InGamePlayerIndex$"]"$" Respawned and Pawn updated");
-		PlayerKFPC.ServerSay
-			(
-			"No."
-			$InGamePlayerIndex
-			$" Player Respawned "
-			$"||Current Player Number="$PlayerNumber
-			);
 		return;
-	}
 	
 	//If he's a new player to game
 	++PlayerNumber; // player number +1
@@ -306,7 +323,6 @@ function AddHimIntoPlayers(Pawn P)
 			"The No."$PlayerIndex
 			$" Player"$Players[PlayerIndex].KFPC.PlayerReplicationInfo.PlayerName
 			$" Joins Game!"
-			$"||Current Player Number="$PlayerNumber
 		);
 }
 
@@ -332,6 +348,22 @@ simulated function bool isSameTarget(int PlayerIndex, Pawn P)
 	return P==Players[PlayerIndex].LastTarget;
 }
 
+//Log Total Headshots This Wave
+function TotalHSTW()
+{
+	local int i;
+	for(i=1; i<=Players.Length; ++i)
+	{
+		Players[i].KFPC.ServerSay
+		(
+			"["
+			$Players[i].TotalHsThisWave
+			$"]Headshots Done"
+		);
+		Players[i].TotalHsThisWave=0;
+	}
+}
+
 Event Tick(float DeltaTime)
 {
 	local int					i;
@@ -342,16 +374,8 @@ Event Tick(float DeltaTime)
 	{
 		if(bLogTHTW_Flag)
 		{
-			for(i=1; i<=PlayerNumber; ++i)
-			{
-				Players[i].KFPC.ServerSay
-				(
-					"["
-					$Players[i].TotalHsThisWave
-					$"]Headshots Done"
-				);
-				Players[i].TotalHsThisWave=0;
-			}
+			SetTimer(1, false, 'TotalHSTW');
+			ReInitPlayersArry();
 		}
 		bLogTHTW_Flag=False;
 		return;
