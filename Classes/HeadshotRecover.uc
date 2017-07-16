@@ -13,6 +13,30 @@
 // Code And Concept By ArHShRn
 // http://steamcommunity.com/id/ArHShRn/
 //=============================================================================
+//struct native PostWaveReplicationInfo
+//{
+//	var Vector 	VectData1; //used for compressing data //X:HeadShots Y:Dosh Earned Z:Damage Dealt
+//	var Vector 	VectData2;	//used for compressing data //Damage Taken, Heals Received, Heals Given
+//
+//	var byte	LargeZedKills;
+//	//Dialog
+//	var bool 	bDiedDuringWave;
+//	var bool	bBestTeammate;
+//	var bool	bKilledMostZeds;
+//	var bool	bEarnedMostDosh;
+//	var bool	bAllSurvivedLastWave;
+//	var bool	bSomeSurvivedLastWave;
+//	var bool	bOneSurvivedLastWave;
+//	var bool	bKilledFleshpoundLastWave;
+//	var bool	bKilledScrakeLastWave;
+//	/** Work-around so we don't have to wait for GRI.OpenTrader() to determine dialog */
+//	var bool    bOpeningTrader;
+//
+//	var class< KFPawn_Monster > ClassKilledByLastWave;
+//
+//	var byte	RepCount;
+//};
+//=============================================================================
 
 class HeadshotRecover extends KFMutator
 	config(HealingExtend);
@@ -31,54 +55,35 @@ class HeadshotRecover extends KFMutator
 	var int						Index;					//  Shows his Index
 	var int						HeadshotsInLogTime;		//  How many head shots are done by him in dLogTime
 	var int						TotalHsThisWave;		//  How many head shots are done by him in this wave
-	var int						TotalHsThisRound;		//  How many head shots are done by him in total wave
 	var int						TotalHsThisZedTime;		//  How many head shots are done bt him in zed time
 };
-
-///* Every Zed in the game should have a Healing Extend structure
-	//to restore the info he has
-//*/
-	//struct HEZed
-//{
-	//var KFPawn_Monster			Zed;
-	//var bool					bIsThisZedDead;			// Check if this zed is dead
-//};
-	
 	
 	//System
 var config int				dLogTime;				// Set how much time to log the headshot been done and health been healed
 var config bool				bEnableProcessFreqcy;	// Set if it's enabled to limit healing frequency
 var config float			fHealingFreq;			// Set how much time (seconds) to process each healing of health or armour
-//var config bool			bEnableHeadshotMsg;		// Set if it's enabled to see a notification when he does a headshot
 var config bool				bEnableHeadshotCount;	// Set if it's enabled to see how many head shots are done by him every dLogTime
 //var config bool			bEnableHeadshotSort;	// Set if it's enabled to sort and detect him who shoots most headshoots in dLogTime
 //var config bool			bEnableFirstScoreBonus;	// Set if it's enabled to add bonus health to him who shoots most headshoots in dLogTime
 var config bool				bAllowOverClocking;		// Set if it's enabled to get beyond the max health or armor
-var config bool				bInitedConfig;
-//var config int			bHEZedArryClearDura;	// Set the time, how often does the DeadZeds array clear once
+var config bool				bInitedConfig;			// If you want to restore the default setting plz set this to False
+var config bool				bRecoverAmmo;			// Set if it;s enabled to recover ammo if he does a decap
+var config bool				bGetDosh;				// Set if it's enabled to get bonus dosh if he does a decap
 var	bool					bClearZedTime;			// To check if it's ZedTime clear or not
 var bool					bHLFlag;				// If it's true, then process healing function
-var bool					bLogTHTW_Flag;				//A flag to check if it's time to log TotalHsThisWave
-
-	
-	//Debug
-var config float			fDetectRadius;			// Set this to detect per head shot
-var config bool				bIsEnableDebugSolo;		// Set if it's enabled to see what target he's aiming at in SOLO game
-var config bool				bIsEnableDebugMsg;		// Set if it's enabled to see Debug Msg
-var config bool				bIsDebugHeadshot;
-//var config bool			bClearShotTarget;		// Set false to debug shot target
+var bool					bLogTHTW_Flag;			//A flag to check if it's time to log TotalHsThisWave
 
 	//GamePlay
 var array<HEPlayer>			Players;
 var HEPlayer				EmptyInstance;
-//var array<HEZed>			DeadZeds;				//Zeds who are headshot by players and dead go into this Arry
-													//should reset per bHEZedArryClearDura
 var int						PlayerNumber;			// How many players are in the game
 var bool					bIsWaveEnded;
 	 
 	//Settings
 var config int				HealthHealingAmount;	// How much health to heal when he does a headshot
 var config int				ArmourHealingAmount;	// How much armour to heal when he does a headshot
+var config int				AmmoRecoverAmout;		// How much ammo to recover when he does a headshot
+var config int				BonusDosh;				// How much dosh to give when he does a headshot
 var config int				HealingMode;			// 0 for both, 1 for health only, 2 for armour only
 var config int				OverclockLimitHealth;	// The maximum health he can get in Overclocking mode
 var config int				OverclockLimitArmour;	// The maximum armour he can get in Overclocking mode
@@ -115,7 +120,7 @@ function PostBeginPlay()
 		SetTimer(dLogTime, True, 'LogHeadshots');
 		
 	//Logger
-	SetTimer(60, True, 'LogMutStat');
+	//SetTimer(60, True, 'LogMutStat');
 	//SetTimer(bHEZedArryClearDura, True, 'ClearDeadZeds');
 	
 	super.PostBeginPlay();
@@ -141,24 +146,20 @@ function InitBasicMutatorValues()
 	bEnableProcessFreqcy=True; 
 	fHealingFreq=0.25; 
 //	bEnableHeadshotMsg;
-	bEnableHeadshotCount=True;
+	bEnableHeadshotCount=False;
 //	bEnableHeadshotSort;
 //	bEnableFirstScoreBonus;
 	bAllowOverClocking=False;
-//	bHEZedArryClearDura;
 	bClearZedTime=True;
 	bInitedConfig=True;
-				
-	//Debug
-	fDetectRadius=100.0f;
-	bIsEnableDebugSolo=False;
-	bIsEnableDebugMsg=False; 
-	bIsDebugHeadshot=False;
-//	bClearShotTarget; 
+	bRecoverAmmo=True;
+	bGetDosh=True;
 
 	//Settings
 	HealthHealingAmount=3; 
-	ArmourHealingAmount=5; 
+	ArmourHealingAmount=5;
+	AmmoRecoverAmout=1; //Means he will not cost ammo if he did a decap
+	BonusDosh=50; 
 	HealingMode=0; 
 	OverclockLimitHealth=175; 
 	OverclockLimitArmour=200; 
@@ -211,14 +212,9 @@ function LogMutStat()
 {
 	`Log("[ArHShRn Mutators]HeadshotRecover: dLogTime="$dLogTime);
 	`Log("[ArHShRn Mutators]HeadshotRecover: bEnableHeadshotCount="$bEnableHeadshotCount);
-	`Log("[ArHShRn Mutators]HeadshotRecover: fDetectRadius="$fDetectRadius);
-	`Log("[ArHShRn Mutators]HeadshotRecover: bIsEnableDebugSolo="$bIsEnableDebugSolo);
 	`Log("[ArHShRn Mutators]HeadshotRecover: HealingMode="$HealingMode);
 	`Log("[ArHShRn Mutators]HeadshotRecover: HealthHealingAmount="$HealthHealingAmount);
 	`Log("[ArHShRn Mutators]HeadshotRecover: ArmourHealingAmount="$ArmourHealingAmount);
-	`Log("[ArHShRn Mutators]HeadshotRecover: bIsEnableDebugMsg="$bIsEnableDebugMsg);
-	//`Log("[ArHShRn Mutators]HeadshotRecover: bEnableHeadshotMsg="$bEnableHeadshotMsg);
-	//`Log("[ArHShRn Mutators]HeadshotRecover: bEnableHeadshotSort="$bEnableHeadshotSort);
 	//`Log("[ArHShRn Mutators]HeadshotRecover: bEnableFirstScoreBonus="$bEnableFirstScoreBonus);
 	//`Log("[ArHShRn Mutators]HeadshotRecover: dFirstScoreBonus="$dFirstScoreBonus);
 }
@@ -367,6 +363,7 @@ function TotalHSTW()
 Event Tick(float DeltaTime)
 {
 	local int					i;
+	local KFWeapon				KFWeap;
 	//local KFPerk				KFP;
 	
 	//If wave is ended
@@ -387,48 +384,29 @@ Event Tick(float DeltaTime)
 	{
 		//Set his pShotTarget to his ShotTarget
 		Players[i].pShotTarget=Players[i].KFPC.ShotTarget;
+		
 		//If he's not shooting a target, continue to check next player
 		if(Players[i].pShotTarget==None)
 			continue;
 		
 		//If his ShotTarget is not the LastTarget
 		if(!isSameTarget(i, Players[i].pShotTarget))
-		{
-			if(bIsEnableDebugMsg)
-				Players[i].KFPC.ServerSay(Players[i].KFPC.PlayerReplicationInfo.PlayerName$" Aims ["$Players[i].pShotTarget$"]"); //For Debug
 			//Set his LastTarget to ShotTarget
 			Players[i].LastTarget=Players[i].pShotTarget; 
-		}
+			
 		//KFPawn_Monster victim he owns is his monster shooting target
 		Players[i].KFPM_Victim=KFPawn_Monster(Players[i].pShotTarget);
+		
 		//If he's not shooting a monster (like shooting a KFHealing_Dart to teammates)
 		//Continue to check next player
 		if(Players[i].KFPM_Victim==None)
 			continue;
-			
-		 //Debug Victim Zed's Head health
-		if(bIsEnableDebugMsg)
-			Players[i].KFPC.ServerSay
-			(
-				Players[i].KFPM_Victim.Name
-				$" HZI_HEAD["
-				$Players[i].KFPM_Victim.HitZones[HZI_HEAD].GoreHealth
-				$"]"
-			); //For Debug
-		
-		//Draw Target Debug Sphere in Solo game
-		if(bIsEnableDebugSolo)
-			DrawDebugSphere(Players[i].KFPM_Victim.Location, fDetectRadius, 10, 0, 255, 0);
 		
 		//If his KFPM_Victim's head health <=0, which means its head is been shot and dismembered
 		if(Players[i].KFPM_Victim.HitZones[HZI_HEAD].GoreHealth<=0 && bHLFlag)
 		{
-			/* 
-				A simulated function can't exec so I put it here for a short time
-			*/
-			if(bIsEnableDebugMsg)
-				Players[i].KFPC.ServerSay("Entered ProcessHeadShotEx()"); //For Debug
-				
+			
+			//	A simulated function can't exec so I put it here for a short time
 			/* Main Function */
 			//0 for both
 			if(HealingMode==0)
@@ -479,6 +457,25 @@ Event Tick(float DeltaTime)
 					Players[i].KFPH.Armor=Min(Players[i].KFPH.Armor+ArmourHealingAmount, 175);
 				}
 			}
+			
+			//Recover ammo if takes a decap
+			if(bRecoverAmmo)
+			{
+				KFWeap=KFWeapon(Players[i].KFPC.Pawn.Weapon);
+				if(KFWeap!=None)
+				{
+					KFWeap.AmmoCount[KFWeap.GetAmmoType(KFWeap.CurrentFireMode)]=Min
+					(
+						KFWeap.AmmoCount[KFWeap.GetAmmoType(KFWeap.CurrentFireMode)]+AmmoRecoverAmout,
+						KFWeap.MagazineCapacity[KFWeap.GetAmmoType(KFWeap.CurrentFireMode)]
+					);
+				}
+			}
+			//if(bGetDosh)
+			//{
+				//
+			//}
+			
 			//Add one shot in his HeadshotsInLogTime and TotalHsThisWave
 			++Players[i].HeadshotsInLogTime;
 			++Players[i].TotalHsThisWave;
@@ -489,18 +486,18 @@ Event Tick(float DeltaTime)
 			{
 				bClearZedTime=False;
 				++Players[i].TotalHsThisZedTime;
-				Players[i].KFPC.ServerSay("No."$Players[i].TotalHsThisZedTime$" Headshots!");
+				Players[i].KFPC.ServerSay(Players[i].TotalHsThisZedTime$" Combo in ZedTime!");
 			}
 			if(bClearZedTime)
+			{
 				Players[i].TotalHsThisZedTime=0;
-				
+			}
+			
+			
 			/* Clear flags */
 			Players[i].pShotTarget=None;
 			Players[i].KFPC.ShotTarget=None;	//Last Zed is killed, avoiding continiously healing
 			bHLFlag=False;	//Disable healing process
-			
-			if(bIsDebugHeadshot)	
-				Players[i].KFPC.ServerSay("Done headshot||Total HLT="$Players[i].HeadshotsInLogTime);
 		}
 	}
 	super.Tick(DeltaTime);
