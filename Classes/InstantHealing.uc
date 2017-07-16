@@ -33,7 +33,7 @@ function InitBasicMutatorValues()
 function PostBeginPlay()
 {
 	SaveConfig();
-	SetTimer(5, true, 'LogStatus');
+	//SetTimer(5, true, 'LogStatus');
 	super.PostBeginPlay();
 }
 
