@@ -12,6 +12,8 @@
 //
 // Code And Concept By ArHShRn
 // http://steamcommunity.com/id/ArHShRn/
+// Version 1.0.3
+// Last Update Date Aug.5th 2017
 //=============================================================================
 //struct native PostWaveReplicationInfo
 //{
@@ -48,6 +50,7 @@ class HeadshotRecover extends KFMutator
 {
 	var Pawn					pShotTarget;			//	A shot target pawn he owns, Use to avoidi checking ShotTarget frequently
 	var Pawn					LastTarget;				//	His last zed target
+	var KFWeapon				KFWeap;
 	var KFPlayerController		KFPC;					//	His KFPlayerController class
 	var KFPawn_Monster			KFPM_Victim;			//	Zed victim who damaged by him
 	var KFPawn_Human			KFPH;					//	His KFPawn_Human
@@ -56,22 +59,20 @@ class HeadshotRecover extends KFMutator
 	var int						HeadshotsInLogTime;		//  How many head shots are done by him in dLogTime
 	var int						TotalHsThisWave;		//  How many head shots are done by him in this wave
 	var int						TotalHsThisZedTime;		//  How many head shots are done bt him in zed time
+	var int						fLastHSC;
 };
 	
 	//System
-var config int				dLogTime;				// Set how much time to log the headshot been done and health been healed
-var config bool				bEnableProcessFreqcy;	// Set if it's enabled to limit healing frequency
 var config float			fHealingFreq;			// Set how much time (seconds) to process each healing of health or armour
-var config bool				bEnableHeadshotCount;	// Set if it's enabled to see how many head shots are done by him every dLogTime
-//var config bool			bEnableHeadshotSort;	// Set if it's enabled to sort and detect him who shoots most headshoots in dLogTime
-//var config bool			bEnableFirstScoreBonus;	// Set if it's enabled to add bonus health to him who shoots most headshoots in dLogTime
 var config bool				bAllowOverClocking;		// Set if it's enabled to get beyond the max health or armor
 var config bool				bInitedConfig;			// If you want to restore the default setting plz set this to False
 var config bool				bRecoverAmmo;			// Set if it;s enabled to recover ammo if he does a decap
+var config bool				bEnableAAR_Headshots;
 var config bool				bGetDosh;				// Set if it's enabled to get bonus dosh if he does a decap
 var	bool					bClearZedTime;			// To check if it's ZedTime clear or not
 var bool					bHLFlag;				// If it's true, then process healing function
 var bool					bLogTHTW_Flag;			//A flag to check if it's time to log TotalHsThisWave
+var float					fLastHSC;
 
 	//GamePlay
 var array<HEPlayer>			Players;
@@ -87,7 +88,6 @@ var config int				BonusDosh;				// How much dosh to give when he does a headshot
 var config int				HealingMode;			// 0 for both, 1 for health only, 2 for armour only
 var config int				OverclockLimitHealth;	// The maximum health he can get in Overclocking mode
 var config int				OverclockLimitArmour;	// The maximum armour he can get in Overclocking mode
-//var config int			dFirstScoreBonus;		// Set bonus ammount
 
 function InitMutator(string Options, out string ErrorMessage)
 {
@@ -110,18 +110,7 @@ function PostBeginPlay()
 	//In order to make array's Index equal to player's Index
 	InitPlayersArry();
 
-
-	//Healing Limit Freq
-	if(bEnableProcessFreqcy)
-		SetTimer(fHealingFreq, True, 'SetHLimitFlag');
-	
-	//Headshot counter
-	if(bEnableHeadshotCount)
-		SetTimer(dLogTime, True, 'LogHeadshots');
-		
-	//Logger
-	//SetTimer(60, True, 'LogMutStat');
-	//SetTimer(bHEZedArryClearDura, True, 'ClearDeadZeds');
+	SetTimer(fHealingFreq, True, 'SetHLimitFlag');
 	
 	super.PostBeginPlay();
 }
@@ -142,18 +131,13 @@ function ModifyPlayer(Pawn Other)
 function InitBasicMutatorValues()
 {
 	//System
-	dLogTime=30;
-	bEnableProcessFreqcy=True; 
 	fHealingFreq=0.25; 
-//	bEnableHeadshotMsg;
-	bEnableHeadshotCount=False;
-//	bEnableHeadshotSort;
-//	bEnableFirstScoreBonus;
-	bAllowOverClocking=False;
+	bAllowOverClocking=True;
 	bClearZedTime=True;
 	bInitedConfig=True;
 	bRecoverAmmo=True;
-	bGetDosh=True;
+	bEnableAAR_Headshots=True;
+	bGetDosh=False;
 
 	//Settings
 	HealthHealingAmount=3; 
@@ -191,98 +175,26 @@ function bool isAlreadyInGame(Pawn P, optional out int Index)
 	return false;
 }
 
-//Log headshots each player in dLogTime
-function LogHeadshots()
-{
-	local int i;
-	for(i=1; i<=PlayerNumber; ++i)
-	{
-		Players[i].KFPC.ServerSay("["$Players[i].HeadshotsInLogTime$"] Headshots");
-		Players[i].HeadshotsInLogTime=0;
-		`Log(
-			"[ArHShRn Mutators]HeadshotRecover: HeadshotsInLogTime["
-			$i
-			$"] Reset"
-			);
-	}
-}
-
-//Mutator Stat Logger
-function LogMutStat()
-{
-	`Log("[ArHShRn Mutators]HeadshotRecover: dLogTime="$dLogTime);
-	`Log("[ArHShRn Mutators]HeadshotRecover: bEnableHeadshotCount="$bEnableHeadshotCount);
-	`Log("[ArHShRn Mutators]HeadshotRecover: HealingMode="$HealingMode);
-	`Log("[ArHShRn Mutators]HeadshotRecover: HealthHealingAmount="$HealthHealingAmount);
-	`Log("[ArHShRn Mutators]HeadshotRecover: ArmourHealingAmount="$ArmourHealingAmount);
-	//`Log("[ArHShRn Mutators]HeadshotRecover: bEnableFirstScoreBonus="$bEnableFirstScoreBonus);
-	//`Log("[ArHShRn Mutators]HeadshotRecover: dFirstScoreBonus="$dFirstScoreBonus);
-}
-
 //Re-initialize Players Array
 //Check if there's player left the game
 function ReInitPlayersArry(Pawn P=None)
 {
-	//local int						i;
 	local int						InGamePlayerIndex;
 	local KFPawn_Human				PlayerKFPH;
-	//local KFPawn_Human				KFPH;
-	//local array<KFPawn_Human>		ArrayKFPH;
-	//local KFPlayerController		KFPC;
 	local KFPlayerController    	PlayerKFPC;
-	PlayerKFPH=KFPawn_Human(P);
-	PlayerKFPC=KFPlayerController(P.Controller);
-	
-	////1.Add all KFPH in the world to ArrayKFPH
-	//ForEach WorldInfo.AllPawns(class'KFPawn_Human', KFPH)
-		//ArrayKFPH.AddItem(KFPH);
-		
-	//2.Update Player number each player restarted
-	//PlayerNumber=ArrayKFPH.Length;
-	
-	//When the function is called without Pawn, just do 1.2. stuffs
+
 	if(P!=None)
 	{
-		//3.If player died last wave, update Player Info (Like KFPH)
-		if(isAlreadyInGame(P, InGamePlayerIndex)) //If his KFPC is already in game (like he died last wave)
+		PlayerKFPH=KFPawn_Human(P);
+		PlayerKFPC=KFPlayerController(P.Controller);
+		//If player died last wave, update Player Info
+		if(isAlreadyInGame(P, InGamePlayerIndex))
 		{
-			//Update his new KFPH into the array, to avoid failing
+			//Update his new KFPH into the array
 			Players[InGamePlayerIndex].KFPH=PlayerKFPH;
 			`Log("["$InGamePlayerIndex$"]"$" Respawned and Pawn updated");
-			PlayerKFPC.ServerSay
-				(
-				"No."
-				$InGamePlayerIndex
-				$" Player Respawned "
-				);
+			PlayerKFPC.ServerSay("Respawned ");
 		}
-		
-		////4.Check if there's a player left game
-		//for(i=1;i<Players.Length;++i)
-		//{
-			////If there is, remove it
-			//if(ArrayKFPH.Find(,Players[i].KFPH)==-1)
-			//{
-				//Players.RemoveItem(Players[i]);
-				//`Log("[ArHShRn Mutators]HeadshotRecover: Removed A Left Player");
-			//}
-		//}
-	
-		////5.Re-assign players' index
-		//ForEach WorldInfo.AllControllers(class'KFPlayerController', KFPC)
-		//{
-			////ForEach HEPlayer in Players Array
-			//for(i=1;i<Players.Length;++i)
-			//{
-				////if find him in Players Array
-				//if(KFPC==Players[i].KFPC)
-				//{
-					//Players[i].Index=i;
-					//`Log("[ArHShRn Mutators]HeadshotRecover:"$Players[i].KFPC.PlayerReplicationInfo.PlayerName$"Re-Assigned Index With ["$i$"]");
-					//break;
-				//}
-			//}
-		//}
 	}
 }
 
@@ -295,7 +207,6 @@ function AddHimIntoPlayers(Pawn P)
 	local KFPawn_Human			PlayerKFPH;
 	local int					PlayerIndex;
 	local int					InGamePlayerIndex;
-	//local int					LastTotalKill;
 
 	PlayerKFPC=KFPlayerController(P.Controller);
 	PlayerKFPH=KFPawn_Human(P);
@@ -314,12 +225,7 @@ function AddHimIntoPlayers(Pawn P)
 	Players.AddItem(instance);
 
 	Players[PlayerIndex].Index=PlayerIndex;
-	Players[PlayerIndex].KFPC.ServerSay
-		(
-			"The No."$PlayerIndex
-			$" Player"$Players[PlayerIndex].KFPC.PlayerReplicationInfo.PlayerName
-			$" Joins Game!"
-		);
+	Players[PlayerIndex].KFPC.ServerSay(Players[PlayerIndex].KFPC.PlayerReplicationInfo.PlayerName$" Joins Game!");
 }
 
 //Initialize Players Array, add a Null instance into it
@@ -333,7 +239,6 @@ function InitPlayersArry()
 	EmptyInstance.Index=0;
 	EmptyInstance.HeadshotsInLogTime=0;
 	EmptyInstance.TotalHsThisWave=0;
-	//EmptyInstance.TotalHsThisRound=0;
 	EmptyInstance.TotalHsThisZedTime=0;
 	Players.AddItem(EmptyInstance);
 }
@@ -344,41 +249,18 @@ simulated function bool isSameTarget(int PlayerIndex, Pawn P)
 	return P==Players[PlayerIndex].LastTarget;
 }
 
-//Log Total Headshots This Wave
-function TotalHSTW()
-{
-	local int i;
-	for(i=1; i<=Players.Length; ++i)
-	{
-		Players[i].KFPC.ServerSay
-		(
-			"["
-			$Players[i].TotalHsThisWave
-			$"]Headshots Done"
-		);
-		Players[i].TotalHsThisWave=0;
-	}
-}
-
 Event Tick(float DeltaTime)
 {
 	local int					i;
-	local KFWeapon				KFWeap;
-	//local KFPerk				KFP;
 	
+	bIsWaveEnded=!MyKFGI.IsWaveActive();
 	//If wave is ended
-	if(!MyKFGI.IsWaveActive())
+	if(bIsWaveEnded)
 	{
-		if(bLogTHTW_Flag)
-		{
-			SetTimer(1, false, 'TotalHSTW');
-			ReInitPlayersArry();
-		}
-		bLogTHTW_Flag=False;
+		ReInitPlayersArry();
+		bIsWaveEnded=False;
 		return;
 	}
-	bLogTHTW_Flag=True;
-	
 	//ForEach Player in Players Array
 	for(i=1; i<=PlayerNumber; ++i)
 	{
@@ -403,72 +285,76 @@ Event Tick(float DeltaTime)
 			continue;
 		
 		//If his KFPM_Victim's head health <=0, which means its head is been shot and dismembered
-		if(Players[i].KFPM_Victim.HitZones[HZI_HEAD].GoreHealth<=0 && bHLFlag)
+		if(Players[i].KFPM_Victim.HitZones[HZI_HEAD].GoreHealth<=0)
 		{
-			
-			//	A simulated function can't exec so I put it here for a short time
-			/* Main Function */
-			//0 for both
-			if(HealingMode==0)
-			{	
-				if(bAllowOverClocking)
-				{
-					Players[i].KFPC.Pawn.Health=Min(Players[i].KFPC.Pawn.Health+HealthHealingAmount, OverclockLimitHealth);
-					Players[i].KFPH.Armor=Min(Players[i].KFPH.Armor+ArmourHealingAmount, OverclockLimitArmour);
-				}
-				else
-				{
-					Players[i].KFPC.Pawn.Health=Min
-					(
-					Players[i].KFPC.Pawn.Health+HealthHealingAmount, 
-					Players[i].KFPC.Pawn.HealthMax
-					);
+			if(bHLFlag)
+			{
+				//	A simulated function can't exec so I put it here for a short time
+				/* Main Function */
+				//0 for both
+				if(HealingMode==0)
+				{	
+					if(bAllowOverClocking)
+					{
+						Players[i].KFPC.Pawn.Health=Min(Players[i].KFPC.Pawn.Health+HealthHealingAmount, OverclockLimitHealth);
+						Players[i].KFPH.Armor=Min(Players[i].KFPH.Armor+ArmourHealingAmount, OverclockLimitArmour);
+					}
+					else
+					{
+						Players[i].KFPC.Pawn.Health=Min
+						(
+						Players[i].KFPC.Pawn.Health+HealthHealingAmount, 
+						Players[i].KFPC.Pawn.HealthMax
+						);
 				
-					//need to know max armor ammount
-					Players[i].KFPH.Armor=Min(Players[i].KFPH.Armor+ArmourHealingAmount, 175);
+						//need to know max armor ammount
+						Players[i].KFPH.Armor=Min(Players[i].KFPH.Armor+ArmourHealingAmount, 175);
+					}
+				}
+				//1 for health only
+				if(HealingMode==1)
+				{
+					if(bAllowOverClocking)
+					{
+						Players[i].KFPC.Pawn.Health=Min(Players[i].KFPC.Pawn.Health+HealthHealingAmount, OverclockLimitHealth);
+					}
+					else
+					{
+						Players[i].KFPC.Pawn.Health=Min
+						(
+						Players[i].KFPC.Pawn.Health+HealthHealingAmount, 
+						Players[i].KFPC.Pawn.HealthMax
+						);
+					}
+				}
+				//2 for armor only
+				if(HealingMode==2)
+				{
+					if(bAllowOverClocking)
+					{
+						Players[i].KFPH.Armor=Min(Players[i].KFPH.Armor+ArmourHealingAmount, OverclockLimitArmour);
+					}
+					else
+					{
+						//need to know max armor ammount
+						Players[i].KFPH.Armor=Min(Players[i].KFPH.Armor+ArmourHealingAmount, 175);
+					}
 				}
 			}
-			//1 for health only
-			if(HealingMode==1)
+			//Decap_Detection Ammo Recovery
+			if(bRecoverAmmo && !bEnableAAR_Headshots)
 			{
-				if(bAllowOverClocking)
+				//Get Player's Weap
+				Players[i].KFWeap=KFWeapon(Players[i].KFPC.Pawn.Weapon);
+				if(Players[i].KFWeap!=None)
 				{
-					Players[i].KFPC.Pawn.Health=Min(Players[i].KFPC.Pawn.Health+HealthHealingAmount, OverclockLimitHealth);
-				}
-				else
-				{
-					Players[i].KFPC.Pawn.Health=Min
+					Players[i].KFWeap.AmmoCount[0]=Min
 					(
-					Players[i].KFPC.Pawn.Health+HealthHealingAmount, 
-					Players[i].KFPC.Pawn.HealthMax
+						Players[i].KFWeap.AmmoCount[0]+AmmoRecoverAmout, 
+						Players[i].KFWeap.MagazineCapacity[0]
 					);
-				}
-			}
-			//2 for armor only
-			if(HealingMode==2)
-			{
-				if(bAllowOverClocking)
-				{
-					Players[i].KFPH.Armor=Min(Players[i].KFPH.Armor+ArmourHealingAmount, OverclockLimitArmour);
-				}
-				else
-				{
-					//need to know max armor ammount
-					Players[i].KFPH.Armor=Min(Players[i].KFPH.Armor+ArmourHealingAmount, 175);
-				}
-			}
-			
-			//Recover ammo if takes a decap
-			if(bRecoverAmmo)
-			{
-				KFWeap=KFWeapon(Players[i].KFPC.Pawn.Weapon);
-				if(KFWeap!=None)
-				{
-					KFWeap.AmmoCount[KFWeap.GetAmmoType(KFWeap.CurrentFireMode)]=Min
-					(
-						KFWeap.AmmoCount[KFWeap.GetAmmoType(KFWeap.CurrentFireMode)]+AmmoRecoverAmout,
-						KFWeap.MagazineCapacity[KFWeap.GetAmmoType(KFWeap.CurrentFireMode)]
-					);
+					Players[i].KFWeap.ClientForceAmmoUpdate(Players[i].KFWeap.AmmoCount[0], Players[i].KFWeap.SpareAmmoCount[0]);
+					Players[i].KFWeap.bNetDirty=True;
 				}
 			}
 			//if(bGetDosh)
@@ -476,28 +362,40 @@ Event Tick(float DeltaTime)
 				//
 			//}
 			
-			//Add one shot in his HeadshotsInLogTime and TotalHsThisWave
-			++Players[i].HeadshotsInLogTime;
-			++Players[i].TotalHsThisWave;
-			
-			/* Record how many headshots are done by him in Zed Time */
+			/* Record in Zed Time */
 			bClearZedTime=True;
 			if(`IsInZedTime(self))
 			{
 				bClearZedTime=False;
-				++Players[i].TotalHsThisZedTime;
-				Players[i].KFPC.ServerSay(Players[i].TotalHsThisZedTime$" Combo in ZedTime!");
+				//Functions called in ZedTime
 			}
 			if(bClearZedTime)
 			{
-				Players[i].TotalHsThisZedTime=0;
+				//Functions called in NormalTime
 			}
 			
 			
 			/* Clear flags */
 			Players[i].pShotTarget=None;
-			Players[i].KFPC.ShotTarget=None;	//Last Zed is killed, avoiding continiously healing
+			Players[i].KFPC.ShotTarget=None;	//Last Zed is killed
 			bHLFlag=False;	//Disable healing process
+		}
+		//AAR_Dection Ammo Recovery
+		if(bRecoverAmmo && bEnableAAR_Headshots)
+		{
+			Players[i].KFWeap=KFWeapon(Players[i].KFPC.Pawn.Weapon);
+			if(Players[i].fLastHSC!=Players[i].KFPC.PWRI.VectData1.X)
+			{
+				Players[i].KFWeap.AmmoCount[0]+=Players[i].KFPC.PWRI.VectData1.X-Players[i].fLastHSC;
+				Players[i].KFWeap.AmmoCount[0]=Min
+				(
+					Players[i].KFWeap.AmmoCount[0], 
+					Players[i].KFWeap.MagazineCapacity[0]
+				);
+				Players[i].KFWeap.ClientForceAmmoUpdate(Players[i].KFWeap.AmmoCount[0], Players[i].KFWeap.SpareAmmoCount[0]);
+				Players[i].KFWeap.bNetDirty=True;
+				Players[i].fLastHSC=Players[i].KFPC.PWRI.VectData1.X;
+			}
 		}
 	}
 	super.Tick(DeltaTime);

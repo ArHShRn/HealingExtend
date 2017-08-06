@@ -12,7 +12,9 @@ class InstantHealing extends Mutator
 	config(HealingExtend);
 
 	var config float					fCurrentRegenRate;
+	//var config float					fZedTimeRegenRate;
 	var config bool						bInitedConfig;
+	//var config bool						bEnableInfiniteHealingZedTime;
 
 function InitMutator(string Options, out string ErrorMessage)
 {
@@ -26,20 +28,16 @@ function InitMutator(string Options, out string ErrorMessage)
 
 function InitBasicMutatorValues()
 {
-	fCurrentRegenRate=40.0;
 	bInitedConfig=True;
+	fCurrentRegenRate=40.0;
+	//bEnableInfiniteHealingZedTime=True;
+	
 }
 
 function PostBeginPlay()
 {
 	SaveConfig();
-	//SetTimer(5, true, 'LogStatus');
 	super.PostBeginPlay();
-}
-
-simulated function LogStatus()
-{
-	`Log("[ArHShRn.Mutators] InstantHealing Mut is working fine!");
 }
 
 function ModifyPlayer(Pawn Other)
