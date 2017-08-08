@@ -1,6 +1,7 @@
 # THX LIST
 Pharrahnox<br>
-Teriyakisaurus Rex
+Teriyakisaurus Rex<br>
+Blackout<br>
 
 # HealingExtend
 Now released Version0.1.2 !
