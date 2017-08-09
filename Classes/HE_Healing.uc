@@ -48,14 +48,7 @@ function ModifyPlayer(Pawn Other)
 	KFPH=KFPawn_Human(Other);
 	KFPH.HealthRegenRate=(1/fCurrentRegenRate);
 	KFPC=KFPlayerController(Other.Controller);
-	if(KFPC!=None)
-		SetTimer(1, True, 'shoat');
 	super.ModifyPlayer(Other);	
-}
-
-function shoat()
-{
-	KFPC.MyGFxHUD.HudChatBox.AddChatMessage("Test Indicator", class'KFLocalMessage'.default.EventColor);
 }
 
 defaultproperties
