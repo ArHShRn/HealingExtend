@@ -65,7 +65,7 @@ function CreateEmptyHEP(out HEPlayer tmp)
 }
 
 //*************************************************
-//*  Mutator Initialization
+//*  Initialization
 //*************************************************
 function InitMutator(string Options, out string ErrorMessage)
 {
@@ -101,19 +101,30 @@ function ModifyPlayer(Pawn Other)
 	//2.Add this player in to Players array if he's new in this game
 	AddHimIntoPlayers(Other);
 	
-	//3.Create his HUD
-	KFPC.ClientSetHUD(HE_HUDType);
-	if(HE_HUD(KFPC.myHUD)==None)
+	//3.Create his HUD on Server side if it's a server && also Standalone
+	if ( KFPC.myHUD != None )
 	{
-		`log("[HER:Server]Error spawning a new HE_HUD hud!");
-		super.ModifyPlayer(Other);
+		KFPC.myHUD.Destroy();
 	}
-	`log("[HER:Server]Spawned a new HUD "$HE_HUD(KFPC.myHUD)$" for "$KFPC.PlayerReplicationInfo.PlayerName);
-	//Create MovieHUD
-	`log("[HER:Server]Creating New MovieHUD...");
-	HE_HUD(KFPC.myHUD).CreateHUDMovie( False );
-	`log("[HER:Server]Setting New GFxHUD...");
-	KFPC.SetGFxHUD(HE_HUD(KFPC.myHUD).HudMovie);
+	KFPC.myHUD = Spawn(HE_HUDType, KFPC);
+	`log("[HER:"$WorldInfo.NetMode$"]Spawn a new HUD name="$KFPC.myHUD.Name$" Owner="$KFPC.myHUD.Owner);
+	//If it's standalone SOLO game, then we need to manually create a GFxMovieHUD
+	if(WorldInfo.NetMode == NM_Standalone)
+	{
+		if(HE_HUD(KFPC.myHUD)==None)
+		{
+			`log("[HER:Standalone]Error spawning a new HE_HUD hud!");
+			super.ModifyPlayer(Other);
+		}
+		`log("[HER:Standalone]Spawned a new HUD "$HE_HUD(KFPC.myHUD)$" for "$KFPC.PlayerReplicationInfo.PlayerName);
+		//Create MovieHUD
+		`log("[HER:Standalone]Creating New MovieHUD...");
+		HE_HUD(KFPC.myHUD).CreateHUDMovie( False );
+		`log("[HER:Standalone]Setting New GFxHUD...");
+		KFPC.SetGFxHUD(HE_HUD(KFPC.myHUD).HudMovie);
+	}
+	`log("[HER:"$WorldInfo.NetMode$"]End ModifyPlayer function.");
+	
 	super.ModifyPlayer(Other);
 }
 
@@ -279,9 +290,7 @@ function HeadshotRecover(int i)
 
 function AddPlayerDosh(int i)
 {
-	Players[i].KFPRI=KFPlayerReplicationInfo(Players[i].KFPC.PlayerReplicationInfo);
-	if(Players[i].KFPRI!=None)
-		Players[i].KFPRI.AddDosh(BonusDosh);
+	KFPlayerReplicationInfo(Players[i].KFPC.PlayerReplicationInfo).AddDosh(BonusDosh);
 }
 
 function TickMutRecover(int i)
