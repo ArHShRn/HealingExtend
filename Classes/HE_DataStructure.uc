@@ -29,7 +29,7 @@ class HE_DataStructure extends Object
 /* Every player in the game should have a Healing Extend structure
 	to restore the info he has
 */
-	struct HEPlayer
+struct HEPlayer
 {
 	//
 	var Pawn					pShotTarget;			//	A shot target pawn he owns, Use to avoidi checking ShotTarget frequently
@@ -44,6 +44,26 @@ class HE_DataStructure extends Object
 	
 	var int						Index;					//  Shows his Index
 	var int						fLastHSC;
+};
+
+enum HUDCrosshairStatus
+{
+	HE_Good,
+	HE_WeapNotGuns,
+	HE_Player_Closed,
+	HE_Player_Dead,
+	HE_Player_NoWeap,
+	HE_Player_Monster,
+	HE_Player_UsingIronsight,
+	HE_Player_SpecialMoveDontAllow,
+	HE_NoneInit
+};
+
+enum AsCMode
+{
+	AsC_Default,
+	AsC_CenterDot,
+	AsC_OnlyDot
 };
 
 defaultproperties

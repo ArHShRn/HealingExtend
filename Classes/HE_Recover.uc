@@ -17,6 +17,7 @@ class HE_Recover extends KFMutator
 //**************************
 //*  System Configs
 //**************************
+var config bool				bUseHE_HUD;
 var config float			fHealingFreq;			// Set how much time (seconds) to process each healing of health or armour
 var config bool				bAllowOverClocking;		// Set if it's enabled to get beyond the max health or armor
 var config bool				bInitedConfig;			// If you want to restore the default setting plz set this to False
@@ -102,29 +103,27 @@ function ModifyPlayer(Pawn Other)
 	AddHimIntoPlayers(Other);
 	
 	//3.Create his HUD on Server side if it's a server && also Standalone
-	if ( KFPC.myHUD != None )
+	if(bUseHE_HUD)
 	{
-		KFPC.myHUD.Destroy();
-	}
-	KFPC.myHUD = Spawn(HE_HUDType, KFPC);
-	`log("[HER:"$WorldInfo.NetMode$"]Spawn a new HUD name="$KFPC.myHUD.Name$" Owner="$KFPC.myHUD.Owner);
-	//If it's standalone SOLO game, then we need to manually create a GFxMovieHUD
-	if(WorldInfo.NetMode == NM_Standalone)
-	{
-		if(HE_HUD(KFPC.myHUD)==None)
+		KFPC.ClientSetHUD(HE_HUDType);
+		//If it's standalone SOLO game, then we need to manually create a GFxMovieHUD
+		if(WorldInfo.NetMode == NM_Standalone)
 		{
-			`log("[HER:Standalone]Error spawning a new HE_HUD hud!");
-			super.ModifyPlayer(Other);
-		}
-		`log("[HER:Standalone]Spawned a new HUD "$HE_HUD(KFPC.myHUD)$" for "$KFPC.PlayerReplicationInfo.PlayerName);
-		//Create MovieHUD
-		`log("[HER:Standalone]Creating New MovieHUD...");
-		HE_HUD(KFPC.myHUD).CreateHUDMovie( False );
-		`log("[HER:Standalone]Setting New GFxHUD...");
-		KFPC.SetGFxHUD(HE_HUD(KFPC.myHUD).HudMovie);
+			if(HE_HUD(KFPC.myHUD)==None)
+			{
+				`log("[HER:Standalone]Error spawning a new HE_HUD hud!");
+				super.ModifyPlayer(Other);
+			}
+			`log("[HER:Standalone]Spawned a new HUD "$HE_HUD(KFPC.myHUD)$" for "$KFPC.PlayerReplicationInfo.PlayerName);
+			//Create MovieHUD
+			`log("[HER:Standalone]Creating New MovieHUD...");
+			HE_HUD(KFPC.myHUD).CreateHUDMovie( False );
+			`log("[HER:Standalone]Setting New GFxHUD...");
+			KFPC.SetGFxHUD(HE_HUD(KFPC.myHUD).HudMovie);
+		}		
 	}
-	`log("[HER:"$WorldInfo.NetMode$"]End ModifyPlayer function.");
 	
+	`log("[HER:"$WorldInfo.NetMode$"]End ModifyPlayer function.");	
 	super.ModifyPlayer(Other);
 }
 
@@ -133,6 +132,7 @@ function ModifyPlayer(Pawn Other)
 function InitBasicMutatorValues()
 {
 	//System
+	bUseHE_HUD=True;
 	fHealingFreq=0.25; 
 	bAllowOverClocking=True;
 	bClearZedTime=True;
@@ -149,12 +149,6 @@ function InitBasicMutatorValues()
 	HealingMode=0; 
 	OverclockLimitHealth=175; 
 	OverclockLimitArmour=200; 
-}
-
-//Set Flag to limit healing frequency
-function SetHLimitFlag()
-{
-	bHLFlag=True;
 }
 
 //Return true if player is already in game
@@ -229,12 +223,23 @@ function AddHimIntoPlayers(Pawn P)
 	Players[PlayerIndex].KFPC.ServerSay(Players[PlayerIndex].KFPC.PlayerReplicationInfo.PlayerName$" Joins Game!");
 }
 
+//*************************************************
+//*  Misc
+//*************************************************
 //Return true if this Pawn is his LastTarget
 function bool isSameTarget(int PlayerIndex, Pawn P)
 {
 	return P==Players[PlayerIndex].LastTarget;
 }
 
+//Set Flag to limit healing frequency
+function SetHLimitFlag()
+{
+	bHLFlag=True;
+}
+//*************************************************
+//*  Main Func
+//*************************************************
 function HeadshotRecover(int i)
 {
 	//0 for both
@@ -382,7 +387,9 @@ function TickMutRecover(int i)
 	bHLFlag=False;	//Disable healing process
 }
 
-//Tick Time Update
+//*************************************************
+//*  Tick Time Update
+//*************************************************
 Event Tick(float DeltaTime)
 {
 	local int i;
