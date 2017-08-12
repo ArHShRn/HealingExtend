@@ -577,7 +577,7 @@ simulated function bool DrawPlayerHealthLowIcon(KFPawn_Human KFPH, optional bool
 	}
 	else
 	{
-		TargetLocation = KFPH.Mesh.GetPosition();
+		TargetLocation = KFPH.Mesh.GetPosition() + ( KFPH.CylinderComponent.CollisionHeight * vect(0,0,1.1f) );
 		ScreenPos = Canvas.Project( TargetLocation );
 	}
 	

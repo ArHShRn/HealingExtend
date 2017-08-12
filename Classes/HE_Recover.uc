@@ -32,7 +32,7 @@ var float					fLastHSC;
 //**************************
 //*  Gameplay Configs
 //**************************
-var class<HUD>				HE_HUDType;
+var HE_HUDManager			HUDManager;
 var array<HEPlayer>			Players;
 var int						PlayerNumber;			// How many players are in the game
 var bool					bIsWaveEnded;
@@ -68,19 +68,6 @@ function CreateEmptyHEP(out HEPlayer tmp)
 //*************************************************
 //*  Initialization
 //*************************************************
-function InitMutator(string Options, out string ErrorMessage)
-{
-	if(!bInitedConfig)
-	{
-		`log("[HE_Recover]Init Basic Mutator Values...");
-		InitBasicMutatorValues();
-		
-		`log("[HE_Recover]Save to config...");
-		SaveConfig();
-	}
-	super.InitMutator( Options, ErrorMessage );
-}
-
 function PostBeginPlay()
 {	
 	local HEPlayer empt;
@@ -88,40 +75,36 @@ function PostBeginPlay()
 	Players.AddItem(empt);
 	SetTimer(fHealingFreq, True, 'SetHLimitFlag');
 	
+	`log("[HER:"$WorldInfo.NetMode$"]Spawning a new HUDManager...");
+	HUDManager = Spawn(class'HE_HUDManager', self);
+	`log("[HER:"$WorldInfo.NetMode$"]Spawned a new HUDManager="$HUDManager.Name);
+	
 	super.PostBeginPlay();
+}
+
+function InitMutator(string Options, out string ErrorMessage)
+{
+	if(!bInitedConfig)
+	{
+		`log("[HER:"$WorldInfo.NetMode$"]Init Basic Mutator Values...");
+		InitBasicMutatorValues();
+		
+		`log("[HER:"$WorldInfo.NetMode$"]Save to config...");
+		SaveConfig();
+	}
+	`log("[HER:"$WorldInfo.NetMode$"]Start initializing the HUDManager...");
+	HUDManager.Init();
+	
+	super.InitMutator( Options, ErrorMessage );
 }
 
 function ModifyPlayer(Pawn Other)
 {	
-	local KFPlayerController KFPC;
-	KFPC=KFPlayerController(Other.Controller);
-	
 	//1.Re-initialize Players Array, Check if he exists in the game
 	ReInitPlayersArry(Other);
 	
 	//2.Add this player in to Players array if he's new in this game
 	AddHimIntoPlayers(Other);
-	
-	//3.Create his HUD on Server side if it's a server && also Standalone
-	if(bUseHE_HUD)
-	{
-		KFPC.ClientSetHUD(HE_HUDType);
-		//If it's standalone SOLO game, then we need to manually create a GFxMovieHUD
-		if(WorldInfo.NetMode == NM_Standalone)
-		{
-			if(HE_HUD(KFPC.myHUD)==None)
-			{
-				`log("[HER:Standalone]Error spawning a new HE_HUD hud!");
-				super.ModifyPlayer(Other);
-			}
-			`log("[HER:Standalone]Spawned a new HUD "$HE_HUD(KFPC.myHUD)$" for "$KFPC.PlayerReplicationInfo.PlayerName);
-			//Create MovieHUD
-			`log("[HER:Standalone]Creating New MovieHUD...");
-			HE_HUD(KFPC.myHUD).CreateHUDMovie( False );
-			`log("[HER:Standalone]Setting New GFxHUD...");
-			KFPC.SetGFxHUD(HE_HUD(KFPC.myHUD).HudMovie);
-		}		
-	}
 	
 	`log("[HER:"$WorldInfo.NetMode$"]End ModifyPlayer function.");	
 	super.ModifyPlayer(Other);
@@ -418,5 +401,4 @@ defaultproperties
 	bIsWaveEnded=False
 	bHLFlag=False
 	bLogTHTW_Flag=True
-	HE_HUDType=class'HealingExtend.HE_HUD'
 }
