@@ -1,3 +1,12 @@
+//=============================================================================
+// Healing Extend Mutator : Data Structure
+// This class stores the basic data structures and variables of the mut
+//
+// Code And Concept By ArHShRn
+// http://steamcommunity.com/id/ArHShRn/
+// Version 0.1.3
+// Last Update Date Aug.5th 2017
+//=============================================================================
 //=================================KFPC========================================
 //struct native PostWaveReplicationInfo
 //{
@@ -34,16 +43,14 @@ struct HEPlayer
 	//
 	var Pawn					pShotTarget;			//	A shot target pawn he owns, Use to avoidi checking ShotTarget frequently
 	var Pawn					LastTarget;				//	His last zed target
-	var KFWeapon				KFWeap;
-	var KFPlayerReplicationInfo	KFPRI;
+	var KFWeapon				KFWeap;					//  His Weap in hand
+	var KFPlayerReplicationInfo	KFPRI;					//  His Player Replication Info
 	var KFPlayerController		KFPC;					//	His KFPlayerController class
 	var KFPawn_Monster			KFPM_Victim;			//	Zed victim who damaged by him
 	var KFPawn_Human			KFPH;					//	His KFPawn_Human
 	
-	var HE_HUD					PlayerHUD;
-	
 	var int						Index;					//  Shows his Index
-	var int						fLastHSC;
+	var int						fLastHSC;				//  His last AAR Headshots Ammout
 };
 
 enum HUDCrosshairStatus

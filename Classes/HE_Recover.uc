@@ -1,8 +1,6 @@
 //=============================================================================
 // Healing Extend Mutator : Head Shot Recover
-// This is the second mutator containing in HealingExtend Mut
-// 
-// This mutator provides you the possibility to recover Armour or Health 
+// This class provides you the possibility to recover Armour or Health 
 //		while you just did a single head shot
 //
 // Code And Concept By ArHShRn
@@ -60,7 +58,6 @@ function CreateEmptyHEP(out HEPlayer tmp)
 	tmp.KFPC=None;				 
 	tmp.KFPM_Victim=None;			 
 	tmp.KFPH=None;				 
-	tmp.PlayerHUD=None;
 	tmp.Index=0;				 
 	tmp.fLastHSC=0;
 }
@@ -71,19 +68,10 @@ function CreateEmptyHEP(out HEPlayer tmp)
 function PostBeginPlay()
 {	
 	local HEPlayer empt;
+	
 	CreateEmptyHEP(empt);
 	Players.AddItem(empt);
-	SetTimer(fHealingFreq, True, 'SetHLimitFlag');
 	
-	`log("[HER:"$WorldInfo.NetMode$"]Spawning a new HUDManager...");
-	HUDManager = Spawn(class'HE_HUDManager', self);
-	`log("[HER:"$WorldInfo.NetMode$"]Spawned a new HUDManager="$HUDManager.Name);
-	
-	super.PostBeginPlay();
-}
-
-function InitMutator(string Options, out string ErrorMessage)
-{
 	if(!bInitedConfig)
 	{
 		`log("[HER:"$WorldInfo.NetMode$"]Init Basic Mutator Values...");
@@ -92,19 +80,27 @@ function InitMutator(string Options, out string ErrorMessage)
 		`log("[HER:"$WorldInfo.NetMode$"]Save to config...");
 		SaveConfig();
 	}
-	`log("[HER:"$WorldInfo.NetMode$"]Start initializing the HUDManager...");
-	HUDManager.Init();
 	
-	super.InitMutator( Options, ErrorMessage );
+	SetTimer(fHealingFreq, True, 'SetHLimitFlag');
+	
+	super.PostBeginPlay();
 }
 
 function ModifyPlayer(Pawn Other)
 {	
+	`log("[HER:"$WorldInfo.NetMode$"]Enter ModifyPlayer Finction.");
 	//1.Re-initialize Players Array, Check if he exists in the game
 	ReInitPlayersArry(Other);
 	
 	//2.Add this player in to Players array if he's new in this game
 	AddHimIntoPlayers(Other);
+	
+	//3.Set Player's HUD
+	//First spawn a manager and set owner to this Pawn's player
+	`log("[HER:"$WorldInfo.NetMode$"]Spawning a new HUDManager...");
+	HUDManager = Spawn(class'HE_HUDManager', Other.Controller);
+	`log("[HER:"$WorldInfo.NetMode$"]Spawned a new HUDManager="$HUDManager.Name);
+	HUDManager.ClientSetHUD(class'HealingExtend.HE_HUDBase');
 	
 	`log("[HER:"$WorldInfo.NetMode$"]End ModifyPlayer function.");	
 	super.ModifyPlayer(Other);

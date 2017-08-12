@@ -1,9 +1,19 @@
+//=============================================================================
+// Healing Extend Mutator : Healing Extend (HE) HUD Manager
+// This class is written to be a replicated actor in order to gain a full control
+//		of the HE HUD in client side
+//
+// Code And Concept By ArHShRn
+// http://steamcommunity.com/id/ArHShRn/
+// Version 0.1.3
+// Last Update Date Aug.5th 2017
+//=============================================================================
+
 class HE_HUDManager extends Actor;
+
 //*************************************************************
 //* Varirables
 //*************************************************************
-var class<HUD>				HE_HUDType;
-
 var KFPlayerController		KFPlayerOwner;
 
 //*************************************************************
@@ -24,42 +34,11 @@ Replication
 //*************************************************************
 //* Initialization
 //*************************************************************
-function Init(optional LocalPlayer LocPlay)
-{
-	`log("[HE_HUDManager:"$Worldinfo.NetMode$"]Entered Init.");
-	//Todo
-}
-
 simulated function PostBeginPlay()
 {
 	`log("[HE_HUDManager:"$Worldinfo.NetMode$"]Entered PostBeginPlay.");
-	
-	//If it's client side or it's standalone solo game
-	if(Role < Role_Authority || WorldInfo.NetMode == NM_Standalone)
-	{
-		`log("[HE_HUDManager:"$Worldinfo.NetMode$"]Client Getting KFPC...");
-		GetKFPC();
-		LogRepStatus();
-		//Create HE_HUD for LocalPlayer
-		KFPlayerOwner.ClientSetHUD(HE_HUDType);
-		//Create his HUD on Client side && also Standalone
-		if(HE_HUD(KFPlayerOwner.myHUD)==None)
-		{
-			`log("[HE_HUDManager:"$Worldinfo.NetMode$"]Error spawning a new HE_HUD hud! Pre-exit the PostBeginPlay Function !");
-			super.PostBeginPlay();
-			return;
-		}
-		`log("[HE_HUDManager:"$Worldinfo.NetMode$"]Spawned a new HUD "$HE_HUD(KFPlayerOwner.myHUD)$" for "$KFPlayerOwner.PlayerReplicationInfo.PlayerName);
-		//Create MovieHUD
-		`log("[HE_HUDManager:"$Worldinfo.NetMode$"]Creating New MovieHUD...");
-		HE_HUD(KFPlayerOwner.myHUD).CreateHUDMovie( False );
-		`log("[HE_HUDManager:"$Worldinfo.NetMode$"]Setting New GFxHUD...");
-		KFPlayerOwner.SetGFxHUD(HE_HUD(KFPlayerOwner.myHUD).HudMovie);	
-	}
-	
 	LogNetworkStatus();
-	
-	`log("[HER:"$WorldInfo.NetMode$"]End PostBeginPlay function.");	
+	`log("[HE_HUDManager:"$WorldInfo.NetMode$"]End PostBeginPlay function.");	
 		
 	super.PostBeginPlay();
 }
@@ -70,7 +49,7 @@ simulated function PostBeginPlay()
 /**
  * Helper function to get the LocalPlayer
  */
-simulated function PlayerController GetPC()
+simulated function PlayerController GetLPPC()
 {
 	local LocalPlayer LocalPlayerOwner;
 
@@ -87,7 +66,7 @@ simulated function PlayerController GetPC()
 //To get KFPlayerOwner
 simulated function GetKFPC()
 {
-	KFPlayerOwner = KFPlayerController( GetPC() );
+	KFPlayerOwner = KFPlayerController( GetLPPC() );
 	if(KFPlayerOwner == None)
 	{
 		`log("[HE_HUDManager:"$Worldinfo.NetMode$"]WARNING: Get no KFPlayerOwner !");
@@ -97,7 +76,7 @@ simulated function GetKFPC()
 }
 
 //*************************************************************
-//* Misc
+//* Misc (Also contains some misc client & server function)
 //*************************************************************
 //Log Network Status for debug
 simulated function LogNetworkStatus()
@@ -108,22 +87,48 @@ simulated function LogNetworkStatus()
 	`log("[HE_HUDManager:"$Worldinfo.NetMode$"]Current Owner="$Owner);
 	for(i=0;i< class'Engine'.static.GetEngine().GamePlayers.Length;++i)
 		`log("[HE_HUDManager:"$Worldinfo.NetMode$"]DisplayAll LP:"$class'Engine'.static.GetEngine().GamePlayers[i].Name);
-	`log("[HE_HUDManager:"$Worldinfo.NetMode$"]Current KFPlayerOwner="$KFPlayerOwner);
 }
 
 //Only server can do this func, to check if the KFPlayerOwner is
 //rep to the server
-function LogRepStatus()
+reliable server function LogRepStatus()
 {
-	if(WorldInfo.NetMode == NM_Standalone)
-		`log("[HE_HUDManager:"$Worldinfo.NetMode$"]Standalone Current KFPlayerOwner="$KFPlayerOwner);
-	else
-		`log("[HE_HUDManager:"$Worldinfo.NetMode$"]Server Side Rep Current KFPlayerOwner="$KFPlayerOwner);
+	`log("[HE_HUDManager:"$Worldinfo.NetMode$"]Server Side Rep Current KFPlayerOwner="$KFPlayerOwner);
 }
 
 //*************************************************************
-//* Client Functions
+//* Client Functions Main
 //*************************************************************
+//reliable client function ClientSetHUD(class<HE_HUDBase> HE_HUDType)
+//Let client set HUD to HE_HUD
+reliable client function ClientSetHUD(class<HE_HUDBase> HE_HUDType)
+{
+	`log("[HE_HUDManager:"$Worldinfo.NetMode$"]Enter ClientSetHUD.");
+	//If it's client side or it's standalone solo game
+	if(Role < Role_Authority || WorldInfo.NetMode == NM_Standalone)
+	{
+		`log("[HE_HUDManager:"$Worldinfo.NetMode$"]Getting KFPC...");
+		GetKFPC();
+		LogRepStatus();
+		//Create HE_HUD for LocalPlayer
+		KFPlayerOwner.ClientSetHUD(HE_HUDType);
+		//Create his HUD on Client side && also Standalone
+		if(HE_HUDBase(KFPlayerOwner.myHUD)==None)
+		{
+			`log("[HE_HUDManager:"$Worldinfo.NetMode$"]Error spawning a new HE_HUD hud! Pre-exit the PostBeginPlay Function !");
+			super.PostBeginPlay();
+			return;
+		}
+		`log("[HE_HUDManager:"$Worldinfo.NetMode$"]Spawned a new HUD "$KFPlayerOwner.myHUD$" for "$KFPlayerOwner.PlayerReplicationInfo.PlayerName);
+		//Create MovieHUD
+		`log("[HE_HUDManager:"$Worldinfo.NetMode$"]Creating New MovieHUD...");
+		HE_HUDBase(KFPlayerOwner.myHUD).CreateHUDMovie( False );
+		`log("[HE_HUDManager:"$Worldinfo.NetMode$"]Setting New GFxHUD...");
+		KFPlayerOwner.SetGFxHUD(HE_HUDBase(KFPlayerOwner.myHUD).HudMovie);	
+	}
+	`log("[HE_HUDManager:"$Worldinfo.NetMode$"]Current KFPlayerOwner="$KFPlayerOwner);
+	`log("[HE_HUDManager:"$Worldinfo.NetMode$"]End ClientSetHUD.");
+}
 
 //*************************************************************
 //* Server Functions
@@ -132,6 +137,4 @@ function LogRepStatus()
 defaultproperties
 {
 	RemoteRole=Role_SimulatedProxy
-	
-	HE_HUDType=class'HealingExtend.HE_HUD'
 }
