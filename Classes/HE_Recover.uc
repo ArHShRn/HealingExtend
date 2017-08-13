@@ -30,7 +30,6 @@ var float					fLastHSC;
 //**************************
 //*  Gameplay Configs
 //**************************
-var HE_HUDManager			HUDManager;
 var array<HEPlayer>			Players;
 var int						PlayerNumber;			// How many players are in the game
 var bool					bIsWaveEnded;
@@ -74,10 +73,10 @@ function PostBeginPlay()
 	
 	if(!bInitedConfig)
 	{
-		`log("[HER:"$WorldInfo.NetMode$"]Init Basic Mutator Values...");
+		`log("[HE:"$WorldInfo.NetMode$"]Init Basic Mutator Values...");
 		InitBasicMutatorValues();
 		
-		`log("[HER:"$WorldInfo.NetMode$"]Save to config...");
+		`log("[HE:"$WorldInfo.NetMode$"]Save to config...");
 		SaveConfig();
 	}
 	
@@ -94,15 +93,7 @@ function ModifyPlayer(Pawn Other)
 	
 	//2.Add this player in to Players array if he's new in this game
 	AddHimIntoPlayers(Other);
-	
-	//3.Set Player's HUD
-	//First spawn a manager and set owner to this Pawn's player
-	`log("[HER:"$WorldInfo.NetMode$"]Spawning a new HUDManager...");
-	HUDManager = Spawn(class'HE_HUDManager', Other.Controller);
-	`log("[HER:"$WorldInfo.NetMode$"]Spawned a new HUDManager="$HUDManager.Name);
-	HUDManager.ClientSetHUD(class'HealingExtend.HE_HUDBase');
-	
-	`log("[HER:"$WorldInfo.NetMode$"]End ModifyPlayer function.");	
+		
 	super.ModifyPlayer(Other);
 }
 
@@ -166,6 +157,15 @@ function ReInitPlayersArry(Pawn P=None)
 		{
 			//Update his new KFPH into the array
 			Players[InGamePlayerIndex].KFPH=PlayerKFPH;
+			
+			//Set its perk class
+			Players[InGamePlayerIndex].LastPerk=PlayerKFPC.GetPerk().GetPerkClass();
+			
+			//Set his new HUD
+			`log("[HER:"$WorldInfo.NetMode$"]Spawning a new HUDManager...");
+			Players[InGamePlayerIndex].HUDManager = Spawn(class'HE_HUDManager', PlayerKFPH.Controller);
+			`log("[HER:"$WorldInfo.NetMode$"]Spawned a new HUDManager="$Players[InGamePlayerIndex].HUDManager.Name);
+			Players[InGamePlayerIndex].HUDManager.ClientSetHUD();
 			`Log("[HE_Recover]["$InGamePlayerIndex$"]"$" Respawned and Pawn updated");
 			PlayerKFPC.ServerSay("I Respawned ;)");
 		}
@@ -196,6 +196,16 @@ function AddHimIntoPlayers(Pawn P)
 	
 	instance.KFPC=PlayerKFPC;
 	instance.KFPH=PlayerKFPH;
+	instance.LastPerk=PlayerKFPC.GetPerk().GetPerkClass();
+	
+	//Set Player's HUD
+	//First spawn a manager and set owner to this Pawn's player
+	`log("[HER:"$WorldInfo.NetMode$"]Spawning a new HUDManager...");
+	instance.HUDManager = Spawn(class'HE_HUDManager', PlayerKFPH.Controller);
+	`log("[HER:"$WorldInfo.NetMode$"]Spawned a new HUDManager="$instance.HUDManager.Name);
+	instance.HUDManager.ClientSetHUD();
+	
+	`log("[HER:"$WorldInfo.NetMode$"]End ModifyPlayer function.");
 	Players.AddItem(instance);
 	Players[PlayerIndex].Index=PlayerIndex;
 	`log("[HE_Recover]Add him into array and INDEX="$PlayerIndex);
@@ -216,6 +226,7 @@ function SetHLimitFlag()
 {
 	bHLFlag=True;
 }
+
 //*************************************************
 //*  Main Func
 //*************************************************
@@ -277,8 +288,51 @@ function AddPlayerDosh(int i)
 	KFPlayerReplicationInfo(Players[i].KFPC.PlayerReplicationInfo).AddDosh(BonusDosh);
 }
 
+//Common Funct - Display Global Message
+function GlobalShowMessage(string Aplayer, string Message)
+{
+	local HE_HUDManager	tpManager;
+	
+	ForEach WorldInfo.AllActors(class'HE_HUDManager', tpManager)
+		tpManager.DisplaySkillUsedAll(Aplayer$" "$Message);
+}
+
+//Medic skill - Global Healing
+function GlobalHealing(int Health)
+{
+	local KFPlayerController KFPC;
+	
+	ForEach WorldInfo.AllControllers(class'KFPlayerController', KFPC)
+	{
+		KFPC.Pawn.Health=Min(KFPC.Pawn.Health+Health, OverclockLimitHealth);
+		
+		//Play healing sound as a Healing Grenade Exploded
+		KFPC.PlayAkEvent(AkEvent'WW_WEP_EXP_Grenade_Medic.Play_WEP_EXP_Grenade_Medic_Explosion');
+	}
+}
+
 function TickMutRecover(int i)
 {
+	//First check player's final skill energy
+	Players[i].HUDManager.CheckHUDFinalSkill(0.f, True);
+	//If energy is enough, trigger it
+	if(Players[i].HUDManager.HEHUDRI.bCanUseFinalSkill)
+	{
+		//To-do: Skills
+		//Medic Skill
+		if(Players[i].KFPC.GetPerk().GetPerkClass() == class'KFPerk_FieldMedic')
+		{
+			
+			GlobalHealing(75);
+			GlobalShowMessage(Players[i].KFPC.PlayerReplicationInfo.PlayerName, "[Global Healing], You Gained 75 HP!");
+		}
+		Players[i].HUDManager.MyHE_HUD.EnergyBarPercent=0.f;
+		Players[i].HUDManager.MyHE_HUD.bPlayerPressedQ=False;
+		Players[i].HUDManager.HEHUDRI.Energy=0.f;
+		Players[i].HUDManager.HEHUDRI.bCanUseFinalSkill=False;
+		Players[i].HUDManager.NotifySkillUsed();
+	}
+	
 	//Set his pShotTarget to his ShotTarget
 	Players[i].pShotTarget=Players[i].KFPC.ShotTarget;
 		
@@ -303,7 +357,7 @@ function TickMutRecover(int i)
 	if(Players[i].KFPM_Victim.HitZones[HZI_HEAD].GoreHealth<=0)
 	{
 		if(bHLFlag)
-		{
+		{		
 			//Add Dosh
 			if(bGetDosh)
 				AddPlayerDosh(i);
@@ -328,6 +382,15 @@ function TickMutRecover(int i)
 				}
 			}
 		}
+	}
+	
+	//Add energy, AAR Detection
+	if(Players[i].fLastHSC!=Players[i].KFPC.PWRI.VectData1.X)
+	{
+		if( Players[i].HUDManager.HEHUDRI.Energy < 1.f)
+			Players[i].HUDManager.CheckHUDFinalSkill(Players[i].HUDManager.HEHUDRI.Energy + 0.04f, False);
+		else
+			Players[i].HUDManager.CheckHUDFinalSkill(1.f, False);
 	}
 	
 	//AAR_Dection Ammo Recovery
@@ -372,9 +435,9 @@ function TickMutRecover(int i)
 Event Tick(float DeltaTime)
 {
 	local int i;
+	//local class<KFPerk> KFPerkClassHere;
 	
 	bIsWaveEnded=!MyKFGI.IsWaveActive();
-	
 	//If wave is ended
 	if(bIsWaveEnded)
 	{
@@ -386,7 +449,15 @@ Event Tick(float DeltaTime)
 	
 	//ForEach Player in Players Array
 	for(i=1; i<=PlayerNumber; ++i)
+	{
+		//KFPerkClassHere=Players[i].KFPC.GetPerk().GetPerkClass();
+		//
+		////If current Perk Class is diffurrent than LastPerk, Re-create his HUD to Corrsponding HUD
+		//if(KFPerkClassHere != Players[i].LastPerk)
+			//Players[i].HUDManager.ClientSetHUD();
+			
 		TickMutRecover(i);
+	}
 		
 	super.Tick(DeltaTime);
 }

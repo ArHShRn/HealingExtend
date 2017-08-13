@@ -49,6 +49,9 @@ struct HEPlayer
 	var KFPawn_Monster			KFPM_Victim;			//	Zed victim who damaged by him
 	var KFPawn_Human			KFPH;					//	His KFPawn_Human
 	
+	var HE_HUDManager			HUDManager;				//	His HUD Manager
+	var class<KFPerk>			LastPerk;
+	
 	var int						Index;					//  Shows his Index
 	var int						fLastHSC;				//  His last AAR Headshots Ammout
 };
@@ -72,6 +75,28 @@ enum AsCMode
 	AsC_CenterDot,
 	AsC_OnlyDot
 };
+
+enum HE_FinalSkills
+{
+	NotInit,
+	Medic_GlobalHealing,
+	Medic_SelfProtection
+};
+
+struct HE_HUDReplicationInfo
+{
+	var class<KFPerk>			PlayerPerk;
+	
+	var HE_FinalSkills			PlayerSkill;
+	var bool					bCanUseFinalSkill;
+	
+	var float					Energy;
+};
+
+//struct HE_HUDServerVariable
+//{
+	//
+//};
 
 defaultproperties
 {

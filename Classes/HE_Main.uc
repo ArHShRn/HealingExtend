@@ -20,22 +20,11 @@ var KFPlayerController				KFPC;
 //*********************************************************
 //* Initialization
 //*********************************************************
-function PostBeginPlay()
-{
-	if(!bInitedConfig)
-	{
-		`log("[HealingExtend_Main Mut:"$WorldInfo.NetMode$"]Init Basic Mutator Values...");
-		InitBasicMutatorValues();
-		
-		`log("[HealingExtend_Main Mut:"$WorldInfo.NetMode$"]Save to config...");
-		SaveConfig();
-	}
-	
-	super.PostBeginPlay();
-}
-
+//Initialize basic config default values used in the mutator
+//Author recommended values, plz do not edit
 function InitBasicMutatorValues()
 {
+	super.InitBasicMutatorValues();
 	bInitedConfig=True;
 	fCurrentRegenRate=40.0;
 }
