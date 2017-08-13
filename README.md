@@ -10,6 +10,13 @@ Mut's structure is completely re-worked and usage command changes to : <br>
 <br>
 which contains two functions in it: Both Instant Healing & Headshot Recover
 
+## About Skill System
+First: Open you KFInput.ini, bind "Q" into command "FangDaZhao" or just add<br>
+Bindings=(Name="Q",Command="GBA_QuickHeal | FangDaZhao",Control=False,Shift=False,Alt=False,bIgnoreCtrl=False,bIgnoreShift=False,bIgnoreAlt=False)
+<br>
+
+Please note: Only Medic has final skill now !
+
 # Note: Update Method and Compatibility !
 This mut has its own HUD ( you cant close it now because I didn't optimize the condition in code )<br>
 please note that <b>IT'S NOT COMPATIBLE WITH ANY MOD (MUT AND GAMEMOD) WITH ITS OWN HUD !!!!!!!!!!!!!!!!</b>
