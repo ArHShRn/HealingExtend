@@ -3,21 +3,21 @@ Pharrahnox<br>
 Teriyakisaurus Rex<br>
 Blackout<br>
 
-# HealingExtend
-Now released Version0.1.2 !
-A collection of healing stuffs containing in a small Mutator, intend to extend the original healing methods
-
-## Healing Extend Mutator : Instant Healing <br>
-This is the first mutator containing in HealingExtend Mut<br>
-This mutator provides you the possibility to recover Health for a customized health regen rate<br>
-
-## Healing Extend Mutator : Head Shot Recover<br>
-his is the second mutator containing in HealingExtend Mut<br>
-This mutator provides you the possibility to recover Armour or Health while you just did a single head shot<br>
-<br> 
-Attention:	You have to do a decap to get the effect !<br>
+# Please Note in BETA 1.0.1 !
+Mut's structure is completely re-worked and usage command changes to : <br>
 <br>
-If you wanna add it on your server, the mutator is supposed to install on a server which is having less than 16 players due to the structure and the process, I'm working on a better way to do it<br>
+?Mutator=HealingExtend.HE_Main
+<br>
+which contains two functions in it: Both Instant Healing & Headshot Recover
+
+# Note: Update Method and Compatibility !
+This mut has its own HUD ( you cant close it now because I didn't optimize the condition in code )<br>
+please note that <b>IT'S NOT COMPATIBLE WITH ANY MOD (MUT AND GAMEMOD) WITH ITS OWN HUD !!!!!!!!!!!!!!!!</b>
+
+## Update Methods
+Whatever side you're (client or server), please completely delete KFHealingExtend.ini in Config folder<br>
+Mut's structure has changed and you're supposed to get a new-auto-generated config of this mut<br>
+Or <b>IT WILL NOT WORK !!!!</b>
 
 ## At Last<br>
 Plz Email me if you find bugs or if you have any suggestion to what's next in the mutator (only about healing extending stuff) !<br>
