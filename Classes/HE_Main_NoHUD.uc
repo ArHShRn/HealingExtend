@@ -1,14 +1,15 @@
 //=============================================================================
-// Healing Extend Mutator Main Part
+// Healing Extend Mutator Main Part No HUD
 //
 // Code And Concept By ArHShRn
 // http://steamcommunity.com/id/ArHShRn/
 // Version Release 1.0.1
 // -Combine Healing n' Headshot Recovery
+// -This mut has no hud and it's a standard version
 //
 // Last Update Date Aug.31th 2017
 //=============================================================================
-class HE_Main extends KFMutator
+class HE_Main_NoHUD extends KFMutator
 	DependsOn(HE_DataStructure)
 	config(HE_Main);
 
@@ -112,7 +113,7 @@ function ModifyPlayer(Pawn Other)
 function InitBasicMutatorValues()
 {
 	//Muatator Version Info
-	Editable_HEVI.ThisMutatorName="HE_Main";
+	Editable_HEVI.ThisMutatorName="HE_Main_NoHUD";
 	Editable_HEVI.AuthorNickname="ArHShRn";
 	Editable_HEVI.AuthorSteamcommunityURL="http://steamcommunity.com/id/ArHShRn/";
 	Editable_HEVI.Version="Release 1.0.1";
@@ -179,14 +180,7 @@ function ReInitPlayersArry(Pawn P=None)
 			
 			//Set its perk class
 			Players[InGamePlayerIndex].LastPerk=PlayerKFPC.GetPerk().GetPerkClass();
-			
-			//Set his new HUD
-			`log("[HER:"$WorldInfo.NetMode$"]Spawning a new HUDManager...");
-			Players[InGamePlayerIndex].HUDManager = Spawn(class'HE_HUDManager', PlayerKFPH.Controller);
-			`log("[HER:"$WorldInfo.NetMode$"]Spawned a new HUDManager="$Players[InGamePlayerIndex].HUDManager.Name);
-			Players[InGamePlayerIndex].HUDManager.ClientSetHUD();
 			`Log("[HE_Recover]["$InGamePlayerIndex$"]"$" Respawned and Pawn updated");
-			//PlayerKFPC.ServerSay("I Respawned ;)");
 		}
 	}
 }
@@ -217,14 +211,6 @@ function AddHimIntoPlayers(Pawn P)
 	instance.KFPH=PlayerKFPH;
 	instance.LastPerk=PlayerKFPC.GetPerk().GetPerkClass();
 	
-	//Set Player's HUD
-	//First spawn a manager and set owner to this Pawn's player
-	`log("[HER:"$WorldInfo.NetMode$"]Spawning a new HUDManager...");
-	instance.HUDManager = Spawn(class'HE_HUDManager', PlayerKFPH.Controller);
-	`log("[HER:"$WorldInfo.NetMode$"]Spawned a new HUDManager="$instance.HUDManager.Name);
-	instance.HUDManager.ClientSetHUD();
-	
-	`log("[HER:"$WorldInfo.NetMode$"]End ModifyPlayer function.");
 	Players.AddItem(instance);
 	Players[PlayerIndex].Index=PlayerIndex;
 	`log("[HE_Recover]Add him into array and INDEX="$PlayerIndex);
@@ -255,7 +241,7 @@ function HeadshotRecover(int i)
 	{	
 		if(bAllowOverClocking)
 		{
-			Players[i].KFPC.Pawn.Health=Min(Players[i].KFPC.Pawn.Health+HealthHealingAmount, OverclockLimitHealth);
+			Players[i].KFPC.Pawn.Health=Min(Players[i].KFPC.Pawn.Health+HealthHealingAmount, Min(OverclockLimitHealth, 200));
 			Players[i].KFPH.Armor=Min(Players[i].KFPH.Armor+ArmourHealingAmount, OverclockLimitArmour);
 		}
 		else
@@ -275,7 +261,7 @@ function HeadshotRecover(int i)
 	{
 		if(bAllowOverClocking)
 		{
-			Players[i].KFPC.Pawn.Health=Min(Players[i].KFPC.Pawn.Health+HealthHealingAmount, OverclockLimitHealth);
+			Players[i].KFPC.Pawn.Health=Min(Players[i].KFPC.Pawn.Health+HealthHealingAmount, Min(OverclockLimitHealth, 200));
 		}
 		else
 		{

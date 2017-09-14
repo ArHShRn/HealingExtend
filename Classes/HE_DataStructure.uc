@@ -4,10 +4,13 @@
 //
 // Code And Concept By ArHShRn
 // http://steamcommunity.com/id/ArHShRn/
-// Version 0.1.3
-// Last Update Date Aug.5th 2017
+//
+// Version Release 1.0.1
+// -Remove skill stuffs
+//
+// Last Update Date Aug.31th 2017
 //=============================================================================
-//=================================KFPC========================================
+//=================================KFPC.PWRI========================================
 //struct native PostWaveReplicationInfo
 //{
 //	var Vector 	VectData1; //used for compressing data //X:HeadShots Y:Dosh Earned Z:Damage Dealt
@@ -35,8 +38,9 @@
 class HE_DataStructure extends Object
 	Abstract;
 
-/* Every player in the game should have a Healing Extend structure
-	to restore the info he has
+/**
+  *Every player in the game should have a Healing Extend structure
+  *to restore the info he has
 */
 struct HEPlayer
 {
@@ -54,6 +58,15 @@ struct HEPlayer
 	
 	var int						Index;					//  Shows his Index
 	var int						fLastHSC;				//  His last AAR Headshots Ammout
+};
+
+struct HEVersionInfo
+{
+	var string					ThisMutatorName;
+	var string					AuthorNickname;
+	var string					AuthorSteamcommunityURL;
+	var string					Version;
+	var string					LastUpdate;
 };
 
 enum HUDCrosshairStatus
@@ -76,27 +89,10 @@ enum AsCMode
 	AsC_OnlyDot
 };
 
-enum HE_FinalSkills
-{
-	NotInit,
-	Medic_GlobalHealing,
-	Medic_SelfProtection
-};
-
 struct HE_HUDReplicationInfo
 {
 	var class<KFPerk>			PlayerPerk;
-	
-	var HE_FinalSkills			PlayerSkill;
-	var bool					bCanUseFinalSkill;
-	
-	var float					Energy;
 };
-
-//struct HE_HUDServerVariable
-//{
-	//
-//};
 
 defaultproperties
 {

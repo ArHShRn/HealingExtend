@@ -4,34 +4,29 @@
 //
 // Code And Concept By ArHShRn
 // http://steamcommunity.com/id/ArHShRn/
-// Version 0.1.3
-// Last Update Date Aug.5th 2017
+// Version Release 1.0.1
+// -Remove skill stuffs
+// -Remove perk HUDs, make it a Standard ver
+// Last Update Date Aug.31th 2017
 //=============================================================================
 class HE_HUDBase extends KFGFxHudWrapper
 	DependsOn(HE_DataStructure)
-	Config(HealingExtend);
+	Config(HE_HUDBase);
 
 //*********************************************************
 //* Variables
 //*********************************************************
+//Mutator Version Info
+var config HEVersionInfo HEVI;
+var HEVersionInfo Editable_HEVI;
+
+//System
 var float				LastX,LastY,StartX,StartY;
-var bool				bDrawDebug;
-var bool				bDrawDebugPI;
+
 var bool				bASSAim;
-var bool				bIsPlayerDead;
-
-var bool				bDrawEnergyBar;
-
-var bool				bPlayerPressedQ;
-var bool				bDrawSkillMsg;
-var string				SkillNotification;
-
-var bool				EnergyTextFlag;
-var bool				EnergyTextFlagTimerFlag;
 
 var float				ScreenX, ScreenY;
 var float				PresetX, PresetY;
-var float				EnergyBarPercent;
 
 var int					Default_HurtHealthRateNotify;
 var int					Default_CriticalHealthRateNotify;
@@ -39,6 +34,17 @@ var int					Default_CriticalHealthRateNotify;
 var HUDCrosshairStatus	HECS;
 var AsCMode				CSMode;
 
+//Status
+var bool				bIsPlayerDead;
+
+//Debug
+var bool				bDrawDebug;
+var bool				bDrawDebugPI;
+
+//Tests
+var int					PicAnimFlag;
+
+//Colors
 var color				Default_MainHUDColor;
 var color				Default_DebugHUDColor;
 var color				Default_CrosshairColor;
@@ -47,6 +53,9 @@ var color				Default_OverclockedArmorColor;
 var color				Default_LowSeverityColor;
 var color				Default_CriticalSeverityColor;
 var color				Default_EnergyBarColor;
+
+//Textures
+var Texture2D			TestIcon;
 
 //*********************************************************
 //* Configs
@@ -63,12 +72,14 @@ var config int			CriticalHealthRateNotify;
 
 var config color		MainHUDColor;
 var config color		DebugHUDColor;
+
 var config color		CrosshairColor;
+
 var config color		OverclockedHealthColor;
 var config color		OverclockedArmorColor;
+
 var config color		LowSeverityColor;
 var config color		CriticalSeverityColor;
-var config color		EnergyBarColor;
 
 //*********************************************************
 //* Initialization
@@ -84,17 +95,19 @@ Event PreBeginPlay()
 
 simulated function PostBeginPlay()
 {	
-	//First. log roles to debug
-	`log("[HE_HUD:"$WorldInfo.NetMode$"]Spawn a new HUD name="$Name$" Owner="$Owner);
-	`log("[HE_HUD:"$WorldInfo.NetMode$"]This HUD Role="$Role);
-	`log("[HE_HUD:"$WorldInfo.NetMode$"]This HUD RemoteRole="$RemoteRole);
-	`log("[HE_HUD:"$WorldInfo.NetMode$"]This HUD bNetOwner="$bNetOwner);
-	
 	super.PostBeginPlay();
 }
 
 function InitBasicValues()
 {
+	//Muatator Version Info
+	Editable_HEVI.ThisMutatorName="HE_HUDBase";
+	Editable_HEVI.AuthorNickname="ArHShRn";
+	Editable_HEVI.AuthorSteamcommunityURL="http://steamcommunity.com/id/ArHShRn/";
+	Editable_HEVI.Version="Release 1.0.1";
+	Editable_HEVI.LastUpdate="Sept.15th 2017 07:31 AM";
+	HEVI=Editable_HEVI;
+	
 	bInitedConfig=True;
 	ASSAim_Width=3.0f;
 	ASSAim_Length=8.0f;
@@ -114,8 +127,6 @@ function InitBasicValues()
 	OverclockedHealthColor=Default_OverclockedHealthColor; //Original blue
 	LowSeverityColor=Default_LowSeverityColor; //Yellow
 	CriticalSeverityColor=Default_CriticalSeverityColor; //Red
-	EnergyBarColor=Default_EnergyBarColor; //Bg Color !!!!!!!
-	
 }
 //*********************************************************
 //* Misc
@@ -138,34 +149,6 @@ function Print( string message, optional bool autoPrefix = true )
 	{
 		LocalGVC.ViewportConsole.OutputTextLine(message);
 	}
-}
-
-//Set EnergyTextFlag to simulate the anim of flash
-simulated function SetEnergyTextFlag()
-{
-	EnergyTextFlag=!EnergyTextFlag;
-}
-
-//Final skill
-simulated function FinalSkill()
-{
-	Print("Triggered Final Skill!");
-}
-
-//Draw skill used notify
-simulated function DrawSkillMsg(string Msg, optional int MsgLifTime=5)
-{
-	bDrawSkillMsg=True;
-	
-	SkillNotification=Msg;
-	
-	SetTimer(MsgLifTime, False, 'ClearDrawSkillMsgFlag');
-}
-
-//Clear global msg notification
-simulated function ClearDrawSkillMsgFlag()
-{
-	bDrawSkillMsg=False;
 }
 
 //*********************************************************
@@ -237,24 +220,6 @@ exec function HuanZhunXin()
 {
 	ChangeAsCMode();
 }
-
-exec function SetDebugEnergyBarPercent(float aNumber)
-{
-	EnergyBarPercent=aNumber;
-}
-
-exec function FangDaZhao()
-{
-	bPlayerPressedQ=True;
-}
-
-//---------------------Subclass Interfaces------------------------
-exec function TriggerFinalSkill()
-{
-	EnergyBarPercent=0.f;
-	FinalSkill();
-}
-exec function TriggerOptionalSkill();
 
 //*********************************************************
 //* Tests
@@ -460,82 +425,11 @@ function DrawASC()
 		}
 		DrawAsCAim(bASSAim, CSMode);
 	}
-	else if(PlayerOwner.Pawn.Health <= 0)
+	else if(PlayerOwner.Pawn != none && PlayerOwner.Pawn.Health <= 0)
 	{
 		bIsPlayerDead=True;
 		HECS=HE_Player_Dead;
 	}
-}
-
-//Draw Energy Bar
-function DrawEnergyBar(float BarPercentage, float BarLength, Color BarColor)
-{
-	local float fStartX, fStartY;
-	local float LX, LY;
-	
-	fStartX=CenterX - ScreenX*0.15f; //0.3f is the length of the bar
-	fStartY=ScreenY*0.85;
-	
-	Canvas.Font = class'KFGameEngine'.Static.GetKFCanvasFont();
-	Canvas.StrLen("Press Q to Release!", LX, LY);
-	
-	//background for status bar
-	Canvas.SetDrawColorStruct(EnergyBarColor);
-	
-	Canvas.SetPos(fStartX, fStartY);
-	//Left vertical
-	Canvas.DrawRect(1, LY+2);
-	//Up horizonal
-	Canvas.DrawRect(ScreenX*0.3f, 1);
-	
-	Canvas.SetPos(fStartX, fStartY+LY+2);
-	//Down horizonal
-	Canvas.DrawRect(ScreenX*0.3f, 1);
-	
-	Canvas.SetPos(fStartX+ScreenX*0.3f, fStartY);
-	//Right vertical
-	Canvas.DrawRect(1, LY+2);
-
-	//Forground for status bar, which means a baaaaaar that indicate the percent
-	if(BarPercentage == 1.f)
-		Canvas.SetDrawColor(78, 238, 148, 255);
-	else
-		Canvas.SetDrawColorStruct(BarColor);
-	Canvas.SetPos(fStartX + 1 , fStartY + 2);  // Adjust pos for border
-	Canvas.DrawTile(PlayerStatusBarBGTexture, (ScreenX*0.3f - 2.f) * BarPercentage, LY-2, 0, 0, 32, 32);
-	
-	//Notify player if it's full energy
-	//Pos is at the right up of the bar, but at CenterX
-	Canvas.SetPos(CenterX - LX*0.5, fStartY);
-	
-	//Draw Flash Anim
-	if(EnergyTextFlagTimerFlag && BarPercentage==1.f)
-	{
-		SetTimer(0.5f, True, 'SetEnergyTextFlag');
-		EnergyTextFlagTimerFlag=False;
-	}
-	if( !EnergyTextFlagTimerFlag && BarPercentage!=1.f)
-	{
-		SetTimer(0.f, False, 'SetEnergyTextFlag');
-		EnergyTextFlag=False;
-		EnergyTextFlagTimerFlag=True;
-	}
-	if(EnergyTextFlag)
-	{
-		Canvas.SetDrawColor(255, 48, 48, 192);
-		Canvas.DrawText("Press Q to Release!");
-	}
-}
-
-//Draw skill used notify
-simulated function FuncDrawSkillMsg()
-{
-	local float LX, LY;
-	Canvas.Font = class'KFGameEngine'.Static.GetKFCanvasFont();
-	Canvas.SetDrawColorStruct(MainHUDColor);
-	Canvas.StrLen(SkillNotification, LX, LY);
-	Canvas.SetPos(CenterX - LX*0.5f, CenterY*0.45f - LY);
-	Canvas.DrawText(SkillNotification);
 }
 
 /*Rewrite sth in super.super class, just copy the
@@ -594,16 +488,6 @@ function DrawHUD()
 	//Draw Assistant Crosshair
 	DrawASC();
 	//----------------------------------Main HE_HUD Customized Draw Flow Put Here!-----------------------------
-	DrawHE_Main(StartX, StartY, LastX, LastY);
-	
-	if(bDrawEnergyBar)
-		DrawEnergyBar(EnergyBarPercent, 80.f, Default_OverclockedHealthColor);
-	
-	if(bDrawSkillMsg)
-		FuncDrawSkillMsg();
-	
-	if(bDrawDebug)
-		DrawDebug(LastX, LastY);
 	if(bDrawDebugPI)
 	{
 		DrawDebugHumanPlayerInfo();
@@ -627,7 +511,10 @@ function DrawHUD()
 				PlayerPartyInfoLocation = KFPH.Mesh.GetPosition() + ( KFPH.CylinderComponent.CollisionHeight * vect(0,0,1) );
 				if(`TimeSince(KFPH.Mesh.LastRenderTime) < 0.2f && Normal(PlayerPartyInfoLocation - ViewLocation) dot ViewVector > 0.f )
 				{
-					DrawPlayerHealthLowIcon(KFPH, False);
+					if(KFPlayerOwner.GetPerk().GetPerkClass()==class'KFPerk_FieldMedic')
+						Medic_DrawPlayerHealthLowIcon(KFPH, False);
+					else
+						DrawPlayerHealthLowIcon(KFPH, False);
 					if( DrawFriendlyHumanPlayerInfo(KFPH) )
 					{
 						VisibleHumanPlayers.AddItem( KFPH.PlayerReplicationInfo );
@@ -750,6 +637,76 @@ simulated function bool DrawPlayerHealthLowIcon(KFPawn_Human KFPH, optional bool
 	return False;
 }
 
+//Medic Only
+//Draw need healing icon when player's health is low
+//Rewrite to fit medic healing patterns
+simulated function bool Medic_DrawPlayerHealthLowIcon(KFPawn_Human KFPH, optional bool isDebug)
+{
+	local float LX, LY;
+	local string NotifyText;
+	local vector ScreenPos, TargetLocation;
+	local KFPlayerReplicationInfo KFPRI;
+	
+	//If teammates dont need healing, return
+	if(KFPH.Health >= KFPH.HealthMax)
+		return false;
+		
+	NotifyText=" ";
+
+	KFPRI = KFPlayerReplicationInfo(KFPH.PlayerReplicationInfo);
+
+	if( KFPRI == none )
+	{
+		return false;
+	}
+	
+	if(isDebug)
+	{
+		ScreenPos.X = CenterX;
+		ScreenPos.Y = CenterY;
+	}
+	else
+	{
+		TargetLocation = KFPH.Mesh.GetPosition() + ( KFPH.CylinderComponent.CollisionHeight * vect(0,0,1.1f) );
+		ScreenPos = Canvas.Project( TargetLocation );
+	}
+	
+	if( ScreenPos.X < 0 || ScreenPos.X > Canvas.SizeX || ScreenPos.Y < 0 || ScreenPos.Y > Canvas.SizeY )
+	{
+		return false;
+	}
+	
+	//Init draw pattern
+	Canvas.Font = class'KFGameEngine'.Static.GetKFCanvasFont();
+	if( KFPH.Health <= KFPH.HealthMax)
+	{
+		Canvas.SetDrawColor(220, 220, 220, 192);
+		Canvas.StrLen("Notify", LX, LY);
+		NotifyText="Notify";
+	}
+	if( KFPH.Health <= HurtHealthRateNotify)
+	{
+		Canvas.SetDrawColorStruct(LowSeverityColor);
+		Canvas.StrLen("Hurt", LX, LY);
+		NotifyText="Hurt";
+	}
+	if( KFPH.Health <= CriticalHealthRateNotify)
+	{
+		Canvas.SetDrawColorStruct(CriticalSeverityColor);
+		Canvas.StrLen("Dying", LX, LY);
+		NotifyText="Dying";
+	}
+	
+	//Draw need healing icon and text
+	Canvas.SetPos(ScreenPos.X - 10.f, ScreenPos.Y - 10.f);
+	Canvas.DrawTile(class'KFPerk_FieldMedic'.default.PerkIcon, 20.f * FriendlyHudScale, 20.f * FriendlyHudScale, 0, 0, 256, 256 );
+	Canvas.SetPos(ScreenPos.X - LX*0.5f, ScreenPos.Y + 2.f + 10.f);
+	Canvas.DrawText(NotifyText);
+	
+	return True;
+}
+
+//HE_HUD's bar drawing
 //Re-work sth at DrawKFBar, draw a transparent but sketched tile
 simulated function DrawKFBar( float BarPercentage, float BarLength, float BarHeight, float XPos, float YPos, Color BarColor )
 {
@@ -938,107 +895,29 @@ function DrawAsCAim(bool Enable, optional AsCMode mode=AsC_Default)
 	}	
 }
 
-//Draw debug info
-function DrawDebug(float X, float Y, optional out float LastLX, optional out float LastLY)
-{
-	local float LX, LY;
-	Canvas.Font = class'KFGameEngine'.Static.GetKFCanvasFont();
-	Canvas.SetDrawColorStruct(DebugHUDColor);
-	
-	Canvas.SetPos(X, Y);
-	Canvas.DrawText("---Healing Extend HUD Debug Info Inner---");
-	Canvas.StrLen("---Healing Extend HUD Debug Info Inner---", LX, LY);
-	LastLY=Y+LY;
-	LastLX=X;
-
-	Canvas.SetPos(LastLX, LastLY);
-//	Canvas.DrawText("---Healing Extend HUD Debug Info Inner---");
-	Canvas.DrawText("   ThisHUD="$self.Name,, 1.0f, 1.0f);
-	LastLY=LastLY+LY;
-
-	Canvas.SetPos(LastLX, LastLY);
-//	Canvas.DrawText("---Healing Extend HUD Debug Info Inner---");
-	Canvas.DrawText("   ThisHUD.Role="$self.Role,, 1.0f, 1.0f);
-	LastLY=LastLY+LY;
-	
-	Canvas.SetPos(LastLX, LastLY);
-//	Canvas.DrawText("---Healing Extend HUD Debug Info Inner---");
-	Canvas.DrawText("   ThisHUD.RemoteRole="$self.RemoteRole,, 1.0f, 1.0f);
-	LastLY=LastLY+LY;
-
-	Canvas.SetPos(LastLX, LastLY);
-//	Canvas.DrawText("---Healing Extend HUD Debug Info Inner---");
-	Canvas.DrawText("   Owner="$Owner.Name,, 1.0f, 1.0f);
-	LastLY=LastLY+LY;
-	
-	Canvas.SetPos(LastLX, LastLY);
-//	Canvas.DrawText("---Healing Extend HUD Debug Info Inner---");
-	Canvas.DrawText("   Owner.Role="$Owner.Role,, 1.0f, 1.0f);
-	LastLY=LastLY+LY;
-	
-	Canvas.SetPos(LastLX, LastLY);
-//	Canvas.DrawText("---Healing Extend HUD Debug Info Inner---");
-	Canvas.DrawText("   Owner.RemoteRole="$Owner.RemoteRole,, 1.0f, 1.0f);
-	LastLY=LastLY+LY;
-}
-
-//Draw right side hud info Main
-function DrawHE_Main(float X, float Y, optional out float LastLX, optional out float LastLY)
-{
-	local float LX, LY;
-	Canvas.Font = class'KFGameEngine'.Static.GetKFCanvasFont();
-	Canvas.SetDrawColorStruct(MainHUDColor);
-	
-	Canvas.SetPos(X, Y);
-	//Canvas.DrawText("---Healing Extend HUD Info---",, HUDMainTextScale, HUDMainTextScale);
-	Canvas.StrLen("---Healing Extend HUD Info---", LX, LY);
-	LastLY=Y+LY;
-	LastLX=X;
-
-	Canvas.SetPos(LastLX, LastLY);
-//	Canvas.DrawText("---Healing Extend HUD Info---");
-	Canvas.DrawText(" _>"$Int(ScreenX)$" x "$Int(ScreenY),, HUDMainTextScale, HUDMainTextScale);
-	LastLY=LastLY+LY;
-	
-	Canvas.SetPos(LastLX, LastLY);
-//	Canvas.DrawText("---Healing Extend HUD Info---");
-	Canvas.DrawText(" _>"$WorldInfo.NetMode,, HUDMainTextScale, HUDMainTextScale);
-	LastLY=LastLY+LY;
-
-	
-	//Canvas.SetPos(LastLX, LastLY);
-////	Canvas.DrawText("---Healing Extend HUD Info---");
-	//Canvas.DrawText(" _>"$KFPlayerOwner.PlayerReplicationInfo.PlayerName,, HUDMainTextScale, HUDMainTextScale);
-	//LastLY=LastLY+LY;
-	
-	//Canvas.SetPos(LastLX, LastLY);
-////	Canvas.DrawText("---Healing Extend HUD Info---");
-	//Canvas.DrawText(" _>Is now alive:"$!bIsPlayerDead,, HUDMainTextScale, HUDMainTextScale);
-	//LastLY=LastLY+LY;
-	
-	Canvas.SetPos(LastLX, LastLY);
-//	Canvas.DrawText("---Healing Extend HUD Info---");
-	Canvas.DrawText(" _>"$HECS,, HUDMainTextScale, HUDMainTextScale);
-	LastLY=LastLY+LY;
-}
+////Draw animated png
+//function DrawAnimated()
+//{
+	//if(PicAnimFlag==3584)
+		//PicAnimFlag=0;
+//
+	//Canvas.SetPos(CenterX, CenterY);
+	//Canvas.DrawTile(TestIcon, 64, 64, 0, PicAnimFlag, 64, 64);
+	//
+	//PicAnimFlag += 64;
+//}
 
 //Default Properties
 defaultproperties
-{
+{	
+	PicAnimFlag=0;
+	
 	bDrawDebug=False
 	bDrawDebugPI=False
 	bASSAim=True
 	CSMode=AsC_Default;
 	bIsPlayerDead=False
 	HECS=HE_NoneInit
-	
-	bDrawEnergyBar=False;
-	
-	bDrawSkillMsg=False;
-	bPlayerPressedQ=False;
-	
-	EnergyTextFlag=False;
-	EnergyTextFlagTimerFlag=True;
 	
 	Default_HurtHealthRateNotify=85;
 	Default_CriticalHealthRateNotify=50; //Need asking people
@@ -1050,12 +929,9 @@ defaultproperties
 	Default_OverclockedHealthColor=(R=95, G=210, B=255, A=192) //Original blue
 	Default_LowSeverityColor=(R=255, G=255, B=0, A=192); //Yellow
 	Default_CriticalSeverityColor=(R=255, G=48, B=48, A=192); //Red
-	Default_EnergyBarColor=(R=248, G=248, B=255, A=192)//Ghost White
 	
 	PresetX=0.039f
 	PresetY=0.28f
-	
-	//RemoteRole=Role_SimulatedProxy
 	
 	ArmorColor=(R=238, G=233, B=233, A=192)//Snow
 	HealthColor=(R=255, G=20, B=147, A=192)//Deep Pink
