@@ -4,7 +4,7 @@ Pharrahnox<br>
 Teriyakisaurus Rex<br>
 Blackout<br>
 
-# What's the changes in Release 1.0.1 ?
+# What are the changes in Release 1.0.1 ?
 ## It adds
 -Standard no hud version, back to original experience(but with bugs on health bar because of TWI's coding)<br>
 ## It removes
