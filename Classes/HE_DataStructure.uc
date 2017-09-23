@@ -44,7 +44,6 @@ class HE_DataStructure extends Object
 */
 struct HEPlayer
 {
-	//
 	var Pawn					pShotTarget;			//	A shot target pawn he owns, Use to avoidi checking ShotTarget frequently
 	var Pawn					LastTarget;				//	His last zed target
 	var KFWeapon				KFWeap;					//  His Weap in hand
@@ -54,10 +53,13 @@ struct HEPlayer
 	var KFPawn_Human			KFPH;					//	His KFPawn_Human
 	
 	var HE_HUDManager			HUDManager;				//	His HUD Manager
+	var HE_ChatController		ChatController;			//  His Chat Controller
 	var class<KFPerk>			LastPerk;
 	
 	var int						Index;					//  Shows his Index
 	var int						fLastHSC;				//  His last AAR Headshots Ammout
+	var float					HealthDecrement;		//  Temply stores the health
+	var float					ArmorDecrement;			//  Temply stores the armor
 };
 
 struct HEVersionInfo
@@ -67,6 +69,13 @@ struct HEVersionInfo
 	var string					AuthorSteamcommunityURL;
 	var string					Version;
 	var string					LastUpdate;
+};
+
+struct HECommand
+{
+	var string					CommandHead;
+	var string					Argument;
+	var string					Parameter;
 };
 
 enum HUDCrosshairStatus

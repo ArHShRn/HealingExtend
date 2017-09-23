@@ -46,7 +46,6 @@ var config int				HealthHealingAmount;
 var config int				ArmourHealingAmount;
 var config int				AmmoRecoverAmout;
 var config int				BonusDosh;
-var config int				HealingMode;
 var config int				OverclockLimitHealth;
 var config int				OverclockLimitArmour;
 
@@ -131,11 +130,10 @@ function InitBasicMutatorValues()
 
 	//Gameplay Settings
 	BonusDosh=50; 
-	HealingMode=0;
 	AmmoRecoverAmout=1;
 	fCurrentRegenRate=40.0;
-	HealthHealingAmount=3; 
-	ArmourHealingAmount=5;
+	HealthHealingAmount=12; 
+	ArmourHealingAmount=20;
 	OverclockLimitHealth=175; 
 	OverclockLimitArmour=200;
 }
@@ -176,6 +174,9 @@ function ReInitPlayersArry(Pawn P=None)
 		{
 			//Update his new KFPH into the array
 			Players[InGamePlayerIndex].KFPH=PlayerKFPH;
+			//Update his health and armor for decrement
+			Players[InGamePlayerIndex].HealthDecrement=float(Players[InGamePlayerIndex].KFPC.Pawn.Health);
+			Players[InGamePlayerIndex].ArmorDecrement=float(Players[InGamePlayerIndex].KFPH.Armor);
 			
 			//Set its perk class
 			Players[InGamePlayerIndex].LastPerk=PlayerKFPC.GetPerk().GetPerkClass();
@@ -186,7 +187,11 @@ function ReInitPlayersArry(Pawn P=None)
 			`log("[HER:"$WorldInfo.NetMode$"]Spawned a new HUDManager="$Players[InGamePlayerIndex].HUDManager.Name);
 			Players[InGamePlayerIndex].HUDManager.ClientSetHUD();
 			`Log("[HE_Recover]["$InGamePlayerIndex$"]"$" Respawned and Pawn updated");
-			//PlayerKFPC.ServerSay("I Respawned ;)");
+			
+			//Set his new HECC
+			Players[InGamePlayerIndex].ChatController = Spawn(class'HE_ChatController', PlayerKFPH.Controller);
+			Players[InGamePlayerIndex].ChatController.ClientSetHE_Main(self);
+			`log("[HER:"$WorldInfo.NetMode$"]Spawned a new ChatController="$Players[InGamePlayerIndex].ChatController.Name);
 		}
 	}
 }
@@ -216,6 +221,8 @@ function AddHimIntoPlayers(Pawn P)
 	instance.KFPC=PlayerKFPC;
 	instance.KFPH=PlayerKFPH;
 	instance.LastPerk=PlayerKFPC.GetPerk().GetPerkClass();
+	instance.HealthDecrement=float(PlayerKFPC.Pawn.Health);
+	instance.ArmorDecrement=float(PlayerKFPH.Armor);
 	
 	//Set Player's HUD
 	//First spawn a manager and set owner to this Pawn's player
@@ -223,6 +230,11 @@ function AddHimIntoPlayers(Pawn P)
 	instance.HUDManager = Spawn(class'HE_HUDManager', PlayerKFPH.Controller);
 	`log("[HER:"$WorldInfo.NetMode$"]Spawned a new HUDManager="$instance.HUDManager.Name);
 	instance.HUDManager.ClientSetHUD();
+	
+	//Set Player's HECC
+	instance.ChatController = Spawn(class'HE_ChatController', PlayerKFPH.Controller);
+	instance.ChatController.ClientSetHE_Main(self);
+	`log("[HER:"$WorldInfo.NetMode$"]Spawned a new ChatController="$instance.ChatController.Name);
 	
 	`log("[HER:"$WorldInfo.NetMode$"]End ModifyPlayer function.");
 	Players.AddItem(instance);
@@ -248,66 +260,56 @@ function SetHLimitFlag()
 //*************************************************
 //*  Main Func
 //*************************************************
+//Headshot Recover Function
 function HeadshotRecover(int i)
 {
-	//0 for both
-	if(HealingMode==0)
-	{	
-		if(bAllowOverClocking)
-		{
-			Players[i].KFPC.Pawn.Health=Min(Players[i].KFPC.Pawn.Health+HealthHealingAmount, OverclockLimitHealth);
-			Players[i].KFPH.Armor=Min(Players[i].KFPH.Armor+ArmourHealingAmount, OverclockLimitArmour);
-		}
+	if(bAllowOverClocking)
+	{
+		//Health
+		if(Players[i].KFPC.Pawn.Health > Players[i].KFPC.Pawn.HealthMax)
+			Players[i].KFPC.Pawn.Health=Min(Players[i].KFPC.Pawn.Health+3*HealthHealingAmount, OverclockLimitHealth);
 		else
-		{
-			Players[i].KFPC.Pawn.Health=Min
-			(
+			Players[i].KFPC.Pawn.Health=Min(Players[i].KFPC.Pawn.Health+HealthHealingAmount, OverclockLimitHealth);
+		//Armor
+		if(Players[i].KFPH.Armor > Players[i].KFPH.MaxArmor)
+			Players[i].KFPH.Armor=Min(Players[i].KFPH.Armor+5*ArmourHealingAmount, OverclockLimitArmour);
+		else
+			Players[i].KFPH.Armor=Min(Players[i].KFPH.Armor+ArmourHealingAmount, OverclockLimitArmour);
+	}
+	else
+	{
+		//Health default state
+		Players[i].KFPC.Pawn.Health=Min
+		(
 			Players[i].KFPC.Pawn.Health+HealthHealingAmount, 
 			Players[i].KFPC.Pawn.HealthMax
-			);
-	
-			//need to know max armor ammount
-			Players[i].KFPH.Armor=Min(Players[i].KFPH.Armor+ArmourHealingAmount, 175);
-		}
+		);
+		//Armor default state
+		Players[i].KFPH.Armor=Min
+		(
+			Players[i].KFPH.Armor+ArmourHealingAmount,
+			Players[i].KFPH.MaxArmor
+		);
 	}
-	//1 for health only
-	if(HealingMode==1)
-	{
-		if(bAllowOverClocking)
-		{
-			Players[i].KFPC.Pawn.Health=Min(Players[i].KFPC.Pawn.Health+HealthHealingAmount, OverclockLimitHealth);
-		}
-		else
-		{
-			Players[i].KFPC.Pawn.Health=Min
-			(
-			Players[i].KFPC.Pawn.Health+HealthHealingAmount, 
-			Players[i].KFPC.Pawn.HealthMax
-			);
-		}
-	}
-	//2 for armor only
-	if(HealingMode==2)
-	{
-		if(bAllowOverClocking)
-		{
-			Players[i].KFPH.Armor=Min(Players[i].KFPH.Armor+ArmourHealingAmount, OverclockLimitArmour);
-		}
-		else
-		{
-			//need to know max armor ammount
-			Players[i].KFPH.Armor=Min(Players[i].KFPH.Armor+ArmourHealingAmount, 175);
-		}
-	}
+	//Need to update Decrement every recovery
+	Players[i].HealthDecrement=Players[i].KFPC.Pawn.Health;
+	Players[i].ArmorDecrement=Players[i].KFPH.Armor;
 }
 
+//Add player dosh function
 function AddPlayerDosh(int i)
 {
 	KFPlayerReplicationInfo(Players[i].KFPC.PlayerReplicationInfo).AddDosh(BonusDosh);
 }
 
-function TickMutRecover(int i)
+//Tick Mutator
+function TickMutRecover(int i, float DeltaTime)
 {
+	//Tick check console command
+	Players[i].ChatController.Complete();
+	
+	//Tick overclock armor and health Decrement
+	
 	//Set his pShotTarget to his ShotTarget
 	Players[i].pShotTarget=Players[i].KFPC.ShotTarget;
 		
@@ -398,6 +400,7 @@ function TickMutRecover(int i)
 //*************************************************
 //*  Tick Time Update
 //*************************************************
+//Tick event
 Event Tick(float DeltaTime)
 {
 	local int i;
@@ -405,11 +408,34 @@ Event Tick(float DeltaTime)
 	//ForEach Player in Players Array
 	for(i=1; i<=PlayerNumber; ++i)
 	{		
-		TickMutRecover(i);
+		TickMutRecover(i, DeltaTime);
+		//OverclockDecrement(DeltaTime, Players[i]);
 	}
 		
 	super.Tick(DeltaTime);
 }
+
+////Player's overclocked health and armor decrement
+//function OverclockDecrement(float DeltaTime, HEPlayer OnePlayer)
+//{
+	////If there's no OnePlayer then return
+	//if(None == OnePlayer.KFPH)
+		//return;
+	//
+	////Check health and armor state
+	//if(OnePlayer.KFPC.Pawn.Health > OnePlayer.KFPC.Pawn.HealthMax)
+	//{
+		//OnePlayer.HealthDecrement=Max(float(OnePlayer.KFPC.Pawn.HealthMax), OnePlayer.HealthDecrement-DeltaTime * 3);
+		//OnePlayer.KFPC.Pawn.Health=int(OnePlayer.HealthDecrement);
+	//}
+	//
+	//if(OnePlayer.KFPH.Armor > OnePlayer.KFPH.MaxArmor)
+	//{
+		//OnePlayer.ArmorDecrement=Max(float(OnePlayer.KFPH.MaxArmor), OnePlayer.ArmorDecrement-DeltaTime * 5);
+		//OnePlayer.KFPH.Armor=int(OnePlayer.ArmorDecrement);
+	//}
+//}
+
 
 defaultproperties
 {

@@ -101,6 +101,11 @@ simulated function GetKFPC()
 	}
 }
 
+simulated function AddChatLine(string str)
+{
+	KFPlayerOwner.MyGFxHUD.HudChatBox.AddChatMessage(str, class 'KFLocalMessage'.default.EventColor);
+}
+
 //*************************************************************
 //* Misc (Also contains some misc client & server function)
 //*************************************************************

@@ -55,7 +55,9 @@ var color				Default_CriticalSeverityColor;
 var color				Default_EnergyBarColor;
 
 //Textures
-var Texture2D			TestIcon;
+var Texture2D			Crosshair1;
+var Texture2D			FleshpoundIcon;
+var Texture2D			ScrakeIcon;
 
 //*********************************************************
 //* Configs
@@ -134,7 +136,7 @@ function InitBasicValues()
 
 //A function by Blackout's CD
 //Print sth in console
-function Print( string message, optional bool autoPrefix = true )
+simulated function Print( string message, optional bool autoPrefix = true )
 {
 	local GameViewportClient LocalGVC;
 
@@ -151,6 +153,10 @@ function Print( string message, optional bool autoPrefix = true )
 	}
 }
 
+simulated function AddChatLine(string str)
+{
+	KFPlayerOwner.MyGFxHUD.HudChatBox.AddChatMessage(str, class 'KFLocalMessage'.default.EventColor);
+}
 //*********************************************************
 //* Exec
 //*********************************************************
@@ -181,10 +187,12 @@ exec function ToggleAsC()
 	bASSAim=!bASSAim;
 	if(bASSAim)
 	{
+		AddChatLine("Enable Crosshair Draw");
 		Print("Enable Crosshair Draw");
 	}
 	else
 	{
+		AddChatLine("Close Crosshair Draw");
 		Print("Close Crosshair Draw");
 	}	
 }
@@ -198,27 +206,22 @@ exec function ZhunXin()
 //Console command to change AsC draw mode
 exec function ChangeAsCMode()
 {
-	if(CSMode==AsC_Default)
-	{
-		CSMode=AsC_CenterDot;
-		Print("Enable CenterDot AsC");
-	}
-	else if(CSMode==AsC_CenterDot)
-	{
-		CSMode=AsC_OnlyDot;
-		Print("Enable OnlyDot AsC");
-	}
-	else if(CSMode==AsC_OnlyDot)
-	{
-		CSMode=AsC_Default;
-		Print("Enable Default AsC");
-	}
-}
-
-//Console command CHN to change AsC draw mode
-exec function HuanZhunXin()
-{
-	ChangeAsCMode();
+	//if(CSMode==AsC_Default)
+	//{
+		//CSMode=AsC_CenterDot;
+		//Print("Enable CenterDot AsC");
+	//}
+	//else if(CSMode==AsC_CenterDot)
+	//{
+		//CSMode=AsC_OnlyDot;
+		//Print("Enable OnlyDot AsC");
+	//}
+	//else if(CSMode==AsC_OnlyDot)
+	//{
+		//CSMode=AsC_Default;
+		//Print("Enable Default AsC");
+	//}
+	Print("Crosshair pattern can't be changed in this version!");
 }
 
 //*********************************************************
@@ -367,6 +370,7 @@ simulated function bool DrawDebugHumanPlayerInfo()
  avoid being scaled usually when you see a friendly pawn in your
  viewport, still despite the original crosshair if user close it,
  make it completely a separated crosshair */
+//Release 1.0.2: Add reload notification
 function DrawASC()
 {
 	local KFPawn KFP;
@@ -423,7 +427,7 @@ function DrawASC()
 			HECS=HE_Player_SpecialMoveDontAllow;
 			return;
 		}
-		DrawAsCAim(bASSAim, CSMode);
+		DrawAsCAim(bASSAim, KFWP, CSMode);
 	}
 	else if(PlayerOwner.Pawn != none && PlayerOwner.Pawn.Health <= 0)
 	{
@@ -434,6 +438,7 @@ function DrawASC()
 
 /*Rewrite sth in super.super class, just copy the
   super class's code */
+//DrawHUD main function
 function DrawHUD()
 {
 	//local vector ViewPoint;
@@ -485,14 +490,14 @@ function DrawHUD()
         DrawCrosshair();
     }
 
-	//Draw Assistant Crosshair
-	DrawASC();
 	//----------------------------------Main HE_HUD Customized Draw Flow Put Here!-----------------------------
 	if(bDrawDebugPI)
 	{
 		DrawDebugHumanPlayerInfo();
 		DrawPlayerHealthLowIcon(KFPawn_Human(KFPlayerOwner.Pawn), True);
 	}
+	//Draw Assistant Crosshair
+	DrawASC();
 	//---------------------------------------------------------------------------------------------------------
     // Friendly player status
     if( PlayerOwner.GetTeamNum() == 0 )
@@ -862,7 +867,9 @@ simulated function bool DrawFriendlyHumanPlayerInfo(KFPawn_Human KFPH)
 }
 
 //A function that draw an assistant crosshair despite of the original
-function DrawAsCAim(bool Enable, optional AsCMode mode=AsC_Default)
+//Release 1.0.2: Remove some modes, add reload notification
+//Draw a crosshair through a pic from .upk
+function DrawAsCAim(bool Enable, KFWeapon KFW, optional AsCMode mode=AsC_Default)
 {
 	if(!Enable)
 	{
@@ -871,28 +878,43 @@ function DrawAsCAim(bool Enable, optional AsCMode mode=AsC_Default)
 	}
 	HECS=HE_Good;
 	Canvas.SetDrawColorStruct(CrosshairColor);
+	Canvas.Font = class'KFGameEngine'.Static.GetKFCanvasFont();
 	
-	//Crosshair
-	if( mode==AsC_Default || mode==AsC_CenterDot)
-	{
-		//Up
-		Canvas.SetPos(CenterX-ASSAim_Width*0.5f, CenterY-ASSAim_Space-ASSAim_Length);
-		Canvas.DrawRect(ASSAim_Width,ASSAim_Length);
-		//Left
-		Canvas.SetPos(CenterX-ASSAim_Space-ASSAim_Length, CenterY-ASSAim_Width*0.5f);
-		Canvas.DrawRect(ASSAim_Length,ASSAim_Width);	
-		//Down
-		Canvas.SetPos(CenterX-ASSAim_Width*0.5f, CenterY+ASSAim_Space);
-		Canvas.DrawRect(ASSAim_Width,ASSAim_Length);
-		//Right
-		Canvas.SetPos(CenterX+ASSAim_Space, CenterY-ASSAim_Width*0.5f);
-		Canvas.DrawRect(ASSAim_Length,ASSAim_Width);
-	}
-	if( mode==AsC_CenterDot || mode==AsC_OnlyDot)
-	{
-		Canvas.SetPos(CenterX-1, CenterY-1);
-		Canvas.DrawRect(2, 2);
-	}	
+	Canvas.SetPos(CenterX-40, CenterY-40);
+	Canvas.DrawTile(Crosshair1, 80, 80, 0, 0, 256, 256);
+}
+
+//Draws a zed icon
+//re-work super class, adds FP SC Zedd's individual new UI Icon
+function DrawZedIcon( Pawn ZedPawn, vector PawnLocation )
+{
+    local vector ScreenPos, TargetLocation;
+    local float IconSizeMult;
+
+    TargetLocation = PawnLocation + ( vect(0,0,2.2f) * ZedPawn.CylinderComponent.CollisionHeight );
+    ScreenPos = Canvas.Project( TargetLocation );
+    IconSizeMult = PlayerStatusIconSize * FriendlyHudScale * 0.5f;
+    ScreenPos.X -= IconSizeMult;
+    ScreenPos.Y -= IconSizeMult;
+
+    if( ScreenPos.X < 0 || ScreenPos.X > Canvas.SizeX || 
+        ScreenPos.Y < 0 || ScreenPos.Y > Canvas.SizeY )
+    {
+        return;
+    }
+
+     //Draw icon
+    Canvas.SetDrawColorStruct( ZedIconColor );
+    Canvas.SetPos( ScreenPos.X, ScreenPos.Y );
+	//If zed's a FP
+	if(KFPawn_ZedFleshpound(ZedPawn) != None)
+		Canvas.DrawTile( FleshpoundIcon, 50, 50, 0, 0, 256, 256 );
+	//Or if zed's a SC
+	else if(KFPawn_ZedScrake(ZedPawn) != None)
+		Canvas.DrawTile( ScrakeIcon, 50, 50, 0, 0, 256, 256 );
+	//Or they're normal
+	else
+		Canvas.DrawTile( GenericZedIconTexture, PlayerStatusIconSize * FriendlyHudScale, PlayerStatusIconSize * FriendlyHudScale, 0, 0, 256, 256 );
 }
 
 ////Draw animated png
@@ -927,8 +949,8 @@ defaultproperties
 	Default_CrosshairColor=(R=255, G=48, B=48, A=192) //Red
 	Default_OverclockedArmorColor=(R=78, G=238, B=148, A=192) //Sea Green 2
 	Default_OverclockedHealthColor=(R=95, G=210, B=255, A=192) //Original blue
-	Default_LowSeverityColor=(R=255, G=255, B=0, A=192); //Yellow
-	Default_CriticalSeverityColor=(R=255, G=48, B=48, A=192); //Red
+	Default_LowSeverityColor=(R=255, G=255, B=0, A=192) //Yellow
+	Default_CriticalSeverityColor=(R=255, G=48, B=48, A=192) //Red
 	
 	PresetX=0.039f
 	PresetY=0.28f
@@ -943,5 +965,10 @@ defaultproperties
 	SupplierUsableColor=(R=255, G=0, B=0, A=192)
 	SupplierHalfUsableColor=(R=220, G=200, B=0, A=192)
 
-    ZedIconColor=(R=0, G=191, B=255, A=192)//Deep Sky Blue
+    ZedIconColor=(R=255, G=48, B=48, A=192)//Red  //(R=0, G=191, B=255, A=192) Deep Sky Blue
+    
+    Crosshair1=Texture2D'HE_Contents.Crosshair'
+	ScrakeIcon=Texture2D'HE_Contents.ZeddAlert'
+	FleshpoundIcon=Texture2D'HE_Contents.fleshpound'
+    GenericZedIconTexture=Texture2D'HE_Contents.ZeddAlert'
 }
