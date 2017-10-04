@@ -936,7 +936,7 @@ defaultproperties
 	
 	bDrawDebug=False
 	bDrawDebugPI=False
-	bASSAim=True
+	bASSAim=False
 	CSMode=AsC_Default;
 	bIsPlayerDead=False
 	HECS=HE_NoneInit

@@ -6,15 +6,14 @@ static simulated event EFilterTypeUI GetTraderFilter()
 	return FT_Assault;
 }
 
-
 defaultproperties
 {
 	// Healing charge
-    HealAmount=20 //Changed from 18 to 20
-	HealFullRechargeSeconds=4 //from 10 to 4
+    HealAmount=15
+	HealFullRechargeSeconds=10
 
 	// Inventory
-	InventorySize=1 //from 7 to 1
+	InventorySize=7
 	GroupPriority=100
 	WeaponSelectTexture=Texture2D'ui_weaponselect_tex.UI_WeaponSelect_MedicAssault'
 	SecondaryAmmoTexture=Texture2D'UI_SecondaryAmmo_TEX.MedicDarts'
@@ -49,17 +48,18 @@ defaultproperties
 	IronSightPosition=(X=12,Y=0,Z=0)
 
 	// Ammo
-	MagazineCapacity[0]=75 //increase from 30 to 35
-	SpareAmmoCapacity[0]=750 //decrease to 10 mags
-	InitialSpareMags[0]=4
+	MagazineCapacity[0]=30
+	SpareAmmoCapacity[0]=360 //13 -> 12 mags
+	InitialSpareMags[0]=3
 	bCanBeReloaded=true
 	bReloadFromMagazine=true
 
 	// Recoil
-	maxRecoilPitch=10 //200 to 150
-	minRecoilPitch=-10//150 to 100
-	maxRecoilYaw=10
-	minRecoilYaw=-10
+	//*0.8
+	maxRecoilPitch=160
+	minRecoilPitch=120
+	maxRecoilYaw=140
+	minRecoilYaw=-140
 	RecoilRate=0.085
 	RecoilMaxYawLimit=500
 	RecoilMinYawLimit=65035
@@ -77,13 +77,13 @@ defaultproperties
 	WeaponFireTypes(DEFAULT_FIREMODE)=EWFT_InstantHit
 	WeaponProjectiles(DEFAULT_FIREMODE)=class'KFProj_Bullet_AssaultRifle'
 	InstantHitDamageTypes(DEFAULT_FIREMODE)=class'KFDT_Ballistic_Assault_Medic'
-	FireInterval(DEFAULT_FIREMODE)=+0.05 // 650 to 1200
+	FireInterval(DEFAULT_FIREMODE)=+0.0857 // 700 RPM
 	Spread(DEFAULT_FIREMODE)=0.0085
-	InstantHitDamage(DEFAULT_FIREMODE)=30.0 //decrease 25%
+	InstantHitDamage(DEFAULT_FIREMODE)=48 //*1.2
 	FireOffset=(X=30,Y=4.5,Z=-5)
 
 	// ALTFIRE_FIREMODE
-	AmmoCost(ALTFIRE_FIREMODE)=10 //decrease 5%+
+	AmmoCost(ALTFIRE_FIREMODE)=27 //*0.9
 
 	// BASH_FIREMODE
 	InstantHitDamage(BASH_FIREMODE)=27
@@ -107,6 +107,6 @@ defaultproperties
 	bHasIronSights=true
 	bHasFlashlight=true
 
-   	AssociatedPerkClasses(0)=class'KFPerk_FieldMedic' //Only Medic
+   	AssociatedPerkClasses(0)=class'KFPerk_FieldMedic'
    	//AssociatedPerkClasses(1)=class'KFPerk_Commando'
 }

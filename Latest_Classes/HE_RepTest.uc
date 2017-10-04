@@ -1,15 +1,37 @@
+// Explanation:
+//	Replicated Event is called when the value marking "repnotify" is changed
+//	or we say, differs from Server Side or Client Side, and is called at the
+//	another side where the variable is replicated to.
+//	In this class we change only the variables on Server Side, and in Replication session,
+//	we make variables be replicated on Server Side to Client Side and the effects are:
+//
+//		1.ChangeValue Function is only called on server
+//		2.Two variables are replicated to client side
+//		3.Replication starts when SimulatedProxy's value differs from Authority
+//		4.ReplicatedEvent is called when replication has started
+//		5.In this class, variables are replicated to client side, so ReplicatedEvent is
+//			called on client side.
 class HE_RepTest extends Actor;
 
-var string					strTest;
-var int						intTest;
+var repnotify string		strTest;
+var repnotify int			intTest;
 
 Replication
 {
-	if(Role <= ROLE_Authority)
+	if(Role == ROLE_Authority)
 		strTest, intTest;
 }
 
-simulated function PostBeginPlay()
+simulated function ReplicatedEvent(name VarName)
+{
+	if(VarName == 'strTest')
+		`log("---[HE_RepTest::ReplicatedEvent]strTest has been replicated.");
+		
+	if(VarName == 'intTest')
+		`log("---[HE_RepTest::ReplicatedEvent]intTest has been replicated.");
+}
+
+function PostBeginPlay()
 {
 	intTest=0; strTest="Now:"$intTest;
 	super.PostBeginPlay();
@@ -22,20 +44,22 @@ reliable client function ClientPrint(int SevrerInt, string SevrerStr)
 	LocalGVC = class'Engine'.static.GetEngine().GameViewport;
 	if(LocalGVC == None)
 		return;
-		
+	
+	intTest++; strTest="Now:"$intTest;
 	LocalGVC.ViewportConsole.OutputTextLine("Client.strTest="$strTest);
 	LocalGVC.ViewportConsole.OutputTextLine("Client.intTest="$intTest);
-	LocalGVC.ViewportConsole.OutputTextLine("Server.strTest="$SevrerStr);
-	LocalGVC.ViewportConsole.OutputTextLine("Server.intTest="$SevrerInt);
+	LocalGVC.ViewportConsole.OutputTextLine("---Server.strTest="$SevrerStr);
+	LocalGVC.ViewportConsole.OutputTextLine("---Server.intTest="$SevrerInt);
+	LocalGVC.ViewportConsole.OutputTextLine(" ");
 }
 
 function ChangeValue()
 {
-	intTest++; strTest="Now:"$intTest;
 	ClientPrint(intTest, strTest);
+	//intTest++; strTest="Now:"$intTest;
 }
 
 defaultproperties
 {
-	RemoteRole=ROLE_SimulatedProxy
+	RemoteRole=ROLE_AutonomousProxy
 }

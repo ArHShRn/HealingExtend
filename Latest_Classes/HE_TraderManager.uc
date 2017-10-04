@@ -26,7 +26,7 @@ struct CustomizedWeap
 
 var config array<CustomizedWeap>	CustomizedWeaps;
 
-simulated function PostBeginPlay()
+simulated function PreBeginPlay()
 {
 	local CustomizedWeap instance;
 	
@@ -35,13 +35,22 @@ simulated function PostBeginPlay()
 	instance.dItemId=-1;
 	CustomizedWeaps.AddItem(instance);
 	
-	`log("[HE_TraderManager]CustomizedWeaps[0]="$CustomizedWeaps[0].WeapClassPath);
+	instance.DefClassPath="HealingExtend.WeapDef_HMT201";
+	instance.WeapClassPath="HealingExtend.Weap_HMT201";
+	instance.dItemId=-1;
+	CustomizedWeaps.AddItem(instance);
+	
+	ForEach CustomizedWeaps(instance)
+		`log("---[HE_TraderManager::PreBeginPlay]CustomizedWeaps="$instance.WeapClassPath);
+		
 	StaticSaveConfig();
+	
+	super.PreBeginPlay();
 }
 
 function StartSyncItem()
 {
-	`log("[HE_TraderManager]StartSyncItem Called.");
+	`log("---[HE_TraderManager::StartSyncItem]StartSyncItem Called.");
 	if(WorldInfo.NetMode != NM_Standalone)
 		CreateWeapon();
 	SetTimer(1.f, True, nameof(ClientSetSaleItems));
@@ -52,7 +61,6 @@ reliable client function ClientSetSaleItems()
 	//If it's synchronized between client and server
 	if(CreateWeapon())
 	{
-		`log("[HE_TraderManager]ClearTimer(nameof(ClientSetSaleItems)).");
 		ClearTimer(nameof(ClientSetSaleItems));
 	}
 }
@@ -72,7 +80,7 @@ simulated function bool CreateWeapon()
 	//`log("[HE_TraderManager]CreateWeapon Called.");
 	if(WorldInfo.GRI == None)
 	{
-		`log("[HE_TraderManager]WARNING: Accessed None GRI...");
+		`log("---[HE_TraderManager::CreateWeapon]WARNING: Accessed None GRI...");
 		return False;
 	}
 		
@@ -80,12 +88,15 @@ simulated function bool CreateWeapon()
 	
 	if(vKFGRI.TraderItems.SaleItems.Length <= 0)
 	{
-		`log("[HE_TraderManager::Client]Waiting for SalesItem to be replicated...");
+		`log("---[HE_TraderManager::CreateWeapon]Waiting for SalesItem to be replicated...");
 		return False;
 	}
 	
 	// find highest ItemID in use
-	IdSet=-vKFGRI.TraderItems.SaleItems.Length;
+	ForEach vKFGRI.TraderItems.SaleItems(item)
+		if(IdSet < item.ItemID)
+			IdSet = item.ItemID;
+	`log("---[HE_TraderManager::CreateWeapon]Highest Item ID = "$IdSet);
 	
 	ForEach CustomizedWeaps(TIClass)
 	{
@@ -95,14 +106,14 @@ simulated function bool CreateWeapon()
 		WeaponDef=class<KFWeaponDefinition>(DynamicLoadObject(TIClass.DefClassPath,class'Class'));
 		if( WeaponDef == none )
 		{
-			`log("[HE_TraderManager::Client]WARNING: Find no WeaponDef, return...");
+			`log("---[HE_TraderManager::CreateWeapon]WARNING: Find no WeaponDef, return...");
 			return False;
 		}
 
 		WeaponClass=class<KFWeapon>(DynamicLoadObject(TIClass.WeapClassPath,class'Class'));
 		if( WeaponClass == none )
 		{
-			`log("[HE_TraderManager::Client]WARNING: Find no WeaponClass, return...");
+			`log("---[HE_TraderManager::CreateWeapon]WARNING: Find no WeaponClass, return...");
 			return False;
 		}
 		
@@ -111,8 +122,8 @@ simulated function bool CreateWeapon()
 		
 		CustomizedTI.WeaponDef=WeaponDef;
 		CustomizedTI.ClassName=WeaponClass.Name;
-		`log("[HE_TraderManager]Customized Trader Item has been inited, following shows the details--");
-		`log("[HE_TraderManager]WeaponClass.Name = "$CustomizedTI.ClassName);
+		`log("---[HE_TraderManager::CreateWeapon]Customized Trader Item has been inited, following shows the details--");
+		`log("---[HE_TraderManager::CreateWeapon]WeaponClass.Name = "$CustomizedTI.ClassName);
 
 		if( class<KFWeap_DualBase>(WeaponClass) != none && class<KFWeap_DualBase>(WeaponClass).Default.SingleClass != none )
 			CustomizedTI.SingleClassName=class<KFWeap_DualBase>(WeaponClass).Default.SingleClass.Name;
@@ -146,10 +157,11 @@ simulated function bool CreateWeapon()
 
 		//Add weap to trader
 		vKFGRI.TraderItems.SaleItems.AddItem(CustomizedTI);
-		vKFGRI.TraderItems.SetItemsInfo(vKFGRI.TraderItems.SaleItems);
-		`log("[HE_TraderManager::"$WorldInfo.NetMode$"]Cutomized Trader Item has been added into SalesItems::"$IdSet$" "$vKFGRI.TraderItems.SaleItems[IdSet].ClassName);
-		IdSet++;
+		`log("---[HE_TraderManager:::CreateWeapon]Cutomized Trader Item has been added into SalesItems::"$IdSet$" "$vKFGRI.TraderItems.SaleItems[IdSet].ClassName);
 	}
+	
+	`log("---[HE_TraderManager::CreateWeapon]ACTION: Start Setting Items Info...");
+	vKFGRI.TraderItems.SetItemsInfo(vKFGRI.TraderItems.SaleItems);
 	
 	return True;
 }
