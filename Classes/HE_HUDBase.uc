@@ -21,9 +21,12 @@ var config HEVersionInfo HEVI;
 var HEVersionInfo Editable_HEVI;
 
 //System
+var HE_HUDManager		ManagerOwner;
+
 var float				LastX,LastY,StartX,StartY;
 
 var bool				bASSAim;
+var bool				bDrawCenterMsg;
 
 var float				ScreenX, ScreenY;
 var float				PresetX, PresetY;
@@ -31,11 +34,15 @@ var float				PresetX, PresetY;
 var int					Default_HurtHealthRateNotify;
 var int					Default_CriticalHealthRateNotify;
 
+var string				CenterMessage;
+
 var HUDCrosshairStatus	HECS;
 var AsCMode				CSMode;
 
 //Status
 var bool				bIsPlayerDead;
+var bool				bIsUpkUser;
+var bool				bIsUsingOldASC;
 
 //Debug
 var bool				bDrawDebug;
@@ -58,6 +65,7 @@ var color				Default_EnergyBarColor;
 var Texture2D			Crosshair1;
 var Texture2D			FleshpoundIcon;
 var Texture2D			ScrakeIcon;
+var Texture2D			GenericZedIconTextureNoUpk;
 
 //*********************************************************
 //* Configs
@@ -129,12 +137,24 @@ function InitBasicValues()
 	OverclockedHealthColor=Default_OverclockedHealthColor; //Original blue
 	LowSeverityColor=Default_LowSeverityColor; //Yellow
 	CriticalSeverityColor=Default_CriticalSeverityColor; //Red
+	
+	if( GenericZedIconTexture != None )
+	{
+		bIsUpkUser = True;
+		`log("---[HE_HUDBase::InitBasicValues]This user is a upk-user, draw customized contents.");
+	}
+}
+
+//Set this class's owner manager
+simulated function SetHUDManager(HE_HUDManager AManager)
+{
+	ManagerOwner = AManager;
+	`log("---[HE_HUDBase::SetHUDManager]ManagerOwner sets to "$ManagerOwner.Name);
 }
 //*********************************************************
 //* Misc
 //*********************************************************
 
-//A function by Blackout's CD
 //Print sth in console
 simulated function Print( string message, optional bool autoPrefix = true )
 {
@@ -187,13 +207,13 @@ exec function ToggleAsC()
 	bASSAim=!bASSAim;
 	if(bASSAim)
 	{
-		AddChatLine("Enable Crosshair Draw");
-		Print("Enable Crosshair Draw");
+		AddChatLine("[HE_HUDBase]Enable Crosshair Draw");
+		Print("[HE_HUDBase]Enable Crosshair Draw");
 	}
 	else
 	{
-		AddChatLine("Close Crosshair Draw");
-		Print("Close Crosshair Draw");
+		AddChatLine("[HE_HUDBase]Close Crosshair Draw");
+		Print("[HE_HUDBase]Close Crosshair Draw");
 	}	
 }
 
@@ -203,25 +223,39 @@ exec function ZhunXin()
 	ToggleAsC();
 }
 
+//Console command CHN pinyin to change AsC draw mode
+exec function HuanZhunXin()
+{
+	ChangeAsCMode();
+}
+
 //Console command to change AsC draw mode
 exec function ChangeAsCMode()
 {
-	//if(CSMode==AsC_Default)
-	//{
-		//CSMode=AsC_CenterDot;
-		//Print("Enable CenterDot AsC");
-	//}
-	//else if(CSMode==AsC_CenterDot)
-	//{
-		//CSMode=AsC_OnlyDot;
-		//Print("Enable OnlyDot AsC");
-	//}
-	//else if(CSMode==AsC_OnlyDot)
-	//{
-		//CSMode=AsC_Default;
-		//Print("Enable Default AsC");
-	//}
-	Print("Crosshair pattern can't be changed in this version!");
+	bIsUsingOldASC=!bIsUsingOldASC;
+	if(bIsUsingOldASC && bIsUpkUser)
+	{
+		AddChatLine("[HE_HUDBase]Changed To Old Crosshair Draw");
+		Print("[HE_HUDBase]Changed To Old Crosshair Draw");
+	}
+	else if(!bIsUsingOldASC && bIsUpkUser)
+	{
+		AddChatLine("[HE_HUDBase]Changed To New Crosshair Draw");
+		Print("[HE_HUDBase]Changed To New Crosshair Draw");
+	}
+	else if(!bIsUpkUser)
+	{
+		Print("Crosshair pattern can't be changed!");
+		Print("Please download HE_Contents.upk and put it in a right folder:");
+		Print("\Documents\My Games\KillingFloor2\KFGame\Unpublished\BrewedPC\Packages\HealingExtend_Contents");
+		Print("Or");
+		Print("\Documents\My Games\KillingFloor2\KFGame\Published\BrewedPC\Packages\HealingExtend_Contents");
+	}
+}
+
+exec function DebugGlobalMsg(string message)
+{
+	ManagerOwner.GlobalHUDMessage(message);
 }
 
 //*********************************************************
@@ -362,6 +396,140 @@ simulated function bool DrawDebugHumanPlayerInfo()
 	return true;
 }
 
+//Same as DrawDebugFriendlyHumanPlayerInfo but its pos is editable
+//And its pawn is yourself
+//Copy code here at any change of the original code!!!!!!!!!!!!
+simulated function bool DrawSelfHumanPlayerInfo()
+{
+	local KFPawn_Human KFPH;
+	local byte PerkLv;
+	local float Percentage;
+	local float BarHeight, BarLength, BarSpace;
+	local string PerkLvText;
+	local vector ScreenPos;
+	local KFPlayerReplicationInfo KFPRI;
+	local FontRenderInfo MyFontRenderInfo;
+	local float FontScale;
+	local color TempColor;
+	
+	KFPH = KFPawn_Human(KFPlayerOwner.Pawn);
+	if(KFPH == None)
+		return false;
+	KFPRI = KFPlayerReplicationInfo(KFPH.PlayerReplicationInfo);
+
+	if( KFPRI == none )
+	{
+		return false;
+	}
+
+	MyFontRenderInfo = Canvas.CreateFontRenderInfo( true );
+	BarLength = FMin(PlayerStatusBarLengthMax * (float(Canvas.SizeX) / 1024.f), PlayerStatusBarLengthMax) * FriendlyHudScale;
+	BarHeight = FMin(8.f * (float(Canvas.SizeX) / 1024.f), 8.f) * FriendlyHudScale;
+	BarSpace = 4.f;
+
+	ScreenPos.X = CenterX;
+	ScreenPos.Y = 0;
+	
+	if( ScreenPos.X < 0 || ScreenPos.X > Canvas.SizeX || ScreenPos.Y < 0 || ScreenPos.Y > Canvas.SizeY )
+	{
+		return false;
+	}
+
+	//Draw health bar
+		//Draw health up limit
+	Canvas.SetPos(ScreenPos.X + (BarLength * 0.5f) + BarSpace, ScreenPos.Y);
+	Canvas.DrawRect(2, BarHeight);
+	//if player's health is under HealthMax
+	if( KFPH.Health - KFPH.HealthMax <=0)
+	{
+		Percentage = FMin(float(KFPH.Health) / float(KFPH.HealthMax), 1.f);
+		DrawKFBar(Percentage, BarLength, BarHeight, ScreenPos.X - (BarLength * 0.5f), ScreenPos.Y, HealthColor);	
+	}
+	else
+	{
+		//First draw the original health bar
+		DrawKFBar(1.0f, BarLength, BarHeight, ScreenPos.X - (BarLength * 0.5f), ScreenPos.Y, HealthColor);
+		//Then draw overclocked health bar	
+		Percentage = FMin(float(KFPH.Health - KFPH.HealthMax) / 75.f, 1.f);
+		DrawKFBar(Percentage, BarLength, BarHeight, ScreenPos.X - (BarLength * 0.5f), ScreenPos.Y, OverclockedHealthColor);
+	}
+
+	//Draw armor bar
+	//if player's armor is under MaxArmor
+	if( KFPH.Armor - KFPH.MaxArmor <=0)
+	{
+		Percentage = FMin(float(KFPH.Armor) / float(KFPH.MaxArmor), 1.f);
+		DrawKFBar(Percentage, BarLength, BarHeight, ScreenPos.X - (BarLength * 0.5f), ScreenPos.Y - BarHeight, ArmorColor);		
+	}
+	else
+	{
+		//First draw the original armor bar
+		DrawKFBar(1.0f, BarLength, BarHeight, ScreenPos.X - (BarLength * 0.5f), ScreenPos.Y - BarHeight, ArmorColor);	
+		//Then draw overclocked armor bar
+		Percentage = FMin(float(KFPH.Armor - KFPH.MaxArmor) / 100.f, 1.f);
+		DrawKFBar(Percentage, BarLength, BarHeight, ScreenPos.X - (BarLength * 0.5f), ScreenPos.Y - BarHeight, OverclockedArmorColor);	
+	}
+
+
+	//Draw player name (Top)
+	FontScale = class'KFGameEngine'.Static.GetKFFontScale();
+	Canvas.Font = class'KFGameEngine'.Static.GetKFCanvasFont();
+	Canvas.SetDrawColorStruct(PlayerBarTextColor);
+	Canvas.SetPos(ScreenPos.X - (BarLength * 0.5f), ScreenPos.Y - BarHeight * 3.8);
+	Canvas.DrawText( KFPRI.PlayerName,,FontScale * FriendlyHudScale,FontScale * FriendlyHudScale, MyFontRenderInfo );
+
+	if( KFPRI.CurrentPerkClass == none )
+	{
+		return false;
+	}
+
+	//draw perk icon
+	Canvas.SetDrawColorStruct(PlayerBarIconColor);
+	Canvas.SetPos(ScreenPos.X - (BarLength * 0.75), ScreenPos.Y - BarHeight * 2.0);
+	Canvas.DrawTile(KFPRI.CurrentPerkClass.default.PerkIcon, PlayerStatusIconSize * FriendlyHudScale, PlayerStatusIconSize * FriendlyHudScale, 0, 0, 256, 256 );
+
+	//Draw perk level and name text
+	Canvas.SetDrawColorStruct(PlayerBarTextColor);
+	Canvas.SetPos(ScreenPos.X - (BarLength * 0.5f), ScreenPos.Y + BarHeight * 0.6);
+	PerkLv=KFPRI.GetActivePerkLevel();
+	if(PerkLv <= 10)
+		PerkLvText = "Rookie";
+	else if(PerkLv <= 20)
+		PerkLvText = "Experienced";
+	else
+		PerkLvText = "Mastered";
+	Canvas.DrawText( PerkLvText @KFPRI.CurrentPerkClass.default.PerkName,,FontScale * FriendlyHudScale, FontScale * FriendlyHudScale, MyFontRenderInfo );
+
+	if( KFPRI.PerkSupplyLevel > 0 && KFPRI.CurrentPerkClass.static.GetInteractIcon() != none )
+	{
+		if( KFPRI.PerkSupplyLevel == 2 )
+		{
+			if( KFPRI.bPerkPrimarySupplyUsed && KFPRI.bPerkSecondarySupplyUsed )
+			{
+				TempColor = SupplierActiveColor;
+			}
+			else if( KFPRI.bPerkPrimarySupplyUsed || KFPRI.bPerkSecondarySupplyUsed )
+			{
+				TempColor = SupplierHalfUsableColor;
+			}
+			else
+			{
+				TempColor = SupplierUsableColor;
+			}
+		}
+		else if( KFPRI.PerkSupplyLevel == 1 )
+		{
+			TempColor = KFPRI.bPerkPrimarySupplyUsed ? SupplierActiveColor : SupplierUsableColor;
+		}
+
+		Canvas.SetDrawColorStruct( TempColor );
+		Canvas.SetPos( ScreenPos.X + BarLength * 0.5f + 2*BarSpace + 2, ScreenPos.Y - BarHeight * 2 );
+		Canvas.DrawTile( KFPRI.CurrentPerkClass.static.GetInteractIcon(), PlayerStatusIconSize * FriendlyHudScale, PlayerStatusIconSize * FriendlyHudScale, 0, 0, 256, 256); 
+	}
+
+	return true;
+}
+
 //*********************************************************
 //* Render Main
 //*********************************************************
@@ -370,7 +538,6 @@ simulated function bool DrawDebugHumanPlayerInfo()
  avoid being scaled usually when you see a friendly pawn in your
  viewport, still despite the original crosshair if user close it,
  make it completely a separated crosshair */
-//Release 1.0.2: Add reload notification
 function DrawASC()
 {
 	local KFPawn KFP;
@@ -496,6 +663,10 @@ function DrawHUD()
 		DrawDebugHumanPlayerInfo();
 		DrawPlayerHealthLowIcon(KFPawn_Human(KFPlayerOwner.Pawn), True);
 	}
+	
+	if(bDrawCenterMsg)
+		FuncDrawCenterMsg();
+	
 	//Draw Assistant Crosshair
 	DrawASC();
 	//---------------------------------------------------------------------------------------------------------
@@ -516,10 +687,12 @@ function DrawHUD()
 				PlayerPartyInfoLocation = KFPH.Mesh.GetPosition() + ( KFPH.CylinderComponent.CollisionHeight * vect(0,0,1) );
 				if(`TimeSince(KFPH.Mesh.LastRenderTime) < 0.2f && Normal(PlayerPartyInfoLocation - ViewLocation) dot ViewVector > 0.f )
 				{
-					if(KFPlayerOwner.GetPerk().GetPerkClass()==class'KFPerk_FieldMedic')
+					//-------------------------------------------------------Customized HUD Draw Flow-----------------------
+					if(KFPlayerOwner.GetPerk().GetPerkClass() == class'KFPerk_FieldMedic')
 						Medic_DrawPlayerHealthLowIcon(KFPH, False);
 					else
 						DrawPlayerHealthLowIcon(KFPH, False);
+					//-------------------------------------------------------Customized HUD Draw Flow-----------------------	
 					if( DrawFriendlyHumanPlayerInfo(KFPH) )
 					{
 						VisibleHumanPlayers.AddItem( KFPH.PlayerReplicationInfo );
@@ -877,11 +1050,33 @@ function DrawAsCAim(bool Enable, KFWeapon KFW, optional AsCMode mode=AsC_Default
 		return;
 	}
 	HECS=HE_Good;
+	
 	Canvas.SetDrawColorStruct(CrosshairColor);
 	Canvas.Font = class'KFGameEngine'.Static.GetKFCanvasFont();
 	
-	Canvas.SetPos(CenterX-40, CenterY-40);
-	Canvas.DrawTile(Crosshair1, 80, 80, 0, 0, 256, 256);
+	if(bIsUpkUser && !bIsUsingOldASC) //Draw UPK contents
+	{
+		Canvas.SetPos(CenterX-40, CenterY-40);
+		Canvas.DrawTile(Crosshair1, 80, 80, 0, 0, 256, 256);
+	}
+	else //Draw Original AsC
+	{
+		//Crosshair with center dot
+		//Up
+		Canvas.SetPos(CenterX-ASSAim_Width*0.5f, CenterY-ASSAim_Space-ASSAim_Length);
+		Canvas.DrawRect(ASSAim_Width,ASSAim_Length);
+		//Left
+		Canvas.SetPos(CenterX-ASSAim_Space-ASSAim_Length, CenterY-ASSAim_Width*0.5f);
+		Canvas.DrawRect(ASSAim_Length,ASSAim_Width);	
+		//Down
+		Canvas.SetPos(CenterX-ASSAim_Width*0.5f, CenterY+ASSAim_Space);
+		Canvas.DrawRect(ASSAim_Width,ASSAim_Length);
+		//Right
+		Canvas.SetPos(CenterX+ASSAim_Space, CenterY-ASSAim_Width*0.5f);
+		Canvas.DrawRect(ASSAim_Length,ASSAim_Width);
+		Canvas.SetPos(CenterX-1, CenterY-1);
+		Canvas.DrawRect(2, 2);
+	}
 }
 
 //Draws a zed icon
@@ -907,14 +1102,16 @@ function DrawZedIcon( Pawn ZedPawn, vector PawnLocation )
     Canvas.SetDrawColorStruct( ZedIconColor );
     Canvas.SetPos( ScreenPos.X, ScreenPos.Y );
 	//If zed's a FP
-	if(KFPawn_ZedFleshpound(ZedPawn) != None)
+	if(KFPawn_ZedFleshpound(ZedPawn) != None && bIsUpkUser)
 		Canvas.DrawTile( FleshpoundIcon, 50, 50, 0, 0, 256, 256 );
 	//Or if zed's a SC
-	else if(KFPawn_ZedScrake(ZedPawn) != None)
+	else if(KFPawn_ZedScrake(ZedPawn) != None && bIsUpkUser)
 		Canvas.DrawTile( ScrakeIcon, 50, 50, 0, 0, 256, 256 );
 	//Or they're normal
-	else
+	else if(bIsUpkUser)
 		Canvas.DrawTile( GenericZedIconTexture, PlayerStatusIconSize * FriendlyHudScale, PlayerStatusIconSize * FriendlyHudScale, 0, 0, 256, 256 );
+	else
+		Canvas.DrawTile( GenericZedIconTextureNoUpk, PlayerStatusIconSize * FriendlyHudScale, PlayerStatusIconSize * FriendlyHudScale, 0, 0, 256, 256 );
 }
 
 ////Draw animated png
@@ -929,14 +1126,51 @@ function DrawZedIcon( Pawn ZedPawn, vector PawnLocation )
 	//PicAnimFlag += 64;
 //}
 
+//*********************************************************
+//* Skill Base
+//*********************************************************
+//API:Draw Center Msg, using flag
+//ATTENTION:Use this to draw msg
+simulated function DrawCenterMsg(string Msg, optional int MsgLifTime=5)
+{
+	bDrawCenterMsg=True;
+	
+	CenterMessage=Msg;
+	
+	SetTimer(MsgLifTime, False, 'ClearDrawCenterMsgFlag');
+}
+
+//Draw Center Msg
+simulated function FuncDrawCenterMsg()
+{
+	local float LX, LY;
+	Canvas.Font = class'KFGameEngine'.Static.GetKFCanvasFont();
+	Canvas.SetDrawColorStruct(MainHUDColor);
+	Canvas.StrLen(CenterMessage, LX, LY);
+	Canvas.SetPos(CenterX - LX*0.5f, CenterY*0.45f - LY);
+	Canvas.DrawText(CenterMessage);
+}
+
+//Clear Center Msg notification
+simulated function ClearDrawCenterMsgFlag()
+{
+	bDrawCenterMsg=False;
+}
+
 //Default Properties
 defaultproperties
 {	
+	bDrawCenterMsg=False
+	
 	PicAnimFlag=0;
 	
+	CenterMessage="NULL"
+	
+	bIsUpkUser=False
 	bDrawDebug=False
+	bIsUsingOldASC=False
 	bDrawDebugPI=False
-	bASSAim=True
+	bASSAim=False
 	CSMode=AsC_Default;
 	bIsPlayerDead=False
 	HECS=HE_NoneInit
@@ -947,16 +1181,16 @@ defaultproperties
 	Default_MainHUDColor=(R=255, G=255, B=0, A=192) //Yellow
 	Default_DebugHUDColor=(R=255, G=192, B=203, A=192) //Pink
 	Default_CrosshairColor=(R=255, G=48, B=48, A=192) //Red
-	Default_OverclockedArmorColor=(R=78, G=238, B=148, A=192) //Sea Green 2
-	Default_OverclockedHealthColor=(R=95, G=210, B=255, A=192) //Original blue
+	Default_OverclockedArmorColor=(R=238, G=233, B=233, A=192)//Snow
+	Default_OverclockedHealthColor=(R=255, G=20, B=147, A=192)//Deep Pink
 	Default_LowSeverityColor=(R=255, G=255, B=0, A=192) //Yellow
 	Default_CriticalSeverityColor=(R=255, G=48, B=48, A=192) //Red
 	
 	PresetX=0.039f
 	PresetY=0.28f
 	
-	ArmorColor=(R=238, G=233, B=233, A=192)//Snow
-	HealthColor=(R=255, G=20, B=147, A=192)//Deep Pink
+	ArmorColor=(R=0, G=0, B=233, A=192) //(R=238, G=233, B=233, A=192)//Snow
+	HealthColor=(R=233, G=0, B=0, A=192) //(R=255, G=20, B=147, A=192)//Deep Pink
 	PlayerBarBGColor=(R=160, G=32, B=240, A=0) //Set to purple, but completely transparant now
 	PlayerBarTextColor=(R=248, G=248, B=255, A=192)//Navy Blue
 	PlayerBarIconColor=(R=248, G=248, B=255, A=192)//Ghost White
@@ -967,8 +1201,9 @@ defaultproperties
 
     ZedIconColor=(R=255, G=48, B=48, A=192)//Red  //(R=0, G=191, B=255, A=192) Deep Sky Blue
     
-    Crosshair1=Texture2D'HE_Contents.Crosshair'
+    Crosshair1=Texture2D'HE_Contents.Crosshair_ss'
 	ScrakeIcon=Texture2D'HE_Contents.ZeddAlert'
 	FleshpoundIcon=Texture2D'HE_Contents.fleshpound'
     GenericZedIconTexture=Texture2D'HE_Contents.ZeddAlert'
+	GenericZedIconTextureNoUpk=Texture2D'UI_PerkIcons_TEX.UI_PerkIcon_ZED'
 }

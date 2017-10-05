@@ -5,10 +5,9 @@
 // Code And Concept By ArHShRn
 // http://steamcommunity.com/id/ArHShRn/
 //
-// Version Release 1.0.1
-// -Remove skill stuffs
+// Version Release 1.3.0
 //
-// Last Update Date Aug.31th 2017
+// Last Update Date Oct.3rd 2017
 //=============================================================================
 //=================================KFPC.PWRI========================================
 //struct native PostWaveReplicationInfo
@@ -46,20 +45,25 @@ struct HEPlayer
 {
 	var Pawn					pShotTarget;			//	A shot target pawn he owns, Use to avoidi checking ShotTarget frequently
 	var Pawn					LastTarget;				//	His last zed target
+	var KFPawn_Monster			KFPM_Victim;			//	Zed victim who damaged by him
 	var KFWeapon				KFWeap;					//  His Weap in hand
+	
 	var KFPlayerReplicationInfo	KFPRI;					//  His Player Replication Info
 	var KFPlayerController		KFPC;					//	His KFPlayerController class
-	var KFPawn_Monster			KFPM_Victim;			//	Zed victim who damaged by him
 	var KFPawn_Human			KFPH;					//	His KFPawn_Human
+	var class<KFPerk>			LastPerk;
 	
 	var HE_HUDManager			HUDManager;				//	His HUD Manager
-	var HE_ChatController		ChatController;			//  His Chat Controller
-	var class<KFPerk>			LastPerk;
+	var HE_TraderManager		TraderManager;
+	var HE_ChatController		ChatController;
 	
 	var int						Index;					//  Shows his Index
 	var int						fLastHSC;				//  His last AAR Headshots Ammout
-	var float					HealthDecrement;		//  Temply stores the health
-	var float					ArmorDecrement;			//  Temply stores the armor
+	//var int						ConfigNotify;
+	var float					HealthDecrement;		//  Temply stores the health delta
+	var float					ArmorDecrement;			//  Temply stores the armor	delta
+	
+	var bool					bIsEpt;
 };
 
 struct HEVersionInfo
@@ -74,8 +78,10 @@ struct HEVersionInfo
 struct HECommand
 {
 	var string					CommandHead;
+	var string					UserName;
 	var string					Argument;
 	var string					Parameter;
+	var string					Value;
 };
 
 enum HUDCrosshairStatus
@@ -101,6 +107,28 @@ enum AsCMode
 struct HE_HUDReplicationInfo
 {
 	var class<KFPerk>			PlayerPerk;
+};
+
+struct HEConfig
+{
+	//Mutator Version
+	var HEVersionInfo			HEVI;
+	//System Variable Configs
+	var float					fCurrentRegenRate;
+	var bool					bAllowOverClocking;	
+	var bool					bInitedConfig;
+	var bool					bRecoverAmmo;	
+	var bool					bEnableAAR_Headshots;
+	var bool					bGetDosh;
+	 
+	//Common Settings
+	var int						HealthHealingAmount;
+	var int						ArmourHealingAmount;
+	var int						AmmoRecoverAmout;
+	var int						BonusDosh;
+	var int						OverclockLimitHealth;
+	var int						OverclockLimitArmour;
+
 };
 
 defaultproperties

@@ -24,9 +24,8 @@ var config HEVersionInfo HEVI;
 var HEVersionInfo Editable_HEVI;
 
 //Client Side variables
-var HE_HUDBase				MyHE_HUD;		//player's HE_HUD
-var HE_HUDReplicationInfo	HEHUDRI;		//HUD Replication Info
-var KFPlayerController		KFPlayerOwner;	//KF Player Onwer
+var HE_HUDBase MyHE_HUD;		//player's HE_HUD
+var repnotify KFPlayerController KFPlayerOwner;	//KF Player Onwer
 
 //*************************************************************
 //* Configs
@@ -37,10 +36,14 @@ var KFPlayerController		KFPlayerOwner;	//KF Player Onwer
 //*************************************************************
 Replication
 {
-	if( Role < Role_Authority && bNetInitial)
+	if( Role < Role_Authority && WorldInfo.NetMode != NM_Standalone)
 		KFPlayerOwner;
-	if( ROle < Role_Authority) 
-		HEHUDRI;
+}
+
+simulated function ReplicatedEvent(name VarName)
+{	
+	if(VarName == 'KFPlayerOwner')
+		`log("---[HE_HUDManager::ReplicatedEvent]REPNOTIFY: KFPlayerOwner is replicated.");
 }
 
 //*************************************************************
@@ -50,7 +53,6 @@ simulated function PostBeginPlay()
 {
 	//Force init
 	InitBasicValues();
-	LogNetworkStatus();	
 	super.PostBeginPlay();
 }
 
@@ -81,10 +83,10 @@ simulated function PlayerController GetLPPC()
 	LocalPlayerOwner = class'Engine'.static.GetEngine().GamePlayers[0];
 	if (LocalPlayerOwner == none)
 	{
-		`log("[HE_HUDManager:"$Worldinfo.NetMode$"]WARNING: Find NONE LocalPlayer !");
+		`log("[---HE_HUDManager::GetLPPC]WARNING: Find NONE LocalPlayer !");
 		return none;
 	}
-	`log("[HE_HUDManager:"$Worldinfo.NetMode$"]Return LocalPlayer.Actor "$LocalPlayerOwner.Actor);
+	`log("---[HE_HUDManager::GetLPPC]Return LocalPlayer.Actor "$LocalPlayerOwner.Actor);
 	return LocalPlayerOwner.Actor;
 }
 
@@ -96,7 +98,7 @@ simulated function GetKFPC()
 	KFPlayerOwner = KFPlayerController( GetLPPC() );
 	if(KFPlayerOwner == None)
 	{
-		`log("[HE_HUDManager:"$Worldinfo.NetMode$"]WARNING: Get no KFPlayerOwner !");
+		`log("---[HE_HUDManager::GetKFPC]WARNING: Get no KFPlayerOwner !");
 		return;
 	}
 }
@@ -106,15 +108,23 @@ simulated function AddChatLine(string str)
 	KFPlayerOwner.MyGFxHUD.HudChatBox.AddChatMessage(str, class 'KFLocalMessage'.default.EventColor);
 }
 
+reliable client function ClientAddChatLine(string str, string HexVal)
+{
+	KFPlayerOwner.MyGFxHUD.HudChatBox.AddChatMessage(str, HexVal);
+}
 //*************************************************************
 //* Misc (Also contains some misc client & server function)
 //*************************************************************
 //Log Network Status for debug
 simulated function LogNetworkStatus()
 {
-	`log("[HE_HUDManager:"$Worldinfo.NetMode$"]Current Role="$Role);
-	`log("[HE_HUDManager:"$Worldinfo.NetMode$"]Current RemoteRole="$RemoteRole);
-	`log("[HE_HUDManager:"$Worldinfo.NetMode$"]Current Owner="$Owner);
+	`log("---[HE_HUDManager::LogNetworkStatus]Current Role="$Role);
+	`log("---[HE_HUDManager::LogNetworkStatus]Current RemoteRole="$RemoteRole);
+	if(Role == ROLE_Authority && KFPlayerOwner == None)
+		`log("---[HE_HUDManager::LogNetworkStatus]WARNING: Current KFPlayerOwner failed to be replicated to Server!");
+	else
+		`log("---[HE_HUDManager::LogNetworkStatus]Current KFPlayerOwner="$KFPlayerOwner);
+	`log("---[HE_HUDManager::LogNetworkStatus]Current Owner="$Owner);
 }
 
 //*************************************************************
@@ -128,7 +138,7 @@ reliable client function ClientSetHUD()
 	//If it's client side or it's standalone solo game
 	if(Role < Role_Authority || WorldInfo.NetMode == NM_Standalone)
 	{
-		`log("[HE_HUDManager:"$Worldinfo.NetMode$"]Getting KFPC...");
+		`log("---[HE_HUDManager::ClientSetHUD]Getting KFPC...");
 		
 		GetKFPC();
 		
@@ -140,21 +150,20 @@ reliable client function ClientSetHUD()
 		//Create his KFGfxMoviePlayer on Client side && also Standalone
 		if(HE_HUDBase(KFPlayerOwner.myHUD)==None)
 		{
-			`log("[HE_HUDManager:"$Worldinfo.NetMode$"]Error spawning a new HE_HUD hud!");
+			`log("---[HE_HUDManager::ClientSetHUD]Error spawning a new HE_HUD hud!");
 			return;
 		}
-		`log("[HE_HUDManager:"$Worldinfo.NetMode$"]Spawned a new HUD "$KFPlayerOwner.myHUD$" for "$KFPlayerOwner.PlayerReplicationInfo.PlayerName);
+		`log("---[HE_HUDManager::ClientSetHUD]Spawned a new HUD "$KFPlayerOwner.myHUD$" for "$KFPlayerOwner.PlayerReplicationInfo.PlayerName);
 		//Create KFGFXMoviePlayer
 		HE_HUDBase(KFPlayerOwner.myHUD).CreateHUDMovie( False );
 		KFPlayerOwner.SetGFxHUD(HE_HUDBase(KFPlayerOwner.myHUD).HudMovie);	
-		`log("[HE_HUDManager:"$Worldinfo.NetMode$"]New KFGFxMoviePlayer is successfully set.");
+		`log("---[HE_HUDManager::ClientSetHUD]New KFGFxMoviePlayer is successfully set.");
 	}
 	MyHE_HUD=HE_HUDBase(KFPlayerOwner.myHUD);
+	MyHE_HUD.SetHUDManager(self);
+	LogNetworkStatus();	
 	
-	//Set HEHUDRI
-	HEHUDRI.PlayerPerk=KFPlayerOwner.GetPerk().GetPerkClass();
-	
-	`log("[HE_HUDManager:"$Worldinfo.NetMode$"]End ClientSetHUD.");
+	`log("---[HE_HUDManager::ClientSetHUD]End ClientSetHUD.");
 }
 
 //*************************************************************
@@ -166,8 +175,21 @@ reliable client function ClientSetHUD()
 //* Skill Functions
 //*************************************************************
 //To-do
+reliable server function GlobalChatLineMessage(string msg)
+{
+	local HE_HUDManager instance;
+	ForEach WorldInfo.AllActors(class'HE_HUDManager', instance)
+		instance.ClientAddChatLine(msg, "00aeff");
+}
+
+reliable server function GlobalHUDMessage(string msg)
+{
+	local HE_HUDManager instance;
+	ForEach WorldInfo.AllActors(class'HE_HUDManager', instance)
+		instance.MyHE_HUD.DrawCenterMsg(msg);
+}
 
 defaultproperties
 {
-	RemoteRole=Role_SimulatedProxy
+	RemoteRole=Role_AutonomousProxy
 }
