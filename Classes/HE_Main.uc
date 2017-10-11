@@ -3,10 +3,11 @@
 //
 // Code And Concept By ArHShRn
 // http://steamcommunity.com/id/ArHShRn/
-// Version Release 1.0.1
+//
+// Version Release 1.1.1
 // -Combine Healing n' Headshot Recovery
 //
-// Last Update Date Aug.31th 2017
+// Last Update Date Oct.11th 2017
 //=============================================================================
 class HE_Main extends KFMutator
 	DependsOn(HE_DataStructure)
@@ -149,8 +150,8 @@ function InitBasicMutatorValues()
 	Editable_HEVI.ThisMutatorName="HE_Main";
 	Editable_HEVI.AuthorNickname="ArHShRn";
 	Editable_HEVI.AuthorSteamcommunityURL="http://steamcommunity.com/id/ArHShRn/";
-	Editable_HEVI.Version="Release 1.0.1";
-	Editable_HEVI.LastUpdate="Sept.15th 2017 07:31 AM";
+	Editable_HEVI.Version="Release 1.1.1";
+	Editable_HEVI.LastUpdate="Oct.11th 2017 08:55 PM";
 	HEVI=Editable_HEVI;
 	
 	//Mutator Config Variable
@@ -628,7 +629,8 @@ Event Tick(float DeltaTime)
 
 defaultproperties
 {
-	DecreModifier=0.25f
+	DecreModifier=0.2f //Health and armor decrement delta
+	
 	PlayerNumber=0
 	bInNormalTime=True
 }

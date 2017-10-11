@@ -6,11 +6,11 @@
 // Code And Concept By ArHShRn
 // http://steamcommunity.com/id/ArHShRn/
 //
-// Version Release 1.0.1
+// Version Release 1.1.1
 // -Remove skill stuffs
 // -Standard HUDs, no seperated HUDs per perk
 //
-// Last Update Date Aug.31th 2017
+// Last Update Date Oct.11th 2017
 //=============================================================================
 
 class HE_HUDManager extends Actor
@@ -62,8 +62,8 @@ function InitBasicValues()
 	Editable_HEVI.ThisMutatorName="HE_HUDManager";
 	Editable_HEVI.AuthorNickname="ArHShRn";
 	Editable_HEVI.AuthorSteamcommunityURL="http://steamcommunity.com/id/ArHShRn/";
-	Editable_HEVI.Version="Release 1.0.1";
-	Editable_HEVI.LastUpdate="Sept.15th 2017 07:31 AM";
+	Editable_HEVI.Version="Release 1.1.1";
+	Editable_HEVI.LastUpdate="Oct.11th 2017 08:55 PM";
 	HEVI=Editable_HEVI;
 	
 	SaveConfig();

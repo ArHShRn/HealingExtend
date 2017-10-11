@@ -4,10 +4,13 @@
 //
 // Code And Concept By ArHShRn
 // http://steamcommunity.com/id/ArHShRn/
-// Version Release 1.0.1
+//
+// Version Release 1.1.1
+//
 // -Remove skill stuffs
 // -Remove perk HUDs, make it a Standard ver
-// Last Update Date Aug.31th 2017
+//
+// Last Update Date Oct.11th 2017
 //=============================================================================
 class HE_HUDBase extends KFGFxHudWrapper
 	DependsOn(HE_DataStructure)
@@ -114,8 +117,8 @@ function InitBasicValues()
 	Editable_HEVI.ThisMutatorName="HE_HUDBase";
 	Editable_HEVI.AuthorNickname="ArHShRn";
 	Editable_HEVI.AuthorSteamcommunityURL="http://steamcommunity.com/id/ArHShRn/";
-	Editable_HEVI.Version="Release 1.0.1";
-	Editable_HEVI.LastUpdate="Sept.15th 2017 07:31 AM";
+	Editable_HEVI.Version="Release 1.1.1";
+	Editable_HEVI.LastUpdate="Oct.11th 2017 08:55 PM";
 	HEVI=Editable_HEVI;
 	
 	bInitedConfig=True;

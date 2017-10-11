@@ -5,8 +5,7 @@
 // Code And Concept By ArHShRn
 // http://steamcommunity.com/id/ArHShRn/
 //
-// Version Release 1.3.0
-// -Created this class
+// Version Release 1.1.1
 //
 // Principle Explanation:
 //	1.How to respond what players have said ?
@@ -67,7 +66,7 @@
 //	Server-side class have no valid values in configs, and only if one class has "FullAccess" can
 //	the configs be replicated to server-side class and let HE_Main check it in Tick event.
 //
-// Last Update Date Oct.3rd 2017
+// Last Update Date Oct.11th 2017
 //=============================================================================
 class HE_ChatController extends Actor
 	DependsOn(HE_Datastructure)

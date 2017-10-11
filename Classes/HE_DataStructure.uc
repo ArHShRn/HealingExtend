@@ -5,9 +5,9 @@
 // Code And Concept By ArHShRn
 // http://steamcommunity.com/id/ArHShRn/
 //
-// Version Release 1.3.0
+// Version Release 1.1.1
 //
-// Last Update Date Oct.3rd 2017
+// Last Update Date Oct.11th 2017
 //=============================================================================
 //=================================KFPC.PWRI========================================
 //struct native PostWaveReplicationInfo

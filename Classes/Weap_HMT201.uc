@@ -1,3 +1,14 @@
+//=============================================================================
+// Healing Extend Mutator : HMTech-201 Balanced
+//	This class is a balanced weapon
+//
+// Code And Concept By ArHShRn
+// http://steamcommunity.com/id/ArHShRn/
+//
+// Version Release 1.1.1
+//
+// Last Update Date Oct.11th 2017
+//=============================================================================
 class Weap_HMT201 extends KFWeap_MedicBase;
 
 /** Returns trader filter index based on weapon type */

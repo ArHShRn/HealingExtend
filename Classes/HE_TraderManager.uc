@@ -1,3 +1,11 @@
+//=============================================================================
+// Healing Extend Mutator : Trader Manager
+//	This class is created for managing customized weapons
+//
+// Code And Concept By ArHShRn
+// http://steamcommunity.com/id/ArHShRn/
+//
+// Version Release 1.1.1
 // Explanation:
 //	To get a customized weapon into Trader, we have to do following things:
 //		1.Create a right Weapon class and a right Weapon Definition class
@@ -14,6 +22,9 @@
 //		to find if it's replicated, once it is, we will set our new Trader Item into
 //		client side's SaleItems, makes them synchronized and set info.
 //		Then, it's time to have fun
+//
+// Last Update Date Oct.11th 2017
+//=============================================================================
 class HE_TraderManager extends Actor
 	config(HE_TraderManager);
 

@@ -1,3 +1,14 @@
+//=============================================================================
+// Healing Extend Mutator : HMTech-401 Balanced Definition
+//	This class is a balanced weapon's definition
+//
+// Code And Concept By ArHShRn
+// http://steamcommunity.com/id/ArHShRn/
+//
+// Version Release 1.1.1
+//
+// Last Update Date Oct.11th 2017
+//=============================================================================
 class WeapDef_HMT401 extends KFWeaponDefinition
 	abstract;
 
