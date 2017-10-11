@@ -1,4 +1,9 @@
-# Mutator Version Updated to Release 1.1.0 插件版本更新至 1.1.0
+# Mutator Version Updated to Release 1.1.1 插件版本更新至 1.1.1
+-Decrease overclocked health and armor counting down by 20% (Now 0.2xAmmount per second)<br>
+-超频血量与护甲每秒减少量降低20%（现在是0.2x回复量）<br>
+-Fix version info, now you can use config editor I wrote for this mut<br>
+-修复了插件版本信息，现在可以使用我写的1.1.1版本的新配置编辑器了<br>
+
 # THX LIST 感谢名单
 Pharrahnox<br>
 Teriyakisaurus Rex<br>
