@@ -1,3 +1,10 @@
+# ATTENTION: THIS PROJECT HAS ALREADY ENDED UP DEVELOPING !!!
+# 注意：此项目已经停止开发
+# Mutator Version Updated to Release 1.1.2 插件版本更新至 1.1.2
+-Overclocked amount will not decrease and will still maintain<br>
+-超频量不在会减少，而是回到了以前可以保持的状态<br>
+-Overclocked amount is now managed by recover pool, which means you will not get it instantly but gradually just like health regeneration<br>
+-超频量现在归回复池管理，获得的超频量将会缓慢增加而不是立刻生效<br>
 # Mutator Version Updated to Release 1.1.1 插件版本更新至 1.1.1
 -Decrease overclocked health and armor counting down by 20% (Now 0.2xAmmount per second)<br>
 -超频血量与护甲每秒减少量降低20%（现在是0.2x回复量）<br>
@@ -8,57 +15,6 @@
 Pharrahnox<br>
 Teriyakisaurus Rex<br>
 Blackout<br>
-
-# What are the changes in Release 1.1.0 ? 版本1.1.0有哪些改动？
-## Balance Changes 平衡性改动
--Medic perk will not see teammates' health status when they're hidden.<br>
--医疗不再能够透视队友的血量<br><br>
--Recovery cooling down time is removed, but you will still lost records if you decap too fast.<br>
--回复冷却时间被取消了，但是爆头太快还是不会被记录进插件并触发回复<br><br>
--Overclocked health and armor will count down in 0.25 * Recovery_Speed till it's standard.<br>
--超频获得的护甲与生命值将会以 恢复速率x0.25 的速度减少，直至回到你的职业标准血量<br><br>
--Normal recovery will only recover your armor onto at most your perk's armor limit, instead of 175.<br>
--普通回复最多只会将你的护甲回复到 职业标准护甲量 而不是以前的175甲了<br><br>
--You can't get infinite recovery at a "decaped-but-dying" any more.<br>
--你不再能够从掉了头但是还没有死的ZED身上刷取无限制的回复量了<br><br>
-## Main Mutator class 插件主要部分
-1.Completely rework mutator strcture, makes it more effient and stable to run.<br>
-2.Shows the Zed's (class) name who kills you last wave.<br>
-3.Applied balance changes to this class, details see above.<br>
-<b>4.Add chat controller and trader manager.</b><br>
-1.插件结构完全被重写，增加了插件的效率与运行稳定性<br>
-2.将会提示上波杀死你的ZED名称（类名）<br>
-3.对此类进行了平衡性改动，详细参考上文<br>
-<b>4.增加了喊话控制和商人功能（自定义武器）</b><br>
-
-## Healing Extend HUD Base class HE插件HUD部分
-1.Add customized icon, but you can decide to use it or not by downloading .upk or not<br>
-if you have .upk, you will see Fleshpound and Scrake notification when there are few zeds left,<br>
-and you will also have a PS-draw crosshair.<br>
-if you have no .upk, you will see the original HUD zeds notification and old version Crosshair.<br>
-2.Changed health bar color to elder version of KF2<br>
-1.增加了自订图标，但是你可以通过下载或者不下载.upk文件来决定使不使用<br>
-如果你下载了.upk文件，你会在还剩几个ZED的时候看到SC或者FP的位置提示（如果有的话），而且有PS画出来的准心<br>
-如果你没有下载.upk文件，你的ZED提示会和原版KF2一样，准心将会是此插件早期版本的十字带点准心<br>
-2.改变了血条的颜色为 护甲：蓝 血量：红，回归早期KF2版本样式
-
-## Healing Extend Mutator - Chat Controller HE插件喊话控制
-1.Create this class xD, it's like CD's chat commander.<br>
-2.You can control mutator's config dynamiclly when you're playing, it will be applied when the wave is ended.<br>
-3.You can check mutator's version, current config, or call help to know what commands you can use.<br>
-4.You have to gain Full-Access Admin control to control the mutator settings. You'll have the admin access to chat controller if you login as admin of the server or you're me xD.<br>
-5.The way to use it is listed at bottom.<br>
-1.创建了这个东东，和CD的汉化控制非常类似<br>
-2.你可以动态控制插件的设置数据，每波结束后会应用更改<br>
-3.你可以查看插件版本、目前设置信息、帮助信息<br>
-4.你必须要有管理员访问权限才能够控制插件设置，获取管理员权限的话你必须作为管理员登录服务器或者你是作者！xD<br>
-5.具体使用方法请看下文介绍<br>
-
-## Healing Extend Mutator - Trader Manager HE内嵌商人插件
-1.Create this class xD for later usage of customized weapons.<br>
-2.For now, I add two balanced weapons:401 BiohaZar and 201 Storm in trader and they're only associated to Medic.<br>
-1.创建了这个东东，为了以后能够加入自订武器进去<br>
-2.现在来说，平衡版的401和201已经被加入了商人，但是仅被关联到医疗职业<br>
 
 # Update Method and Compatibility 插件升级方法以及兼容性
 This mut has its own HUD and I created one No_HUD version before, but this is ver 1.1.0 and I didn't create one for this version because it has too many features associated to the HUD, so I may not write a No_HUD version for every version of the mutator.
@@ -111,11 +67,5 @@ PLEASE NOTIFY: Overclocking stuffs can't be changed in Dynamic Settings, please 
 请注意： 超频设置不能在动态设置里面更改，请在运行之前在.ini配置文件中更改<br>
 
 ## At Last 最后<br>
-Plz Email me if you find bugs or if you have any suggestion to what's next in the mutator (only about healing extending stuff) !<br>
-And you're welcomed to provide weapon datas for me to be written into the mut as the customized weapons!<br>
-如果你找到任何BUG或者有一些小建议清邮我！而且如果你对武器数据有见解的话也请将改动数据邮给我！<br>
-<br>
-drancickphysix@yahoo.com<br>
-<br>
-Code And Concept By ArHShRn<br>
-http://steamcommunity.com/id/ArHShRn/<br>
+This project is dead, if you find any bug or else, let it go.<br>
+此项目已寿尽，如果有任何问题请随缘<br>
