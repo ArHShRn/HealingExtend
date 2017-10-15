@@ -7,8 +7,7 @@
 //
 // Version Release 1.1.1
 //
-// -Remove skill stuffs
-// -Remove perk HUDs, make it a Standard ver
+// -Auto-hide health bar when the player is full
 //
 // Last Update Date Oct.11th 2017
 //=============================================================================
@@ -123,15 +122,15 @@ function InitBasicValues()
 	
 	bInitedConfig=True;
 	ASSAim_Width=3.0f;
-	ASSAim_Length=8.0f;
-	ASSAim_Space=4.0f;
+	ASSAim_Length=12.0f;
+	ASSAim_Space=8.0f;
 	HUDMainTextScale=1.0f;
 	HUDDebugTextScale=1.0f;
 	
 	HurtHealthRateNotify=Default_HurtHealthRateNotify;
 	CriticalHealthRateNotify=Default_CriticalHealthRateNotify;
 	
-	bShowHUD=True;
+	bShowHUD=True; //Force player use HUD
 	
 	MainHUDColor=Default_MainHUDColor; //Yellow
 	DebugHUDColor=Default_DebugHUDColor; //Pink
@@ -537,11 +536,8 @@ simulated function bool DrawSelfHumanPlayerInfo()
 //* Render Main
 //*********************************************************
 
-/* Use code from DrawCrosshair to draw normal HUD with Status and
- avoid being scaled usually when you see a friendly pawn in your
- viewport, still despite the original crosshair if user close it,
- make it completely a separated crosshair */
-function DrawASC()
+//Check AsC Status
+function CheckDrawASCStatus()
 {
 	local KFPawn KFP;
 	local KFWeapon KFWP;
@@ -670,8 +666,8 @@ function DrawHUD()
 	if(bDrawCenterMsg)
 		FuncDrawCenterMsg();
 	
-	//Draw Assistant Crosshair
-	DrawASC();
+	//Check and Draw Assistant Crosshair
+	CheckDrawASCStatus();
 	//---------------------------------------------------------------------------------------------------------
     // Friendly player status
     if( PlayerOwner.GetTeamNum() == 0 )
@@ -914,7 +910,16 @@ simulated function DrawKFBar( float BarPercentage, float BarLength, float BarHei
 	Canvas.DrawTile(PlayerStatusBarBGTexture, (BarLength - 2.0) * BarPercentage, BarHeight - 2.0, 0, 0, 32, 32);
 }
 
+//DrawFriendlyHumanPlayerInfo
+//Version 1.1.2 Auto-Hide player info when the player's full
 //Re-work sth at DrawFriendlyHumanPlayerInfo
+//Example pool:
+//
+//           |--
+//		PKIC |==============-----
+//		PKIC |=====-----------
+//           |-
+//
 simulated function bool DrawFriendlyHumanPlayerInfo(KFPawn_Human KFPH)
 {
 	local byte PerkLv;
@@ -933,6 +938,11 @@ simulated function bool DrawFriendlyHumanPlayerInfo(KFPawn_Human KFPH)
 	{
 		return false;
 	}
+	
+	//Ver 1.1.2
+	//Auto-Hide player info when the player's full
+	if ( KFPH.Health - KFPH.HealthMax >=0 )
+		return False;
 
 	MyFontRenderInfo = Canvas.CreateFontRenderInfo( true );
 	BarLength = FMin(PlayerStatusBarLengthMax * (float(Canvas.SizeX) / 1024.f), PlayerStatusBarLengthMax) * FriendlyHudScale;
@@ -1043,7 +1053,7 @@ simulated function bool DrawFriendlyHumanPlayerInfo(KFPawn_Human KFPH)
 }
 
 //A function that draw an assistant crosshair despite of the original
-//Release 1.0.2: Remove some modes, add reload notification
+//Release 1.0.2: Remove some modes.
 //Draw a crosshair through a pic from .upk
 function DrawAsCAim(bool Enable, KFWeapon KFW, optional AsCMode mode=AsC_Default)
 {
@@ -1057,12 +1067,13 @@ function DrawAsCAim(bool Enable, KFWeapon KFW, optional AsCMode mode=AsC_Default
 	Canvas.SetDrawColorStruct(CrosshairColor);
 	Canvas.Font = class'KFGameEngine'.Static.GetKFCanvasFont();
 	
-	if(bIsUpkUser && !bIsUsingOldASC) //Draw UPK contents
+	//AsC Drawing
+	if(bIsUpkUser && !bIsUsingOldASC) //Draw UPK contents, has no reload notification
 	{
 		Canvas.SetPos(CenterX-40, CenterY-40);
 		Canvas.DrawTile(Crosshair1, 80, 80, 0, 0, 256, 256);
 	}
-	else //Draw Original AsC
+	else //Draw Original AsC, has reload notification
 	{
 		//Crosshair with center dot
 		//Up
@@ -1077,8 +1088,12 @@ function DrawAsCAim(bool Enable, KFWeapon KFW, optional AsCMode mode=AsC_Default
 		//Right
 		Canvas.SetPos(CenterX+ASSAim_Space, CenterY-ASSAim_Width*0.5f);
 		Canvas.DrawRect(ASSAim_Length,ASSAim_Width);
-		Canvas.SetPos(CenterX-1, CenterY-1);
-		Canvas.DrawRect(2, 2);
+		//Dot
+		Canvas.SetPos(CenterX-2, CenterY-2);
+		Canvas.DrawRect(4, 4);
+		
+		//Reload notification
+		
 	}
 }
 

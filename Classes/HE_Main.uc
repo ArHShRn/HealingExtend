@@ -4,8 +4,8 @@
 // Code And Concept By ArHShRn
 // http://steamcommunity.com/id/ArHShRn/
 //
-// Version Release 1.1.1
-// -Combine Healing n' Headshot Recovery
+// Version Release 1.1.2
+// -Add player health pool, to gradually recover bonus HP and Armor
 //
 // Last Update Date Oct.11th 2017
 //=============================================================================
@@ -30,7 +30,7 @@ var config bool				bInitedConfig;
 var config bool				bRecoverAmmo;	
 var config bool				bEnableAAR_Headshots;
 var config bool				bGetDosh;
-var float					DecreModifier;
+var float					DeltaModifier;
 
 //System Variables
 //var HE_ChatController		ChatController;				
@@ -258,9 +258,11 @@ function AddHimIntoPlayers(Pawn P)
 	`log("---[HE]Spawned a new HE_ChatController="$Players[PlayerIndex].ChatController.Name);
 	Players[PlayerIndex].ChatController.ClientPrint("If you see this, then this works fine.", True);
 	
-	//Set Decrement Delta
-	Players[PlayerIndex].HealthDecrement=0.f;
-	Players[PlayerIndex].ArmorDecrement=0.f;
+	//Set Delta and Recover Pool
+	Players[PlayerIndex].HealthDelta=0.f;
+	Players[PlayerIndex].ArmorDelta=0.f;
+	Players[PlayerIndex].HealthToRecover=0.f;
+	Players[PlayerIndex].ArmorToRecover=0.f;
 	
 	Players[PlayerIndex].Index=PlayerIndex;//Use PlayerIndex just to ensure he's added to the right position
 	Players[PlayerIndex].HUDManager.ClientAddChatLine("Array Index="$PlayerIndex, "ffea00");
@@ -310,9 +312,11 @@ function ReInitPlayersArry(Pawn P=None)
 		//Set its perk class
 		Players[InGamePlayerIndex].LastPerk=PlayerKFPC.GetPerk().GetPerkClass();
 		
-		//Set Decrement Delta
-		Players[InGamePlayerIndex].HealthDecrement=0.f;
-		Players[InGamePlayerIndex].ArmorDecrement=0.f;
+		//Set Delta n Recover Pool
+		Players[InGamePlayerIndex].HealthDelta=0.f;
+		Players[InGamePlayerIndex].ArmorDelta=0.f;
+		Players[InGamePlayerIndex].HealthToRecover=0.f;
+		Players[InGamePlayerIndex].ArmorToRecover=0.f;
 		
 		Players[InGamePlayerIndex].HUDManager.ClientAddChatLine("YOU DIED LAST WAVE", "ff0000"); //Red
 		Players[InGamePlayerIndex].HUDManager.ClientAddChatLine("KILLER:"$PlayerKFPC.PWRI.ClassKilledByLastWave.Name, "ff0000"); //Red
@@ -446,21 +450,25 @@ function UpdateHEConfig()
 //*  Main Func
 //*************************************************
 //Headshot Recover Function
+//Version 1.1.2
+//-OC recover ammount will be added into recover pool
 function HeadshotRecover(int i)
 {
 	if(bAllowOverClocking)
 	{
 		//Health
-		if(Players[i].KFPC.Pawn.Health > Players[i].KFPC.Pawn.HealthMax)
-			Players[i].KFPC.Pawn.Health=Min(Players[i].KFPC.Pawn.Health+2*HealthHealingAmount, OverclockLimitHealth);
-		else
-			Players[i].KFPC.Pawn.Health=Min(Players[i].KFPC.Pawn.Health+HealthHealingAmount, OverclockLimitHealth);
+		if(Players[i].KFPC.Pawn.Health > Players[i].KFPC.Pawn.HealthMax) //OC
+			Players[i].HealthToRecover += int(1.5 * HealthHealingAmount);
+			//Players[i].KFPC.Pawn.Health=Min(Players[i].KFPC.Pawn.Health+int(1.5*HealthHealingAmount), OverclockLimitHealth);
+		else //Normal
+			Players[i].KFPC.Pawn.Health=Players[i].KFPC.Pawn.Health+HealthHealingAmount;
 			
 		//Armor
-		if(Players[i].KFPH.Armor > Players[i].KFPH.MaxArmor)
-			Players[i].KFPH.Armor=Min(Players[i].KFPH.Armor+2*ArmourHealingAmount, OverclockLimitArmour);
-		else
-			Players[i].KFPH.Armor=Min(Players[i].KFPH.Armor+ArmourHealingAmount, OverclockLimitArmour);
+		if(Players[i].KFPH.Armor > Players[i].KFPH.MaxArmor) //OC
+			Players[i].ArmorToRecover += int(1.5 * ArmourHealingAmount);
+			//Players[i].KFPH.Armor=Min(Players[i].KFPH.Armor+int(1.5*ArmourHealingAmount), OverclockLimitArmour);
+		else //Normal
+			Players[i].KFPH.Armor=Players[i].KFPH.Armor+ArmourHealingAmount;
 	}
 	else
 	{
@@ -486,10 +494,12 @@ function TickMutRecover(int i, float DeltaTime)
 {	
 	if(Players[i].KFPC == None 
 		|| Players[i].KFPC.Pawn == None 
-		|| Players[i].KFPH == None)
+		|| Players[i].KFPH == None
+		)
 		return;
 	
 	//Chat Controller Checking Msg
+	//Check wave activity
 	Players[i].ChatController.NotifyWaveActivity(KFGameInfo(WorldInfo.Game).IsWaveActive());
 	Players[i].ChatController.Recheck();
 	
@@ -505,25 +515,25 @@ function TickMutRecover(int i, float DeltaTime)
 		Players[i].ChatController.ClientSay("Config Is Accepted");
 	}
 	
-	//Tick overclock armor and health Decrement
-	//Check health and armor state
-	//Only decrease when overclocks
-	if(Players[i].KFPC.Pawn.Health > Players[i].KFPC.Pawn.HealthMax)
+	//Version 1.1.2
+	//Tick overclock armor and health Increment
+	//Check recover pool and recover health and armor
+	if(Players[i].KFPC.Pawn.Health > Players[i].KFPC.Pawn.HealthMax)//If he's in OC status
 	{
-		Players[i].HealthDecrement += DecreModifier * HealthHealingAmount * DeltaTime;
-		if(Players[i].HealthDecrement >= 1.f)
+		Players[i].HealthDelta += DeltaModifier * HealthHealingAmount * DeltaTime;
+		if(Players[i].HealthDelta >= 1.f)
 		{
-			--Players[i].KFPC.Pawn.Health;
-			Players[i].HealthDecrement -= 1.f;
+			Players[i].KFPC.Pawn.Health=Min(Players[i].KFPC.Pawn.Health++, OverclockLimitHealth);
+			Players[i].HealthDelta -= 1.f;
 		}
 	}
-	if(Players[i].KFPH.Armor > Players[i].KFPH.MaxArmor)
+	if(Players[i].KFPH.Armor > Players[i].KFPH.MaxArmor)//If he's in OC status
 	{
-		Players[i].ArmorDecrement += DecreModifier * ArmourHealingAmount * DeltaTime;
-		if(Players[i].ArmorDecrement >= 1.f)
+		Players[i].ArmorDelta += DeltaModifier * ArmourHealingAmount * DeltaTime;
+		if(Players[i].ArmorDelta >= 1.f)
 		{
-			--Players[i].KFPH.Armor;
-			Players[i].ArmorDecrement -= 1.f;
+			Players[i].KFPH.Armor=Min(Players[i].KFPH.Armor++, OverclockLimitArmour);
+			Players[i].ArmorDelta -= 1.f;
 		}
 	}
 	
@@ -629,7 +639,7 @@ Event Tick(float DeltaTime)
 
 defaultproperties
 {
-	DecreModifier=0.2f //Health and armor decrement delta
+	DeltaModifier=0.2f //Health and armor pool delta
 	
 	PlayerNumber=0
 	bInNormalTime=True

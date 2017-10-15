@@ -20,7 +20,7 @@ static simulated event EFilterTypeUI GetTraderFilter()
 defaultproperties
 {
 	// Healing charge
-    HealAmount=15
+    HealAmount=10
 	HealFullRechargeSeconds=10
 
 	// Inventory
@@ -67,8 +67,8 @@ defaultproperties
 
 	// Recoil
 	//*0.8
-	maxRecoilPitch=160
-	minRecoilPitch=120
+	maxRecoilPitch=120
+	minRecoilPitch=80
 	maxRecoilYaw=140
 	minRecoilYaw=-140
 	RecoilRate=0.085
@@ -90,14 +90,14 @@ defaultproperties
 	InstantHitDamageTypes(DEFAULT_FIREMODE)=class'KFDT_Ballistic_Assault_Medic'
 	FireInterval(DEFAULT_FIREMODE)=+0.0857 // 700 RPM
 	Spread(DEFAULT_FIREMODE)=0.0085
-	InstantHitDamage(DEFAULT_FIREMODE)=48 //*1.2
+	InstantHitDamage(DEFAULT_FIREMODE)=50 //*1.25
 	FireOffset=(X=30,Y=4.5,Z=-5)
 
 	// ALTFIRE_FIREMODE
-	AmmoCost(ALTFIRE_FIREMODE)=27 //*0.9
+	AmmoCost(ALTFIRE_FIREMODE)=12
 
 	// BASH_FIREMODE
-	InstantHitDamage(BASH_FIREMODE)=27
+	InstantHitDamage(BASH_FIREMODE)=30
 	InstantHitDamageTypes(BASH_FIREMODE)=class'KFDT_Bludgeon_Assault_Medic'
 
 	// Fire Effects

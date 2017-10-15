@@ -20,7 +20,7 @@ static simulated event EFilterTypeUI GetTraderFilter()
 defaultproperties
 {
 	// Healing charge
-    HealAmount=15
+    HealAmount=10
 	HealFullRechargeSeconds=15
 
 	// Inventory
@@ -51,7 +51,7 @@ defaultproperties
 	//SpectatorWeaponArchetype=KFWeaponAttachment'WEP_Medic_SMG_ARCH.Wep_Medic_SMG_3P'
 
 	// Ammo
-	MagazineCapacity[0]=30 //0.75
+	MagazineCapacity[0]=40
 	SpareAmmoCapacity[0]=360
 	InitialSpareMags[0]=5
 	bCanBeReloaded=true
@@ -81,11 +81,11 @@ defaultproperties
 	InstantHitDamageTypes(DEFAULT_FIREMODE)=class'KFDT_Ballistic_SMG_Medic'
 	FireInterval(DEFAULT_FIREMODE)=+.075 // 800 RPM
 	Spread(DEFAULT_FIREMODE)=0.007
-	InstantHitDamage(DEFAULT_FIREMODE)=21.0 // *1.4
+	InstantHitDamage(DEFAULT_FIREMODE)=35
 	FireOffset=(X=30,Y=4.5,Z=-5)
 
 	// ALTFIRE_FIREMODE
-	AmmoCost(ALTFIRE_FIREMODE)=50
+	AmmoCost(ALTFIRE_FIREMODE)=30
 
 	// BASH_FIREMODE
 	InstantHitDamage(BASH_FIREMODE)=23.0

@@ -108,10 +108,6 @@ simulated function AddChatLine(string str)
 	KFPlayerOwner.MyGFxHUD.HudChatBox.AddChatMessage(str, class 'KFLocalMessage'.default.EventColor);
 }
 
-reliable client function ClientAddChatLine(string str, string HexVal)
-{
-	KFPlayerOwner.MyGFxHUD.HudChatBox.AddChatMessage(str, HexVal);
-}
 //*************************************************************
 //* Misc (Also contains some misc client & server function)
 //*************************************************************
@@ -175,6 +171,7 @@ reliable client function ClientSetHUD()
 //* Skill Functions
 //*************************************************************
 //To-do
+//Global ChatLine message notification
 reliable server function GlobalChatLineMessage(string msg)
 {
 	local HE_HUDManager instance;
@@ -182,11 +179,24 @@ reliable server function GlobalChatLineMessage(string msg)
 		instance.ClientAddChatLine(msg, "00aeff");
 }
 
+//Global HUD Center message notificaion
 reliable server function GlobalHUDMessage(string msg)
 {
 	local HE_HUDManager instance;
 	ForEach WorldInfo.AllActors(class'HE_HUDManager', instance)
-		instance.MyHE_HUD.DrawCenterMsg(msg);
+		instance.ClientHUDMessage(msg);
+}
+
+//Implement of GlobalChatLineMessage, a client function
+reliable client function ClientAddChatLine(string str, string HexVal)
+{
+	KFPlayerOwner.MyGFxHUD.HudChatBox.AddChatMessage(str, HexVal);
+}
+
+//Implement of GlobalHUDMessage, a client function
+reliable client function ClientHUDMessage(string msg)
+{
+	MyHE_HUD.DrawCenterMsg(msg);
 }
 
 defaultproperties

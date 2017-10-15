@@ -43,26 +43,30 @@ class HE_DataStructure extends Object
 */
 struct HEPlayer
 {
-	var Pawn					pShotTarget;			//	A shot target pawn he owns, Use to avoidi checking ShotTarget frequently
+	//Headshot Recover : Target Relative
+	var Pawn					pShotTarget;			//	A shot target
 	var Pawn					LastTarget;				//	His last zed target
-	var KFPawn_Monster			KFPM_Victim;			//	Zed victim who damaged by him
-	var KFWeapon				KFWeap;					//  His Weap in hand
-	
-	var KFPlayerReplicationInfo	KFPRI;					//  His Player Replication Info
-	var KFPlayerController		KFPC;					//	His KFPlayerController class
-	var KFPawn_Human			KFPH;					//	His KFPawn_Human
+	var KFPawn_Monster			KFPM_Victim;			//	Zed victim
+	var KFWeapon				KFWeap;					//  Weapon in hand
+	//Headshot Recover : Player Relative
+	var KFPlayerReplicationInfo	KFPRI;
+	var KFPlayerController		KFPC;
+	var KFPawn_Human			KFPH;
+	var int						fLastHSC;				//  Last AAR Headshots Ammout
 	var class<KFPerk>			LastPerk;
+	//Player Health Pool
+	var int						HealthToRecover;
+	var int						ArmorToRecover;
+	var float					HealthDelta;
+	var float					ArmorDelta;
 	
-	var HE_HUDManager			HUDManager;				//	His HUD Manager
+	//Actor Relative
+	var HE_HUDManager			HUDManager;
 	var HE_TraderManager		TraderManager;
 	var HE_ChatController		ChatController;
 	
+	//Structure Relative
 	var int						Index;					//  Shows his Index
-	var int						fLastHSC;				//  His last AAR Headshots Ammout
-	//var int						ConfigNotify;
-	var float					HealthDecrement;		//  Temply stores the health delta
-	var float					ArmorDecrement;			//  Temply stores the armor	delta
-	
 	var bool					bIsEpt;
 };
 
@@ -102,11 +106,6 @@ enum AsCMode
 	AsC_Default,
 	AsC_CenterDot,
 	AsC_OnlyDot
-};
-
-struct HE_HUDReplicationInfo
-{
-	var class<KFPerk>			PlayerPerk;
 };
 
 struct HEConfig
