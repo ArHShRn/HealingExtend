@@ -1,5 +1,8 @@
 # ATTENTION: THIS PROJECT HAS ALREADY ENDED UP DEVELOPING !!!
 # 注意：此项目已经停止开发
+请在<br>
+https://github.com/ArHShRn/HealingExtend/tree/02ba1204379e8a078d72d086a05e63faaea3bea5 <br>
+下载1.1.1版本的HealingExtend.u文件<br>
 # Mutator Version Updated to Release 1.1.1 插件版本更新至 1.1.1
 # 注意1.1.2版本回血池有重大BUG请不要下载
 -Decrease overclocked health and armor counting down by 20% (Now 0.2xAmmount per second)<br>
