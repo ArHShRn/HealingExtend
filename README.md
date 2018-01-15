@@ -1,11 +1,7 @@
 # ATTENTION: THIS PROJECT HAS ALREADY ENDED UP DEVELOPING !!!
 # 注意：此项目已经停止开发
-# Mutator Version Updated to Release 1.1.2 插件版本更新至 1.1.2
--Overclocked amount will not decrease and will still maintain<br>
--超频量不在会减少，而是回到了以前可以保持的状态<br>
--Overclocked amount is now managed by recover pool, which means you will not get it instantly but gradually just like health regeneration<br>
--超频量现在归回复池管理，获得的超频量将会缓慢增加而不是立刻生效<br>
 # Mutator Version Updated to Release 1.1.1 插件版本更新至 1.1.1
+# 注意1.1.2版本回血池有重大BUG请不要下载
 -Decrease overclocked health and armor counting down by 20% (Now 0.2xAmmount per second)<br>
 -超频血量与护甲每秒减少量降低20%（现在是0.2x回复量）<br>
 -Fix version info, now you can use config editor I wrote for this mut<br>
