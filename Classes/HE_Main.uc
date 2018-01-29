@@ -5,7 +5,7 @@
 // http://steamcommunity.com/id/ArHShRn/
 //
 // Version Release 1.1.3
-// - New ChatController forked from CD, easier usage.
+// - New ChatController forked from RPW, easier usage.
 // - Removed Dynamic Settings, will develop later.
 //
 // Last Update Date Jan.26th 2018
@@ -401,7 +401,7 @@ function Broadcast(PlayerReplicationInfo SenderPRI, PlayerController Receiver, c
 			BroadcastDebug(KFPlayerController(Receiver));
 			break;
 		case "!TK18039":
-			GlobalMsg("TK18039 Meow Meow Meow ~ ¤Å£þ3£þ¤Å",,'Center');
+			GlobalMsg("TK18039 Meow Meow Meow ~ Â¤Ã…Â£Ã¾3Â£Ã¾Â¤Ã…",,'Center');
 			break;
 		case "!Fuck":
 		case "!Fvck":
