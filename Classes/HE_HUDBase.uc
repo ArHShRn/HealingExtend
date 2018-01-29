@@ -12,7 +12,6 @@
 // Last Update Date Oct.11th 2017
 //=============================================================================
 class HE_HUDBase extends KFGFxHudWrapper
-	DependsOn(HE_DataStructure)
 	Config(HE_HUDBase);
 
 //*********************************************************
@@ -437,7 +436,7 @@ simulated function bool DrawSelfHumanPlayerInfo()
 		return false;
 	}
 
-	//Draw health bar
+		//Draw health bar
 		//Draw health up limit
 	Canvas.SetPos(ScreenPos.X + (BarLength * 0.5f) + BarSpace, ScreenPos.Y);
 	Canvas.DrawRect(2, BarHeight);
@@ -445,7 +444,9 @@ simulated function bool DrawSelfHumanPlayerInfo()
 	if( KFPH.Health - KFPH.HealthMax <=0)
 	{
 		Percentage = FMin(float(KFPH.Health) / float(KFPH.HealthMax), 1.f);
-		DrawKFBar(Percentage, BarLength, BarHeight, ScreenPos.X - (BarLength * 0.5f), ScreenPos.Y, HealthColor);	
+		DrawKFBar(Percentage, BarLength, BarHeight, ScreenPos.X - (BarLength * 0.5f), ScreenPos.Y, HealthColor);
+		Canvas.SetPos(	ScreenPos.X - (BarLength * 0.5f), ScreenPos.Y);
+		Canvas.DrawText("-NORMAL-");
 	}
 	else
 	{
@@ -454,6 +455,8 @@ simulated function bool DrawSelfHumanPlayerInfo()
 		//Then draw overclocked health bar	
 		Percentage = FMin(float(KFPH.Health - KFPH.HealthMax) / 75.f, 1.f);
 		DrawKFBar(Percentage, BarLength, BarHeight, ScreenPos.X - (BarLength * 0.5f), ScreenPos.Y, OverclockedHealthColor);
+		Canvas.SetPos(ScreenPos.X - (BarLength * 0.5f), ScreenPos.Y);
+		Canvas.DrawText("=OVERCLOCKING=");
 	}
 
 	//Draw armor bar
@@ -461,7 +464,9 @@ simulated function bool DrawSelfHumanPlayerInfo()
 	if( KFPH.Armor - KFPH.MaxArmor <=0)
 	{
 		Percentage = FMin(float(KFPH.Armor) / float(KFPH.MaxArmor), 1.f);
-		DrawKFBar(Percentage, BarLength, BarHeight, ScreenPos.X - (BarLength * 0.5f), ScreenPos.Y - BarHeight, ArmorColor);		
+		DrawKFBar(Percentage, BarLength, BarHeight, ScreenPos.X - (BarLength * 0.5f), ScreenPos.Y - BarHeight, ArmorColor);	
+		Canvas.SetPos(ScreenPos.X - (BarLength * 0.5f), ScreenPos.Y - BarHeight);
+		Canvas.DrawText("-NORMAL-");
 	}
 	else
 	{
@@ -469,7 +474,9 @@ simulated function bool DrawSelfHumanPlayerInfo()
 		DrawKFBar(1.0f, BarLength, BarHeight, ScreenPos.X - (BarLength * 0.5f), ScreenPos.Y - BarHeight, ArmorColor);	
 		//Then draw overclocked armor bar
 		Percentage = FMin(float(KFPH.Armor - KFPH.MaxArmor) / 100.f, 1.f);
-		DrawKFBar(Percentage, BarLength, BarHeight, ScreenPos.X - (BarLength * 0.5f), ScreenPos.Y - BarHeight, OverclockedArmorColor);	
+		DrawKFBar(Percentage, BarLength, BarHeight, ScreenPos.X - (BarLength * 0.5f), ScreenPos.Y - BarHeight, OverclockedArmorColor);
+		Canvas.SetPos(ScreenPos.X - (BarLength * 0.5f), ScreenPos.Y - BarHeight);
+		Canvas.DrawText("=OVERCLOCKING=");	
 	}
 
 
@@ -932,17 +939,13 @@ simulated function bool DrawFriendlyHumanPlayerInfo(KFPawn_Human KFPH)
 	local float FontScale;
 	local color TempColor;
 
+	Canvas.Font = class'KFGameEngine'.Static.GetKFCanvasFont();
 	KFPRI = KFPlayerReplicationInfo(KFPH.PlayerReplicationInfo);
 
 	if( KFPRI == none )
 	{
 		return false;
 	}
-	
-	//Ver 1.1.2
-	//Auto-Hide player info when the player's full
-	if ( KFPH.Health - KFPH.HealthMax >=0 )
-		return False;
 
 	MyFontRenderInfo = Canvas.CreateFontRenderInfo( true );
 	BarLength = FMin(PlayerStatusBarLengthMax * (float(Canvas.SizeX) / 1024.f), PlayerStatusBarLengthMax) * FriendlyHudScale;
@@ -965,7 +968,9 @@ simulated function bool DrawFriendlyHumanPlayerInfo(KFPawn_Human KFPH)
 	if( KFPH.Health - KFPH.HealthMax <=0)
 	{
 		Percentage = FMin(float(KFPH.Health) / float(KFPH.HealthMax), 1.f);
-		DrawKFBar(Percentage, BarLength, BarHeight, ScreenPos.X - (BarLength * 0.5f), ScreenPos.Y, HealthColor);	
+		DrawKFBar(Percentage, BarLength, BarHeight, ScreenPos.X - (BarLength * 0.5f), ScreenPos.Y, HealthColor);
+		Canvas.SetPos(	ScreenPos.X - (BarLength * 0.5f), ScreenPos.Y);
+		Canvas.DrawText("-NORMAL-");
 	}
 	else
 	{
@@ -974,6 +979,8 @@ simulated function bool DrawFriendlyHumanPlayerInfo(KFPawn_Human KFPH)
 		//Then draw overclocked health bar	
 		Percentage = FMin(float(KFPH.Health - KFPH.HealthMax) / 75.f, 1.f);
 		DrawKFBar(Percentage, BarLength, BarHeight, ScreenPos.X - (BarLength * 0.5f), ScreenPos.Y, OverclockedHealthColor);
+		Canvas.SetPos(ScreenPos.X - (BarLength * 0.5f), ScreenPos.Y);
+		Canvas.DrawText("=OVERCLOCKING=");
 	}
 
 	//Draw armor bar
@@ -981,7 +988,9 @@ simulated function bool DrawFriendlyHumanPlayerInfo(KFPawn_Human KFPH)
 	if( KFPH.Armor - KFPH.MaxArmor <=0)
 	{
 		Percentage = FMin(float(KFPH.Armor) / float(KFPH.MaxArmor), 1.f);
-		DrawKFBar(Percentage, BarLength, BarHeight, ScreenPos.X - (BarLength * 0.5f), ScreenPos.Y - BarHeight, ArmorColor);		
+		DrawKFBar(Percentage, BarLength, BarHeight, ScreenPos.X - (BarLength * 0.5f), ScreenPos.Y - BarHeight, ArmorColor);	
+		Canvas.SetPos(ScreenPos.X - (BarLength * 0.5f), ScreenPos.Y - BarHeight);
+		Canvas.DrawText("-NORMAL-");
 	}
 	else
 	{
@@ -989,7 +998,9 @@ simulated function bool DrawFriendlyHumanPlayerInfo(KFPawn_Human KFPH)
 		DrawKFBar(1.0f, BarLength, BarHeight, ScreenPos.X - (BarLength * 0.5f), ScreenPos.Y - BarHeight, ArmorColor);	
 		//Then draw overclocked armor bar
 		Percentage = FMin(float(KFPH.Armor - KFPH.MaxArmor) / 100.f, 1.f);
-		DrawKFBar(Percentage, BarLength, BarHeight, ScreenPos.X - (BarLength * 0.5f), ScreenPos.Y - BarHeight, OverclockedArmorColor);	
+		DrawKFBar(Percentage, BarLength, BarHeight, ScreenPos.X - (BarLength * 0.5f), ScreenPos.Y - BarHeight, OverclockedArmorColor);
+		Canvas.SetPos(ScreenPos.X - (BarLength * 0.5f), ScreenPos.Y - BarHeight);
+		Canvas.DrawText("=OVERCLOCKING=");	
 	}
 
 
@@ -1099,7 +1110,7 @@ function DrawAsCAim(bool Enable, KFWeapon KFW, optional AsCMode mode=AsC_Default
 
 //Draws a zed icon
 //re-work super class, adds FP SC Zedd's individual new UI Icon
-function DrawZedIcon( Pawn ZedPawn, vector PawnLocation )
+function DrawZedIcon( Pawn ZedPawn, vector PawnLocation, float NormalizedAngle)
 {
     local vector ScreenPos, TargetLocation;
     local float IconSizeMult;
@@ -1110,11 +1121,14 @@ function DrawZedIcon( Pawn ZedPawn, vector PawnLocation )
     ScreenPos.X -= IconSizeMult;
     ScreenPos.Y -= IconSizeMult;
 
-    if( ScreenPos.X < 0 || ScreenPos.X > Canvas.SizeX || 
-        ScreenPos.Y < 0 || ScreenPos.Y > Canvas.SizeY )
-    {
-        return;
-    }
+    if (NormalizedAngle > 0)
+	{
+		ScreenPos.x = FClamp(ScreenPos.x, PlayerStatusIconSize * FriendlyHudScale, Canvas.SizeX - (PlayerStatusIconSize * FriendlyHudScale));
+	}
+	else
+	{
+		ScreenPos = GetClampedScreenPosition(ScreenPos);
+	}
 
      //Draw icon
     Canvas.SetDrawColorStruct( ZedIconColor );
@@ -1207,8 +1221,8 @@ defaultproperties
 	PresetX=0.039f
 	PresetY=0.28f
 	
-	ArmorColor=(R=0, G=0, B=233, A=192) //(R=238, G=233, B=233, A=192)//Snow
-	HealthColor=(R=233, G=0, B=0, A=192) //(R=255, G=20, B=147, A=192)//Deep Pink
+	ArmorColor=(R=238, G=233, B=233, A=192) //(R=238, G=233, B=233, A=192)Snow (R=0, G=0, B=233, A=192)Blue
+	HealthColor=(R=255, G=20, B=147, A=192) //(R=255, G=20, B=147, A=192)DeepPink (R=233, G=0, B=0, A=192)Red
 	PlayerBarBGColor=(R=160, G=32, B=240, A=0) //Set to purple, but completely transparant now
 	PlayerBarTextColor=(R=248, G=248, B=255, A=192)//Navy Blue
 	PlayerBarIconColor=(R=248, G=248, B=255, A=192)//Ghost White
@@ -1217,7 +1231,7 @@ defaultproperties
 	SupplierUsableColor=(R=255, G=0, B=0, A=192)
 	SupplierHalfUsableColor=(R=220, G=200, B=0, A=192)
 
-    ZedIconColor=(R=255, G=48, B=48, A=192)//Red  //(R=0, G=191, B=255, A=192) Deep Sky Blue
+    ZedIconColor=(R=0, G=191, B=255, A=192)  //(R=0, G=191, B=255, A=192)DeepSkyBlue (R=255, G=48, B=48, A=192)Red
     
     Crosshair1=Texture2D'HE_Contents.Crosshair_ss'
 	ScrakeIcon=Texture2D'HE_Contents.ZeddAlert'

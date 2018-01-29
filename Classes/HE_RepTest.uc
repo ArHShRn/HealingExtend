@@ -56,10 +56,11 @@ reliable client function ClientPrint(int SevrerInt, string SevrerStr)
 function ChangeValue()
 {
 	ClientPrint(intTest, strTest);
-	//intTest++; strTest="Now:"$intTest;
+	intTest++; strTest="Now:"$intTest;
 }
 
 defaultproperties
 {
 	RemoteRole=ROLE_AutonomousProxy
+	bAlwaysRelevant=true
 }
