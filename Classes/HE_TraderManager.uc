@@ -39,23 +39,6 @@ var config array<CustomizedWeap>	CustomizedWeaps;
 
 simulated function PreBeginPlay()
 {
-	local CustomizedWeap instance;
-	
-	instance.DefClassPath="HealingExtend.WeapDef_HMT401";
-	instance.WeapClassPath="HealingExtend.Weap_HMT401";
-	instance.dItemId=-1;
-	CustomizedWeaps.AddItem(instance);
-	
-	instance.DefClassPath="HealingExtend.WeapDef_HMT201";
-	instance.WeapClassPath="HealingExtend.Weap_HMT201";
-	instance.dItemId=-1;
-	CustomizedWeaps.AddItem(instance);
-	
-	ForEach CustomizedWeaps(instance)
-		`log("[HE_TraderManager::PreBeginPlay]CustomizedWeaps="$instance.WeapClassPath);
-		
-	SaveConfig();
-	
 	super.PreBeginPlay();
 }
 

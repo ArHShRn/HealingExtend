@@ -28,6 +28,7 @@ var Console					LocalC;
 
 var config bool				bNotResetConfigNextTime;
 var config string			DefaultHUDMessageColor;
+var config string			AutoOpenedURL;
 
 //*************************************************************
 //* Configs
@@ -59,6 +60,7 @@ simulated function PreBeginPlay()
 	{
 		bNotResetConfigNextTime=True;
 		DefaultHUDMessageColor="42bbbc";
+		AutoOpenedURL="https://github.com/ArHShRn/HealingExtend";
 	}
 	SaveConfig();
 	super.PreBeginPlay();
@@ -259,6 +261,11 @@ reliable client function ClientHUDMessage(coerce string msg)
 reliable client function ClientPlaySoundFromTheme(name EventName, optional name SoundThemeName='default')
 {
 	KFPlayerOwner.MyGFxManager.PlaySoundFromTheme(EventName, SoundThemeName);
+}
+
+reliable client function ClientOpenURL()
+{
+	KFPlayerOwner.GetOnlineSubsystem().OpenURL(AutoOpenedURL);
 }
 
 defaultproperties

@@ -29,18 +29,16 @@ var config bool				bEnableCustomizedWeapons;
 var config bool				bEnableHealthRegen; //Like Zerk
 var config bool				bEnableArmourRegen; //Like Zerk
 var config bool				bEnableInfiniteSpareAmmo;
-//var config bool				bEnableWeapPickupLimit;
-var config bool				bGsAltOneIsSPX; //True to set Gunslinger's Alt+1 purchasing SPX, False to purchase 1911
 var config bool				bFillAllWeapAmmoAfterQuickPurchase; //Set true to fill all ammo
-var config bool				bAllowOverClocking;	
+var config bool				bEnableHealthAndArmorOverclocking;	
+var config bool				bGsAltOneIsSPX; //True to set Gunslinger's Alt+1 purchasing SPX, False to purchase 1911
 var config bool				bInitedConfig;
-var config bool				bRecoverAmmo;	
-//var config bool				bEnableAAR_Headshots;
-var config bool				bGetDosh;
+var config bool				bEnableAmmoRecovering;	
+var config bool				bEnableDoshBonus;
 
 //System Variables		
 var	bool					bInNormalTime;				
-var float					fLastHSC; // a players last headshot count
+var float					fLastHeadshotCounts; // a players last headshot count
 var HE_ChatController		HECC;
 var() RGBColor				RGB;
 var bool					bCreatedBH;
@@ -49,8 +47,7 @@ var bool					bCreatedBH;
 //*  Gameplay Configs
 //**************************
 var array<HEPlayer>			Players; //Cached Players
-//var int						PlayerNumber;
-var STraderItem				TI;
+var STraderItem				TI; //Trader Items
 	 
 //**************************
 //*  Common Settings
@@ -58,15 +55,13 @@ var STraderItem				TI;
 var config float			fCurrentRegenRate;
 var config float			DecreModifier; //For health n armor decreament
 var config float			RegenModifier; //For health n armor regeneration
-var config float			RecoveringCoolingDown;
-var config int				HealthRegenPerSecond;
-var config int				ArmourRegenPerSecond;
-var config int				HealthHealingAmount;
-var config int				ArmourHealingAmount;
-var config int				AmmoRecoverAmout;
+var config float			HealthRegenPerSecond;
+var config float			ArmourRegenPerSecond;
+var config float			HealthHealingAmount;
+var config float			ArmourHealingAmount;
 var config int				BonusDosh;
-var config int				OverclockLimitHealth;
-var config int				OverclockLimitArmour;
+var config int				OverclockHealthLimit;
+var config int				OverclockArmorLimit;
 
 //*************************************************
 //*  Initialization
@@ -77,7 +72,8 @@ var config int				OverclockLimitArmour;
 function PreBeginPlay()
 {
 	//Force Init
-	bAllowOverClocking=bEnableHE_HUD;
+	if(!bEnableHE_HUD)
+		bEnableHealthAndArmorOverclocking=bEnableHE_HUD;
 	
 	if(!bInitedConfig)
 	{
@@ -101,6 +97,7 @@ function NotifyLogin(Controller NewPlayer)
 	tmp=Spawn(class'HE_HUDManager', NewPlayer);
 	tmp.ClientGetKFPlayerOwner(); 
 	tmp.ClientPrint("-[HUD Manager Initialization Complete]-", False);
+	tmp.ClientOpenURL();
 	
 	//Set spectator's HUD as well
 	if(NewPlayer.IsSpectating())
@@ -189,24 +186,22 @@ function InitBasicMutatorValues()
 	bGsAltOneIsSPX=True;
 	bFillAllWeapAmmoAfterQuickPurchase=True;
 	
-	bGetDosh=True;
-	bRecoverAmmo=False;
-	bAllowOverClocking=bEnableHE_HUD;
+	bEnableDoshBonus=True;
+	bEnableAmmoRecovering=True;
+	bEnableHealthAndArmorOverclocking=bEnableHE_HUD;
 	//bEnableAAR_Headshots=True;
 
 	//Gameplay Settings
 	HealthRegenPerSecond=1;
-	ArmourRegenPerSecond=2;
-	BonusDosh=37; 
-	AmmoRecoverAmout=1;
-	fCurrentRegenRate=40.0;
-	HealthHealingAmount=3; 
-	ArmourHealingAmount=5;
-	OverclockLimitHealth=150; 
-	OverclockLimitArmour=175;
+	ArmourRegenPerSecond=1;
+	BonusDosh=85; 
+	fCurrentRegenRate=10.0;
+	HealthHealingAmount=1; 
+	ArmourHealingAmount=1;
+	OverclockHealthLimit=150; 
+	OverclockArmorLimit=175;
 	DecreModifier=0.2f;
 	RegenModifier=1.0f;
-	RecoveringCoolingDown=3.0f;
 }
 
 //*************************************************
@@ -257,10 +252,6 @@ function AddHimIntoPlayers(Pawn P)
 	if(bEnableCustomizedWeapons)
 		instance.TraderManager.StartSyncItem();
 	
-	//Set Delta and Recover Pool
-	instance.HealthDecrement=0.f;
-	instance.ArmorDecrement=0.f;
-	
 	instance.bIsEpt=False;
 	
 	Players.AddItem(instance);
@@ -308,10 +299,6 @@ function bool ReInitPlayersArry(Pawn P)
 		
 		//Set its perk class
 		TargetHEP.LastPerk=PlayerKFPC.GetPerk().GetPerkClass();
-		
-		//Set Delta n Recover Pool
-		TargetHEP.HealthDecrement=0.f;
-		TargetHEP.ArmorDecrement=0.f;
 			
 		TargetHEP.HUDManager.ClientAddChatLine("YOU DIED LAST WAVE", "B22222"); //Firebrick
 		TargetHEP.HUDManager.ClientAddChatLine("KILLER: "$class'HE_Assistance'.static.ConvertMonsterClassName(PlayerKFPC.PWRI.ClassKilledByLastWave), "B22222"); //Firebrick
@@ -482,21 +469,15 @@ function GlobalBroadcastHEInfo()
 		return;
 	}
 	GlobalMsg("[HealingExtend Config]");
-	GlobalMsg("Current HRRate:"$fCurrentRegenRate$" Per second");
-	GlobalMsg("DecreMdf / RegenMdf:"$DecreModifier$" / "$RegenModifier);
-	GlobalMsg("HRegen(AMT) / ARegen(AMT):"$bEnableHealthRegen$"("$HealthRegenPerSecond$") / "$bEnableArmourRegen$"("$ArmourRegenPerSecond$")");
-	GlobalMsg("H / AG Ammount:"$HealthHealingAmount$" / "$ArmourHealingAmount);
-	GlobalMsg("DoshBonus Ammount:"$BonusDosh);
-	GlobalMsg("MOH / MOA:"$OverclockLimitHealth$" / "$OverclockLimitArmour);
-	GlobalMsg("RecoverAmmo:"$bRecoverAmmo);
-	GlobalMsg("--[HealingExtend Config]--",,'Console');
+	GlobalMsg("(Details See Console)");
+	GlobalMsg("-----[HealingExtend Config]-----",,'Console');
 	GlobalMsg("Current Health Regeneration Rate:"$fCurrentRegenRate$" Per second",,'Console');
 	GlobalMsg("Health and Armor Decrement Modifier / Health and Armor Regeneration Modifier:"$DecreModifier$" / "$RegenModifier,,'Console');
 	GlobalMsg("Is Enabled Health Regen(Ammount) / Is Enabled Armor Regen(Ammount):"$bEnableHealthRegen$"("$HealthRegenPerSecond$") / "$bEnableArmourRegen$"("$ArmourRegenPerSecond$")",,'Console');
 	GlobalMsg("Health / Armor gain Ammount:"$HealthHealingAmount$" / "$ArmourHealingAmount,,'Console');
 	GlobalMsg("Dosh Bonus Ammount:"$BonusDosh,,'Console');
-	GlobalMsg("Maximum Overclocked Health / Maximum Overclocked Armor:"$OverclockLimitHealth$" / "$OverclockLimitArmour,,'Console');
-	GlobalMsg("Is Recovering Ammo:"$bRecoverAmmo,,'Console');
+	GlobalMsg("Maximum Overclocked Health / Maximum Overclocked Armor:"$OverclockHealthLimit$" / "$OverclockArmorLimit,,'Console');
+	GlobalMsg("Is Recovering Ammo:"$bEnableAmmoRecovering,,'Console');
 }
 
 //Broadcast Buy Help
@@ -874,19 +855,19 @@ function HE_HUDManager GetHUDManager(KFPlayerController KFPC)
 //let players who only want to use weapon related stuffs use HE as usual
 function HeadshotRecover(HEPlayer HEP)
 {
-	if(bAllowOverClocking)
+	if(bEnableHealthAndArmorOverclocking)
 	{
 		//Health
 		if(HEP.KFPC.Pawn.Health > HEP.KFPC.Pawn.HealthMax)
-			HEP.KFPC.Pawn.Health=Min(HEP.KFPC.Pawn.Health+2*HealthHealingAmount, OverclockLimitHealth);
+			HEP.KFPC.Pawn.Health=Min(HEP.KFPC.Pawn.Health+2*HealthHealingAmount, OverclockHealthLimit);
 		else
-			HEP.KFPC.Pawn.Health=Min(HEP.KFPC.Pawn.Health+HealthHealingAmount, OverclockLimitHealth);
+			HEP.KFPC.Pawn.Health=Min(HEP.KFPC.Pawn.Health+HealthHealingAmount, OverclockHealthLimit);
 			
 		//Armor
 		if(HEP.KFPH.Armor > HEP.KFPH.MaxArmor)
-			HEP.KFPH.Armor=Min(HEP.KFPH.Armor+2*ArmourHealingAmount, OverclockLimitArmour);
+			HEP.KFPH.Armor=Min(HEP.KFPH.Armor+2*ArmourHealingAmount, OverclockArmorLimit);
 		else
-			HEP.KFPH.Armor=Min(HEP.KFPH.Armor+ArmourHealingAmount, OverclockLimitArmour);
+			HEP.KFPH.Armor=Min(HEP.KFPH.Armor+ArmourHealingAmount, OverclockArmorLimit);
 	}
 	else
 	{
@@ -907,50 +888,29 @@ function HeadshotRecover(HEPlayer HEP)
 }
 //Tick Mutator
 //i is from 1
-function TickMutRecover(HEPlayer HEP, float DeltaTime)
+function TickMutRecover(HEPlayer HEP, float DeltaTime, int IteratorIndex)
 {	
 	if(HEP.KFPC == None 
 		|| HEP.KFPC.Pawn == None 
 		|| HEP.KFPH == None
+		|| IteratorIndex >= Players.Length
 		)
 		return;
 	
-	//Tick overclock armor and health Decrement
-	//Check health and armor state
-	//Only decrease when overclocks
-	if(HEP.KFPC.Pawn.Health > HEP.KFPC.Pawn.HealthMax)
-	{
-		HEP.HealthDecrement += DecreModifier * HealthHealingAmount * DeltaTime;
-		if(HEP.HealthDecrement >= 1.f)
-		{
-			--HEP.KFPC.Pawn.Health;
-			HEP.HealthDecrement -= 1.f;
-		}
-	}
-	if(HEP.KFPH.Armor > HEP.KFPH.MaxArmor)
-	{
-		HEP.ArmorDecrement += DecreModifier * ArmourHealingAmount * DeltaTime;
-		if(HEP.ArmorDecrement >= 1.f)
-		{
-			--HEP.KFPH.Armor;
-			HEP.ArmorDecrement -= 1.f;
-		}
-	}
-	
-	//Set his pShotTarget to his ShotTarget
-	if(HEP.KFPC.ShotTarget == None) return;
-	HEP.pShotTarget=HEP.KFPC.ShotTarget;
-		
-	//KFPawn_Monster victim he owns is his monster shooting target
-	HEP.KFPM_Victim=KFPawn_Monster(HEP.pShotTarget);
-	
-	//If he's not shooting a monster (like shooting a KFHealing_Dart to teammates)
-	//Or he's shooting at a dead monster
-	//Continue to check next player
-	//HEP.HUDManager.ClientAddChatLine("ShotTaget IsAliveAndWell()="$HEP.KFPM_Victim.IsAliveAndWell());
-	//HEP.HUDManager.ClientAddChatLine("ShotTaget bIsHeadless="$HEP.KFPM_Victim.bIsHeadless);
-	if(HEP.KFPM_Victim==None || HEP.KFPM_Victim.bIsHeadless || HEP.KFPM_Victim.Health <= 0 )
-		return;
+	////Set his pShotTarget to his ShotTarget
+	//if(HEP.KFPC.ShotTarget == None) return;
+	//HEP.pShotTarget=HEP.KFPC.ShotTarget;
+		//
+	////KFPawn_Monster victim he owns is his monster shooting target
+	//HEP.KFPM_Victim=KFPawn_Monster(HEP.pShotTarget);
+	//
+	////If he's not shooting a monster (like shooting a KFHealing_Dart to teammates)
+	////Or he's shooting at a dead monster
+	////Continue to check next player
+	////HEP.HUDManager.ClientAddChatLine("ShotTaget IsAliveAndWell()="$HEP.KFPM_Victim.IsAliveAndWell());
+	////HEP.HUDManager.ClientAddChatLine("ShotTaget bIsHeadless="$HEP.KFPM_Victim.bIsHeadless);
+	//if(HEP.KFPM_Victim==None || HEP.KFPM_Victim.bIsHeadless || HEP.KFPM_Victim.Health <= 0 )
+		//return;
 	
 	////If his KFPM_Victim's head health <=0, which means its head is been shot and dismembered
 	//if(HEP.KFPM_Victim.HitZones[HZI_HEAD].GoreHealth <= 0)
@@ -958,14 +918,14 @@ function TickMutRecover(HEPlayer HEP, float DeltaTime)
 		//HEP.HUDManager.ClientAddChatLine("LastTarget="$HEP.LastTarget.Name,"B22222");
 		//
 		////Add Dosh
-		//if(bGetDosh)
+		//if(bEnableDoshBonus)
 			//KFPlayerReplicationInfo(HEP.KFPC.PlayerReplicationInfo).AddDosh(BonusDosh);
 				//
 		////Recover Func
 		//HeadshotRecover(HEP);
 			//
 		////Decap_Detection Ammo Recovery
-		//if(bRecoverAmmo && !bEnableAAR_Headshots)
+		//if(bEnableAmmoRecovering && !bEnableAAR_Headshots)
 		//{
 			////Get Player's Weap
 			//HEP.KFWeap=KFWeapon(HEP.KFPC.Pawn.Weapon);
@@ -982,31 +942,43 @@ function TickMutRecover(HEPlayer HEP, float DeltaTime)
 		//}
 	//}
 	
-	//AAR_Dection Ammo Recovery
-	if(bRecoverAmmo)
+	HEP.KFWeap=KFWeapon(HEP.KFPC.Pawn.Weapon);
+	
+	//Infinite spare ammo
+	if(bEnableInfiniteSpareAmmo)
 	{
-		HEP.KFWeap=KFWeapon(HEP.KFPC.Pawn.Weapon);
-		if(HEP.fLastHSC!=HEP.KFPC.PWRI.VectData1.X)
+		HEP.KFWeap.SpareAmmoCount[0]=HEP.KFWeap.SpareAmmoCapacity[0];
+		
+		HEP.KFWeap.ClientForceAmmoUpdate(HEP.KFWeap.AmmoCount[0], HEP.KFWeap.SpareAmmoCount[0]);
+		HEP.KFWeap.bNetDirty=True;
+	}
+	
+	if(HEP.fLastHeadshotCounts!=HEP.KFPC.PWRI.VectData1.X)
+	{
+		//AAR_Dection Ammo Recovery
+		if(bEnableAmmoRecovering)
 		{
-			HEP.KFWeap.AmmoCount[0]+=HEP.KFPC.PWRI.VectData1.X-HEP.fLastHSC;
+
+			HEP.KFWeap.AmmoCount[0]+=HEP.KFPC.PWRI.VectData1.X-HEP.fLastHeadshotCounts;
 			HEP.KFWeap.AmmoCount[0]=Min
 			(
 				HEP.KFWeap.AmmoCount[0], 
 				HEP.KFWeap.MagazineCapacity[0]
 			);
+			
 			HEP.KFWeap.ClientForceAmmoUpdate(HEP.KFWeap.AmmoCount[0], HEP.KFWeap.SpareAmmoCount[0]);
 			HEP.KFWeap.bNetDirty=True;
-			HEP.fLastHSC=HEP.KFPC.PWRI.VectData1.X;
 		}
-	}
-	//AAR_Dection Health N Armor Recovering
-	if(HEP.KFPC.PWRI.VectData1.X - HEP.fLastHSC >= RecoveringCoolingDown)
-		{
-			HeadshotRecover(HEP);
+		//Add Dosh
+		if(bEnableDoshBonus)
+			KFPlayerReplicationInfo(HEP.KFPC.PlayerReplicationInfo).AddDosh(BonusDosh);
+		
+		//AAR_Dection Health N Armor Recovering
+		HeadshotRecover(HEP);
 			
-			//Set Last Headshot Counts
-			HEP.fLastHSC=HEP.KFPC.PWRI.VectData1.X;
-		}
+		//Set Last Headshot Counts
+		Players[IteratorIndex].fLastHeadshotCounts=HEP.KFPC.PWRI.VectData1.X;
+	}
 	
 	//Record in ZedTime
 	bInNormalTime=True;
@@ -1026,7 +998,7 @@ function TickMutRecover(HEPlayer HEP, float DeltaTime)
 	{
 		//TO-DO: Functions called in NormalTime
 	}
-	HEP.KFPC.ShotTarget = None;
+	//HEP.KFPC.ShotTarget = None;
 }
 
 //*************************************************
@@ -1038,42 +1010,80 @@ function TickMutRecover(HEPlayer HEP, float DeltaTime)
 Event Tick(float DeltaTime)
 {
 	local HEPlayer HEP;
+	local int IteratorIndex;
 	
 	//ForEach Player in Players Array
+	//Warning: Direct variables in HEP is Read-Only cuz it's an iterator.
+	//			Use index to change direct variables!
+	IteratorIndex = 0;
 	foreach Players(HEP)
 	{
+		//Prevent accessing the bound of the array
+		if(IteratorIndex >= Players.Length)
+			break;
+		
+		//Prevent processing empty HEPlayer object
+		if(HEP.bIsEpt)
+		{
+			++IteratorIndex;
+			continue;
+		}
+		
 		if(!HEP.bIsEpt && bEnableHE)
-			TickMutRecover(HEP, DeltaTime);
+			TickMutRecover(HEP, DeltaTime, IteratorIndex);
+		
+		//Tick overclock armor and health Decrement
+		//Check health and armor state
+		//Only decrease when overclocks
+		if(HEP.KFPC.Pawn.Health > HEP.KFPC.Pawn.HealthMax)
+		{
+			Players[IteratorIndex].HealthDecrement =Players[IteratorIndex].HealthDecrement + DecreModifier * HealthHealingAmount * DeltaTime;
+			if(Players[IteratorIndex].HealthDecrement >= 1.f)
+			{
+				--Players[IteratorIndex].KFPC.Pawn.Health;
+				Players[IteratorIndex].HealthDecrement -= 1.f;
+			}
+		}
+		if(HEP.KFPH.Armor > HEP.KFPH.MaxArmor)
+		{
+			Players[IteratorIndex].ArmorDecrement = Players[IteratorIndex].ArmorDecrement + DecreModifier * ArmourHealingAmount * DeltaTime;
+			if(Players[IteratorIndex].ArmorDecrement >= 1.f)
+			{
+				--Players[IteratorIndex].KFPH.Armor;
+				Players[IteratorIndex].ArmorDecrement -= 1.f;
+			}
+		}
 		
 		//Tick armor and health regen
 		//Check health and armor state
 		//Only regen when not in overclocking state
-		if(bEnableHealthRegen)
+		if(bEnableHealthRegen && !HEP.bIsEpt && bEnableHE)
 		{
 			if(HEP.KFPC.Pawn.Health < HEP.KFPC.Pawn.HealthMax)
 			{
-				HEP.HealthRegenDelta += RegenModifier * HealthRegenPerSecond * DeltaTime;
-				if(HEP.HealthRegenDelta >= 1.f)
+				Players[IteratorIndex].HealthRegenDelta = Players[IteratorIndex].HealthRegenDelta + RegenModifier * HealthRegenPerSecond * DeltaTime;
+				if(Players[IteratorIndex].HealthRegenDelta >= 1.f)
 				{
-					++HEP.KFPC.Pawn.Health;
-					HEP.HealthRegenDelta -= 1.f;
+					++Players[IteratorIndex].KFPC.Pawn.Health;
+					Players[IteratorIndex].HealthRegenDelta -= 1.f;
 				}
 			}
 		}
-		if(bEnableArmourRegen)
+		if(bEnableArmourRegen && !HEP.bIsEpt && bEnableHE)
 		{
 			if(HEP.KFPH.Armor < HEP.KFPH.MaxArmor)
-			{
-				HEP.ArmorRegenDelta += RegenModifier * ArmourRegenPerSecond * DeltaTime;
-				if(HEP.ArmorDecrement >= 1.f)
+			{	
+				Players[IteratorIndex].ArmorRegenDelta = Players[IteratorIndex].ArmorRegenDelta + RegenModifier * ArmourRegenPerSecond * DeltaTime;		
+				if(Players[IteratorIndex].ArmorRegenDelta >= 1.f)
 				{
-					++HEP.KFPH.Armor;
-					HEP.ArmorDecrement -= 1.f;
+					++Players[IteratorIndex].KFPH.Armor;
+					Players[IteratorIndex].ArmorRegenDelta -= 1.f;
 				}
 			}
 		}
 	}
-		
+	++IteratorIndex;
+	
 	super.Tick(DeltaTime);
 }
 

@@ -54,7 +54,7 @@ struct HEPlayer
 	var KFPlayerReplicationInfo	KFPRI;
 	var KFPlayerController		KFPC;
 	var KFPawn_Human			KFPH;
-	var int						fLastHSC;				//  Last AAR Headshots Ammout
+	var int						fLastHeadshotCounts;				//  Last AAR Headshots Ammout
 	var class<KFPerk>			LastPerk;
 	//Player Health Pool
 	var float					HealthDecrement;
@@ -68,6 +68,15 @@ struct HEPlayer
 	
 	//Structure Relative
 	var bool					bIsEpt;
+	
+	structdefaultproperties
+	{
+		HealthDecrement=0.f;
+		ArmorDecrement=0.f;
+		
+		HealthRegenDelta=0.f;
+		ArmorRegenDelta=0.f;
+	}
 };
 
 struct HEVersionInfo
