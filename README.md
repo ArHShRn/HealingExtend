@@ -1,26 +1,26 @@
-# ATTENTION: THIS PROJECT IS RESTARTED !!!
-# 注意：此项目重新开始维护
-如果需要稳定版本，请在<br>
-https://github.com/ArHShRn/HealingExtend/tree/02ba1204379e8a078d72d086a05e63faaea3bea5 <br>
-下载1.1.1版本的HealingExtend.u文件<br>
-# Mutator Version Updated to Release 1.1.1 插件版本更新至 1.1.1
-# 注意1.1.2版本回血池有重大BUG请不要下载
--Decrease overclocked health and armor counting down by 20% (Now 0.2xAmmount per second)<br>
--超频血量与护甲每秒减少量降低20%（现在是0.2x回复量）<br>
--Fix version info, now you can use config editor I wrote for this mut<br>
--修复了插件版本信息，现在可以使用我写的1.1.1版本的新配置编辑器了<br>
-
-# THX LIST 感谢名单
+# HealingExtend Plus Version 1.1.3 扩展治疗1.1.3
+## THX LIST 感谢名单
 Pharrahnox<br>
 Teriyakisaurus Rex<br>
 Blackout<br>
 
-# Update Method and Compatibility 插件升级方法以及兼容性
-This mut has its own HUD and I created one No_HUD version before, but this is ver 1.1.0 and I didn't create one for this version because it has too many features associated to the HUD, so I may not write a No_HUD version for every version of the mutator.
-And this mutator is not compatible with any mode that has its own HUD!<br>
-这个插件有自己的HUD而且之前的版本我重写了一个无HUD版本的插件加入进去，但是因为这是新版本1.1.0所以我没有给这个版本写无HUD版本，因为目前为止它具有太多与自订HUD相关的功能了，而且之后我也不会给每个版本单独写一个无HUD版本出来了。<br>
-所以这个插件不支持任何带有自制HUD的插件！例如RPG MOD<br>
-To update the mutator, you need to delete KFHealingExtend.ini (Version 0.1.2) or KFHE_Main.ini (Version 1.0.1) in your config folder and run the mutator for at least once.<br>
-为了升级插件，你需要将原有的配置文件删除，对应的是KFHealingExtend.ini (版本号 0.1.2) 或者 KFHE_Main.ini (版本号 1.0.1)，然后至少运行插件一次<br>
-
-# New ChatController Is Pending！　新版本汉化控制准备出炉！
+## READ-ME!! COMPATIBILITY!! 必读！！兼容性！！
+### For The New ChatController 对于新的喊话控制器
+<b>Warning:</b>The new CC is forked from RPW, but due to RPW BroadcastHandler's initialization procedure:<br><br>
+<b>ANY BROADCASTHANDLER CREATED THROUGH THE METHOD IN HE SRC MUST OBEY THE PATTERN OF THE PROCEDURE OF HealingExtend's CHATCONTROLLER(BROADCASTHANDLER) OR YOUR MUTATOR WILL SUFFER FROM UNKNOWN CRTICAL BUGS DUE TO THE COMPATIBILITY!<b><br>
+  <br><b>警告:</b>新版本汉化控制器借鉴RPW的喊话控制器，但是由于RPW喊话控制器自身的初始化结构：<br>
+  <b>任何通过运用本项目源码中初始化方法的喊话控制器必须严格遵循此项目源码中的代码格式，否则你的插件会因为兼容性而将遭遇严重的随机未知BUG！</b><br>
+### For The HE_HUD 对于HE的HUD
+  HealingExtend's HE_HUD now can be closed in .ini file with bEnableHE_HUD set to False which means you can use HE in ServerExt servers. :D
+  <br><b>Attention: Disable HE_HUD will also disable Overclocking thanks to TWI's unforgettable bugs in KFHUD_Base.</b>
+  <br><br>
+  HE插件的自身HUD现在可以通过将.ini文件中的bEnableHE_HUD设置成False来关闭，这意味着HE将兼容ServerExt，你们可以把HE用到ServerExt的服务器上面去了<br>
+  <b>注意：感谢TWI在KF HUD里面创造的令人难忘的bugs，至此关闭HE_HUD将会强制关闭生命和护甲值超频功能</b><br>
+  
+## README !! COMMAND LINES !! 必读！启用插件的命令行代码
+Though HE's command line is still:<br>
+?Mutator=HealingExtend.HE_Main<br>
+But <b> DO REMEMBER TO PUT HealingExtend.HE_Main AFTER RPWMod.RestrictPW if you're using RPW!</b> For the compatibilty!<br><br>
+虽然HE的命令行代码还是<br>
+?Mutator=HealingExtend.HE_Main<br>
+但是<b>如果使用了RPW就请务必将HealingExtend.HE_Main放在RPWMod.RestrictPW的后面！</b>，为的是兼容性
