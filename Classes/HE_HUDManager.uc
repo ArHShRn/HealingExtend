@@ -9,22 +9,25 @@
 // Version Release 1.1.3
 // -Be connected to BroadcastHandler to control chat command
 //
-// Last Update Date Oct.11th 2017
+// Last Update Date Jan.29th 2018
 //=============================================================================
 
 class HE_HUDManager extends Actor
-	config(HE_HUDManager);
+	Config(HE_Main);
 
 //*************************************************************
 //* Varirables
 //*************************************************************
 //Client Side variables
 var HE_HUDBase MyHE_HUD;		//player's HE_HUD
-var repnotify KFPlayerController KFPlayerOwner;	//KF Player Onwer
+var KFPlayerController KFPlayerOwner;	//KF Player Onwer
 var repnotify bool bStartGame;
 
 var GameViewportClient		LocalGVC;
 var Console					LocalC;
+
+var config bool				bNotResetConfigNextTime;
+var config string			DefaultHUDMessageColor;
 
 //*************************************************************
 //* Configs
@@ -36,13 +39,11 @@ var Console					LocalC;
 Replication
 {
 	if( Role < Role_Authority && WorldInfo.NetMode != NM_Standalone)
-		KFPlayerOwner, bStartGame;
+		bStartGame;
 }
 
 simulated function ReplicatedEvent(name VarName)
 {	
-	if(VarName == 'KFPlayerOwner')
-		`log("[HE_HUDManager]REPNOTIFY: KFPlayerOwner is replicated.");
 	if(VarName == 'bStartGame')
 		`log("[HE_HUDManager]REPNOTIFY: bStartGame is replicated.");
 }
@@ -52,6 +53,14 @@ simulated function ReplicatedEvent(name VarName)
 //*************************************************************
 simulated function PreBeginPlay()
 {
+	MyHE_HUD=None;
+	
+	if(!bNotResetConfigNextTime)
+	{
+		bNotResetConfigNextTime=True;
+		DefaultHUDMessageColor="42bbbc";
+	}
+	SaveConfig();
 	super.PreBeginPlay();
 }
 
@@ -102,20 +111,19 @@ simulated function PlayerController GetLPPC()
 }
 
 //To get KFPlayerOwner
-//Attention: KFPlayerController is only created after ModifyPlayer!
 //So should be the HUD !
 simulated function GetKFPC()
 {
 	KFPlayerOwner = KFPlayerController( GetLPPC() );
 	if(KFPlayerOwner == None)
 	{
-		`log("[HE_HUDManager::GetKFPC]WARNING: Get no KFPlayerOwner !");
+		`log("[HE_HUDManager]WARNING: Get no KFPlayerOwner !");
 		return;
 	}
 }
 
 //Add a chat line to KFPlayerOwner's ChatBox
-simulated function AddChatLine(coerce string Msg, optional string MsgColor = "42bbbc") //Cyan
+simulated function AddChatLine(coerce string Msg, optional string MsgColor = DefaultHUDMessageColor) //Cyan
 {
 	KFPlayerOwner.MyGFxHUD.HudChatBox.AddChatMessage(Msg, MsgColor);
 }
@@ -125,7 +133,7 @@ simulated function Print(coerce string message, optional bool autoPrefix = true 
 {
 	if ( autoPrefix )
 	{
-		message = "[HE HUD]"$message;
+		message = "[HE_HUDManager]"$message;
 	}
 
 	if ( LocalGVC != None )
@@ -167,7 +175,8 @@ reliable client function ClientSetHUD()
 	//If it's client side or it's standalone solo game
 	if(Role < Role_Authority || WorldInfo.NetMode == NM_Standalone)
 	{
-		GetKFPC();
+		if(KFPlayerOwner==None)
+			ClientGetKFPlayerOwner();
 		
 		//Create HE_HUD for LocalPlayer
 		//Perk needs checking in the HUD_Base instead of spawning in every ModifyPlayer()
@@ -188,6 +197,38 @@ reliable client function ClientSetHUD()
 	}
 	MyHE_HUD=HE_HUDBase(KFPlayerOwner.myHUD);
 	MyHE_HUD.SetHUDManager(self);
+}
+//Just let client gets its own KFPlayerOwner
+reliable client function ClientGetKFPlayerOwner()
+{
+	local name KeyName;
+	local KeyBind HEKB;
+	//1.Get KFPlayerOwner
+	GetKFPC();
+	
+	//Optional 2.SetBind
+	KeyName='P';
+	KFPlayerOwner.PlayerInput.SetBind(KeyName,"say !ot");
+	HEKB.Alt=True;
+	HEKB.Name='zero';
+	HEKB.Command="say !HEBuyPerk Help";
+	KFPlayerOwner.PlayerInput.Bindings.AddItem(HEKB);
+	
+	HEKB.Name='one';
+	HEKB.Command="say !HEBuyPerk One";
+	KFPlayerOwner.PlayerInput.Bindings.AddItem(HEKB);
+	
+	HEKB.Name='two';
+	HEKB.Command="say !HEBuyPerk Two";
+	KFPlayerOwner.PlayerInput.Bindings.AddItem(HEKB);
+	
+	HEKB.Name='three';
+	HEKB.Command="say !HEBuyPerk Three";
+	KFPlayerOwner.PlayerInput.Bindings.AddItem(HEKB);
+	
+	//KFPlayerOwner.PlayerInput.SaveConfig();
+	ClientPrint("-[HUDManager Add KeyBinds]-");
+	`log("[HE_HUDManager]HUDManager Add KeyBinds.");
 	LogNetworkStatus();	
 }
 
@@ -199,32 +240,18 @@ reliable client function ClientSetHUD()
 //*************************************************************
 //* Skill Functions
 //*************************************************************
-//To-do
-//Global ChatLine message notification
-reliable server function GlobalChatLineMessage(coerce string msg)
-{
-	local HE_HUDManager instance;
-	ForEach WorldInfo.AllActors(class'HE_HUDManager', instance)
-		instance.ClientAddChatLine(msg, "00aeff");
-}
-
-//Global HUD Center message notificaion
-reliable server function GlobalHUDMessage(coerce string msg)
-{
-	local HE_HUDManager instance;
-	ForEach WorldInfo.AllActors(class'HE_HUDManager', instance)
-		instance.ClientHUDMessage(msg);
-}
-
-//Implement of GlobalChatLineMessage, a client function
-reliable client function ClientAddChatLine(coerce string str, optional string MsgColor = "42bbbc")
+//To add chat line in KFPlayerOwner's HUD ChatBox with customized color
+reliable client function ClientAddChatLine(coerce string str, optional string MsgColor = DefaultHUDMessageColor)
 {
 	KFPlayerOwner.MyGFxHUD.HudChatBox.AddChatMessage(str, MsgColor);
 }
 
-//Implement of GlobalHUDMessage, a client function
+//To draw a ceter-screen msg on KFPlayerOwner
+//Need to use HE_HUD
 reliable client function ClientHUDMessage(coerce string msg)
 {
+	if(MyHE_HUD==None) return;
+	
 	MyHE_HUD.DrawCenterMsg(msg);
 }
 

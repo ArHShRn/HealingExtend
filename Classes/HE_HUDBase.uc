@@ -5,11 +5,10 @@
 // Code And Concept By ArHShRn
 // http://steamcommunity.com/id/ArHShRn/
 //
-// Version Release 1.1.1
+// Version Release 1.1.3
+// -No big changes than Ver 1.1.2
 //
-// -Auto-hide health bar when the player is full
-//
-// Last Update Date Oct.11th 2017
+// Last Update Date Jan.29th 2017
 //=============================================================================
 class HE_HUDBase extends KFGFxHudWrapper
 	Config(HE_HUDBase);
@@ -142,7 +141,7 @@ function InitBasicValues()
 	if( GenericZedIconTexture != None )
 	{
 		bIsUpkUser = True;
-		`log("---[HE_HUDBase::InitBasicValues]This user is a upk-user, draw customized contents.");
+		`log("[HE_HUDBase::InitBasicValues]This user is a upk-user, draw customized contents.");
 	}
 }
 
@@ -150,7 +149,7 @@ function InitBasicValues()
 simulated function SetHUDManager(HE_HUDManager AManager)
 {
 	ManagerOwner = AManager;
-	`log("---[HE_HUDBase::SetHUDManager]ManagerOwner sets to "$ManagerOwner.Name);
+	`log("[HE_HUDBase::SetHUDManager]ManagerOwner sets to "$ManagerOwner.Name);
 }
 //*********************************************************
 //* Misc
@@ -253,12 +252,6 @@ exec function ChangeAsCMode()
 		Print("\Documents\My Games\KillingFloor2\KFGame\Published\BrewedPC\Packages\HealingExtend_Contents");
 	}
 }
-
-exec function DebugGlobalMsg(string message)
-{
-	ManagerOwner.GlobalHUDMessage(message);
-}
-
 //*********************************************************
 //* Tests
 //*********************************************************
@@ -969,8 +962,8 @@ simulated function bool DrawFriendlyHumanPlayerInfo(KFPawn_Human KFPH)
 	{
 		Percentage = FMin(float(KFPH.Health) / float(KFPH.HealthMax), 1.f);
 		DrawKFBar(Percentage, BarLength, BarHeight, ScreenPos.X - (BarLength * 0.5f), ScreenPos.Y, HealthColor);
-		Canvas.SetPos(	ScreenPos.X - (BarLength * 0.5f), ScreenPos.Y);
-		Canvas.DrawText("-NORMAL-");
+		//Canvas.SetPos(	ScreenPos.X - (BarLength * 0.5f), ScreenPos.Y);
+		//Canvas.DrawText("-NORMAL-");
 	}
 	else
 	{
@@ -979,8 +972,8 @@ simulated function bool DrawFriendlyHumanPlayerInfo(KFPawn_Human KFPH)
 		//Then draw overclocked health bar	
 		Percentage = FMin(float(KFPH.Health - KFPH.HealthMax) / 75.f, 1.f);
 		DrawKFBar(Percentage, BarLength, BarHeight, ScreenPos.X - (BarLength * 0.5f), ScreenPos.Y, OverclockedHealthColor);
-		Canvas.SetPos(ScreenPos.X - (BarLength * 0.5f), ScreenPos.Y);
-		Canvas.DrawText("=OVERCLOCKING=");
+		//Canvas.SetPos(ScreenPos.X - (BarLength * 0.5f), ScreenPos.Y);
+		//Canvas.DrawText("=OVERCLOCKING=");
 	}
 
 	//Draw armor bar
@@ -989,8 +982,8 @@ simulated function bool DrawFriendlyHumanPlayerInfo(KFPawn_Human KFPH)
 	{
 		Percentage = FMin(float(KFPH.Armor) / float(KFPH.MaxArmor), 1.f);
 		DrawKFBar(Percentage, BarLength, BarHeight, ScreenPos.X - (BarLength * 0.5f), ScreenPos.Y - BarHeight, ArmorColor);	
-		Canvas.SetPos(ScreenPos.X - (BarLength * 0.5f), ScreenPos.Y - BarHeight);
-		Canvas.DrawText("-NORMAL-");
+		//Canvas.SetPos(ScreenPos.X - (BarLength * 0.5f), ScreenPos.Y - BarHeight);
+		//Canvas.DrawText("-NORMAL-");
 	}
 	else
 	{
@@ -999,8 +992,8 @@ simulated function bool DrawFriendlyHumanPlayerInfo(KFPawn_Human KFPH)
 		//Then draw overclocked armor bar
 		Percentage = FMin(float(KFPH.Armor - KFPH.MaxArmor) / 100.f, 1.f);
 		DrawKFBar(Percentage, BarLength, BarHeight, ScreenPos.X - (BarLength * 0.5f), ScreenPos.Y - BarHeight, OverclockedArmorColor);
-		Canvas.SetPos(ScreenPos.X - (BarLength * 0.5f), ScreenPos.Y - BarHeight);
-		Canvas.DrawText("=OVERCLOCKING=");	
+		//Canvas.SetPos(ScreenPos.X - (BarLength * 0.5f), ScreenPos.Y - BarHeight);
+		//Canvas.DrawText("=OVERCLOCKING=");	
 	}
 
 

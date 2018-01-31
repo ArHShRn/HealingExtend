@@ -6,15 +6,18 @@
 // http://steamcommunity.com/id/ArHShRn/
 //
 // Version Release 1.1.3
+// -Rewrite this class, achieve it with BroadcastHandler inspired from RPW
 //
 // Last Update Date Jan.26th 2017
 //=============================================================================
 class HE_ChatController extends BroadcastHandler
-	Config(HE_ChatController);
+	config(HE_Main);
 	
-var HE_Main MyHEMain;
+var HE_Main				MyHEMain;
 
-var BroadcastHandler PreBroadcastHandler; //Compability to RPW
+var BroadcastHandler	PreBroadcastHandler; //Compability to RPW
+
+var config bool			bPrintNetworkStatusInConsole;
 
 //Initialize HE_Main Class
 //WARNING: Must be compatible with RPW!
@@ -22,7 +25,18 @@ function InitHEClass(HE_Main HE_MainObj) {
 	MyHEMain = HE_MainObj;
 	PreBroadcastHandler = MyHEMain.MyKFGI.BroadcastHandler;
 	MyHEMain.MyKFGI.BroadcastHandler = self;
-	`log("[HECC]Compability To Class "$PreBroadcastHandler.Name);
+	`log("[HECC]Compatibility To Class "$PreBroadcastHandler.Name);
+}
+
+simulated function PreBeginPlay()
+{
+	if(!MyHEMain.bInitedConfig)
+	{
+		bPrintNetworkStatusInConsole=False;
+	}
+	
+	SaveConfig();
+	super.PreBeginPlay();
 }
 
 simulated function PostBeginPlay()
@@ -33,10 +47,15 @@ simulated function PostBeginPlay()
 	if(LocalGVC == None)
 		return;
 	
-	LocalGVC.ViewportConsole.OutputTextLine("[HECC]WorldInfo.NetMode="$WorldInfo.NetMode);
-	LocalGVC.ViewportConsole.OutputTextLine("[HECC]Role="$Role);
-	LocalGVC.ViewportConsole.OutputTextLine("[HECC]RemoteRole="$RemoteRole);
-	LocalGVC.ViewportConsole.OutputTextLine("[HECC]Owner="$Owner);
+	if(bPrintNetworkStatusInConsole)
+	{
+		LocalGVC.ViewportConsole.OutputTextLine("-[HealingExtend Chat Controller]-");
+		LocalGVC.ViewportConsole.OutputTextLine("WorldInfo.NetMode="$WorldInfo.NetMode);
+		LocalGVC.ViewportConsole.OutputTextLine("Role="$Role);
+		LocalGVC.ViewportConsole.OutputTextLine("RemoteRole="$RemoteRole);
+		LocalGVC.ViewportConsole.OutputTextLine("Owner="$Owner);
+	}
+	LocalGVC.ViewportConsole.OutputTextLine("-[HECC Initialization Complete]-");
 }
 
 //Override the super, get an entrance for chat command

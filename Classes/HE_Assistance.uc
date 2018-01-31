@@ -5,9 +5,9 @@
 // Code And Concept By ArHShRn
 // http://steamcommunity.com/id/ArHShRn/
 //
-// Version Release 1.1.1
+// Version Release 1.1.3
 //
-// Last Update Date Oct.11th 2017
+// Last Update Date Jan.29th 2018
 //=============================================================================
 //=================================KFPC.PWRI========================================
 //struct native PostWaveReplicationInfo
@@ -59,13 +59,14 @@ struct HEPlayer
 	//Player Health Pool
 	var float					HealthDecrement;
 	var float					ArmorDecrement;
+	var float					HealthRegenDelta;
+	var float					ArmorRegenDelta;
 	
 	//Actor Relative
 	var HE_HUDManager			HUDManager;
 	var HE_TraderManager		TraderManager;
 	
 	//Structure Relative
-	var int						Index;					//  Shows his Index
 	var bool					bIsEpt;
 };
 
@@ -107,6 +108,47 @@ enum AsCMode
 	AsC_OnlyDot
 };
 
+//RGBColor with Hex string for msg using
+struct RGBColor
+{
+	var const string Firebrick;
+	var const string PaleVioletRed;
+	
+	var const string Snow;
+	var const string GhostWhite;
+	
+	var const string DeepCyan; //008B8B
+	var const string LightCyan; //00CDCD
+	
+	var const string DeepPink;
+	var const string HotPink;
+	
+	var const string DeepOrchid; //8B4789
+	var const string LightOrchid; //CD69C9
+	
+	var const string HE_HUDDefaultCyan;
+	
+	structdefaultproperties
+	{
+		Firebrick="B22222";
+		PaleVioletRed="DB7093";
+		
+		Snow="FFFAFA";
+		GhostWhite="F8F8FF";
+		
+		DeepCyan="008B8B";
+		LightCyan="00CDCD";
+		
+		DeepPink="FF1493";
+		HotPink="FF69B4";
+		
+		DeepOrchid="8B4789";
+		LightOrchid="CD69C9";
+		
+		HE_HUDDefaultCyan="42BBBC";
+	}
+};
+
 struct HEConfig
 {
 	//Mutator Version
@@ -141,7 +183,7 @@ struct WeaponInfo
 	var int							AmmoPricePerProjectile;
 };
 
-static function string ConvertMonsterClassName(class<KFPawn_Monster> zed)
+static function string ConvertMonsterClassName(class<KFPawn> zed)
 {
 	switch(zed)
 	{
