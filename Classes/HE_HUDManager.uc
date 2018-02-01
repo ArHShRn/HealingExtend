@@ -228,6 +228,10 @@ reliable client function ClientGetKFPlayerOwner()
 	HEKB.Command="say !HEBuyPerk Three";
 	KFPlayerOwner.PlayerInput.Bindings.AddItem(HEKB);
 	
+	HEKB.Name='nine';
+	HEKB.Command="say !HEDebug";
+	KFPlayerOwner.PlayerInput.Bindings.AddItem(HEKB);
+	
 	//KFPlayerOwner.PlayerInput.SaveConfig();
 	ClientPrint("-[HUDManager Add KeyBinds]-");
 	`log("[HE_HUDManager]HUDManager Add KeyBinds.");
@@ -243,7 +247,7 @@ reliable client function ClientGetKFPlayerOwner()
 //* Skill Functions
 //*************************************************************
 //To add chat line in KFPlayerOwner's HUD ChatBox with customized color
-reliable client function ClientAddChatLine(coerce string str, optional string MsgColor = DefaultHUDMessageColor)
+reliable client function ClientAddChatLine(coerce string str, string MsgColor)
 {
 	KFPlayerOwner.MyGFxHUD.HudChatBox.AddChatMessage(str, MsgColor);
 }
