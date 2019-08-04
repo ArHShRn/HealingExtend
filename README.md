@@ -1,3 +1,5 @@
+# This Proj is **depreciated** 项目已经**过时**
+----
 # HealingExtend Plus Version 1.1.3 扩展治疗1.1.3
 ## THX LIST 感谢名单
 Pharrahnox<br>
