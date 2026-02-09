@@ -1,0 +1,1623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HealingExtend Plus v1.1.3 - Wiki</title>
+<style>
+:root {
+  --bg-primary: #0d1117;
+  --bg-secondary: #161b22;
+  --bg-sidebar: #0d1117;
+  --bg-card: #1c2333;
+  --bg-code: #1a1f2e;
+  --text-primary: #e6edf3;
+  --text-secondary: #8b949e;
+  --text-muted: #6e7681;
+  --accent: #58a6ff;
+  --accent-dim: #1f6feb;
+  --border: #30363d;
+  --border-light: #21262d;
+  --green: #3fb950;
+  --yellow: #d29922;
+  --red: #f85149;
+  --purple: #bc8cff;
+  --sidebar-width: 280px;
+  --header-height: 56px;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+/* Header */
+.header {
+  position: fixed; top:0; left:0; right:0;
+  height: var(--header-height);
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center;
+  padding: 0 20px; z-index: 100;
+}
+.header-logo {
+  font-size: 18px; font-weight: 700;
+  color: var(--accent);
+  display: flex; align-items: center; gap: 10px;
+}
+.header-logo span.tag {
+  font-size: 11px; padding: 2px 8px;
+  background: var(--accent-dim);
+  border-radius: 12px; color: #fff;
+  font-weight: 500;
+}
+.header-logo span.deprecated {
+  background: var(--yellow);
+  color: #000;
+}
+.header-search {
+  margin-left: 40px; position: relative;
+}
+.header-search input {
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  padding: 6px 12px 6px 32px;
+  border-radius: 6px;
+  font-size: 14px; width: 300px;
+  outline: none;
+}
+.header-search input:focus { border-color: var(--accent); }
+.header-search svg {
+  position: absolute; left: 10px; top: 50%;
+  transform: translateY(-50%);
+  fill: var(--text-muted); width: 16px; height: 16px;
+}
+.menu-toggle {
+  display: none; background: none; border: none;
+  color: var(--text-primary); cursor: pointer;
+  padding: 4px; margin-right: 12px;
+}
+/* Sidebar */
+.sidebar {
+  position: fixed; top: var(--header-height); left:0;
+  width: var(--sidebar-width);
+  height: calc(100vh - var(--header-height));
+  background: var(--bg-sidebar);
+  border-right: 1px solid var(--border);
+  overflow-y: auto; padding: 16px 0;
+  z-index: 50;
+  transition: transform 0.3s ease;
+}
+.sidebar::-webkit-scrollbar { width: 4px; }
+.sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+.sidebar-group { margin-bottom: 4px; }
+.sidebar-group-title {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 6px 20px; cursor: pointer;
+  font-size: 12px; font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-secondary);
+  user-select: none;
+}
+.sidebar-group-title:hover { color: var(--text-primary); }
+.sidebar-group-title .arrow {
+  transition: transform 0.2s;
+  font-size: 10px;
+}
+.sidebar-group.collapsed .arrow { transform: rotate(-90deg); }
+.sidebar-group.collapsed .sidebar-items { display: none; }
+.sidebar-items { list-style: none; }
+.sidebar-item {
+  display: block;
+  padding: 6px 20px 6px 28px;
+  font-size: 14px;
+  color: var(--text-secondary);
+  text-decoration: none;
+  cursor: pointer;
+  border-left: 2px solid transparent;
+  transition: all 0.15s;
+}
+.sidebar-item:hover {
+  color: var(--text-primary);
+  background: var(--bg-secondary);
+}
+.sidebar-item.active {
+  color: var(--accent);
+  border-left-color: var(--accent);
+  background: rgba(88,166,255,0.05);
+}
+/* Main Content */
+.main {
+  margin-left: var(--sidebar-width);
+  margin-top: var(--header-height);
+  padding: 32px 48px 80px;
+  max-width: 960px;
+}
+.section { margin-bottom: 64px; display: block; }
+.section h1 {
+  font-size: 32px; font-weight: 700;
+  margin-bottom: 8px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+.section h2 {
+  font-size: 24px; font-weight: 600;
+  margin: 32px 0 12px;
+  color: var(--text-primary);
+}
+.section h3 {
+  font-size: 18px; font-weight: 600;
+  margin: 24px 0 8px;
+  color: var(--text-primary);
+}
+.section p { margin: 8px 0; color: var(--text-secondary); }
+.section a { color: var(--accent); text-decoration: none; }
+.section a:hover { text-decoration: underline; }
+/* Tables */
+table {
+  width: 100%; border-collapse: collapse;
+  margin: 16px 0; font-size: 14px;
+}
+th {
+  text-align: left; padding: 10px 12px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  font-weight: 600; color: var(--text-primary);
+  white-space: nowrap;
+}
+td {
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+}
+tr:hover td { background: rgba(88,166,255,0.03); }
+/* Code */
+code {
+  font-family: 'Cascadia Code', 'Fira Code', 'JetBrains Mono', monospace;
+  background: var(--bg-code);
+  padding: 2px 6px; border-radius: 4px;
+  font-size: 13px; color: var(--purple);
+}
+pre {
+  background: var(--bg-code);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px; margin: 12px 0;
+  overflow-x: auto; font-size: 13px;
+  line-height: 1.5;
+}
+pre code {
+  background: none; padding: 0;
+  color: var(--text-primary);
+}
+/* Syntax highlighting for UnrealScript */
+.kw { color: #ff7b72; } /* keywords */
+.ty { color: #79c0ff; } /* types */
+.fn { color: #d2a8ff; } /* functions */
+.cm { color: #8b949e; font-style: italic; } /* comments */
+.st { color: #a5d6ff; } /* strings */
+.nu { color: #79c0ff; } /* numbers */
+.vr { color: #ffa657; } /* variables */
+/* Info boxes */
+.info-box {
+  padding: 12px 16px; margin: 12px 0;
+  border-radius: 6px; border-left: 4px solid;
+  font-size: 14px;
+}
+.info-box.note { background: rgba(88,166,255,0.1); border-color: var(--accent); }
+.info-box.warn { background: rgba(210,153,34,0.1); border-color: var(--yellow); }
+.info-box.tip { background: rgba(63,185,80,0.1); border-color: var(--green); }
+.info-box strong { color: var(--text-primary); }
+/* Tags/Badges */
+.badge {
+  display: inline-block; padding: 2px 8px;
+  border-radius: 12px; font-size: 12px;
+  font-weight: 500;
+}
+.badge-blue { background: rgba(88,166,255,0.15); color: var(--accent); }
+.badge-green { background: rgba(63,185,80,0.15); color: var(--green); }
+.badge-yellow { background: rgba(210,153,34,0.15); color: var(--yellow); }
+.badge-red { background: rgba(248,81,73,0.15); color: var(--red); }
+.badge-purple { background: rgba(188,140,255,0.15); color: var(--purple); }
+/* Feature cards */
+.feature-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 12px; margin: 16px 0;
+}
+.feature-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px; padding: 16px;
+}
+.feature-card h4 {
+  font-size: 15px; margin-bottom: 6px;
+  color: var(--text-primary);
+}
+.feature-card p {
+  font-size: 13px; color: var(--text-secondary);
+  margin: 0;
+}
+/* Mermaid */
+.mermaid {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px; padding: 20px;
+  margin: 16px 0; text-align: center;
+  overflow-x: auto;
+}
+.diagram-caption {
+  text-align: center; font-size: 13px;
+  color: var(--text-muted); margin-top: -8px;
+  margin-bottom: 16px;
+}
+/* Responsive */
+@media (max-width: 900px) {
+  .sidebar { transform: translateX(-100%); }
+  .sidebar.open { transform: translateX(0); }
+  .main { margin-left: 0; padding: 24px 16px 60px; }
+  .menu-toggle { display: block; }
+  .header-search input { width: 180px; }
+  .feature-grid { grid-template-columns: 1fr; }
+}
+/* Overlay for mobile sidebar */
+.sidebar-overlay {
+  display: none; position: fixed;
+  top: var(--header-height); left:0; right:0; bottom:0;
+  background: rgba(0,0,0,0.5); z-index: 40;
+}
+.sidebar-overlay.active { display: block; }
+/* Scroll margin for anchors */
+.section { scroll-margin-top: calc(var(--header-height) + 16px); }
+/* Stats row */
+.stats-row {
+  display: flex; gap: 16px; margin: 16px 0; flex-wrap: wrap;
+}
+.stat-item {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px; padding: 16px 24px;
+  text-align: center; flex: 1; min-width: 120px;
+}
+.stat-item .stat-value {
+  font-size: 28px; font-weight: 700;
+  color: var(--accent);
+}
+.stat-item .stat-label {
+  font-size: 12px; color: var(--text-muted);
+  text-transform: uppercase; letter-spacing: 0.5px;
+}
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<header class="header">
+  <button class="menu-toggle" onclick="toggleSidebar()" aria-label="Toggle menu">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+  </button>
+  <div class="header-logo">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="var(--accent)"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+    HealingExtend Plus
+    <span class="tag">v1.1.3</span>
+    <span class="tag deprecated">Deprecated</span>
+  </div>
+  <div class="header-search">
+    <svg viewBox="0 0 16 16"><path d="M11.5 7a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0Zm-.82 4.74a6 6 0 1 1 1.06-1.06l3.04 3.04a.75.75 0 1 1-1.06 1.06l-3.04-3.04Z"/></svg>
+    <input type="text" id="searchInput" placeholder="Search docs..." oninput="handleSearch(this.value)">
+  </div>
+</header>
+
+<!-- Sidebar Overlay -->
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+<!-- Sidebar -->
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-group">
+    <div class="sidebar-group-title" onclick="toggleGroup(this)">
+      Overview <span class="arrow">▼</span>
+    </div>
+    <ul class="sidebar-items">
+      <li class="sidebar-item active" onclick="scrollToSection('home')">Home</li>
+      <li class="sidebar-item" onclick="scrollToSection('architecture')">Architecture Overview</li>
+    </ul>
+  </div>
+  <div class="sidebar-group">
+    <div class="sidebar-group-title" onclick="toggleGroup(this)">
+      Data & Initialization <span class="arrow">▼</span>
+    </div>
+    <ul class="sidebar-items">
+      <li class="sidebar-item" onclick="scrollToSection('data-structures')">Data Structures</li>
+      <li class="sidebar-item" onclick="scrollToSection('system-init')">Initialization Flow</li>
+    </ul>
+  </div>
+  <div class="sidebar-group">
+    <div class="sidebar-group-title" onclick="toggleGroup(this)">
+      Core Systems <span class="arrow">▼</span>
+    </div>
+    <ul class="sidebar-items">
+      <li class="sidebar-item" onclick="scrollToSection('core-mutator')">Core Mutator</li>
+      <li class="sidebar-item" onclick="scrollToSection('headshot')">Headshot Recovery & Overclocking</li>
+      <li class="sidebar-item" onclick="scrollToSection('quick-purchase')">Quick Purchase System</li>
+      <li class="sidebar-item" onclick="scrollToSection('chat-system')">Chat Command System</li>
+    </ul>
+  </div>
+  <div class="sidebar-group">
+    <div class="sidebar-group-title" onclick="toggleGroup(this)">
+      Peripheral Systems <span class="arrow">▼</span>
+    </div>
+    <ul class="sidebar-items">
+      <li class="sidebar-item" onclick="scrollToSection('hud-system')">HUD System</li>
+      <li class="sidebar-item" onclick="scrollToSection('trader-weapons')">Trader & Weapons</li>
+      <li class="sidebar-item" onclick="scrollToSection('network')">Network Replication</li>
+    </ul>
+  </div>
+  <div class="sidebar-group">
+    <div class="sidebar-group-title" onclick="toggleGroup(this)">
+      Reference <span class="arrow">▼</span>
+    </div>
+    <ul class="sidebar-items">
+      <li class="sidebar-item" onclick="scrollToSection('config-ref')">Configuration Manual</li>
+      <li class="sidebar-item" onclick="scrollToSection('glossary')">Glossary</li>
+    </ul>
+  </div>
+</nav>
+
+<!-- Main Content -->
+<main class="main">
+
+<!-- ===================== SECTION 1: HOME ===================== -->
+<div class="section" id="home">
+<h1>HealingExtend Plus v1.1.3</h1>
+<p>Killing Floor 2 Mutator plugin — a tailored headshot recovery, overclocking, quick purchase, and custom HUD solution designed for CD (Controlled Difficulty) mode.</p>
+
+<div class="stats-row">
+  <div class="stat-item"><div class="stat-value">11</div><div class="stat-label">Source Files</div></div>
+  <div class="stat-item"><div class="stat-value">~3,400</div><div class="stat-label">Lines of Code</div></div>
+  <div class="stat-item"><div class="stat-value">7</div><div class="stat-label">Core Classes</div></div>
+  <div class="stat-item"><div class="stat-value">6</div><div class="stat-label">Subsystems</div></div>
+</div>
+
+<table>
+<tr><th>Property</th><th>Value</th></tr>
+<tr><td>Project Name</td><td>HealingExtend Plus</td></tr>
+<tr><td>Version</td><td>Release 1.1.3</td></tr>
+<tr><td>Author</td><td>ArHShRn (<a href="http://steamcommunity.com/id/ArHShRn/">Steam</a>)</td></tr>
+<tr><td>Last Updated</td><td>January 29, 2018</td></tr>
+<tr><td>Status</td><td><span class="badge badge-yellow">Deprecated / Feature-Complete</span></td></tr>
+<tr><td>Launch Command</td><td><code>?Mutator=HealingExtend.HE_Main</code></td></tr>
+<tr><td>Compiled Output</td><td><code>HealingExtend.u</code></td></tr>
+<tr><td>Asset Package</td><td><code>HE_Contents.upk</code> (optional, provides custom crosshair/icon textures)</td></tr>
+</table>
+
+<h2>Feature Overview</h2>
+<table>
+<tr><th>Feature</th><th>Description</th><th>Primary Source File</th></tr>
+<tr><td>Headshot Recovery</td><td>Restores HP/Armor/Dosh/Ammo on headshot kills</td><td><code>HE_Main.uc</code></td></tr>
+<tr><td>HP/Armor Overclocking</td><td>Allows health/armor to exceed cap, gradually decays</td><td><code>HE_Main.uc</code></td></tr>
+<tr><td>Passive Regen</td><td>Optional per-second HP/Armor auto-regeneration</td><td><code>HE_Main.uc</code></td></tr>
+<tr><td>Quick Purchase</td><td>Alt+1/2/3 hotkeys for rapid perk weapon purchase</td><td><code>HE_Main.uc</code>, <code>HE_HUDManager.uc</code></td></tr>
+<tr><td>Custom HUD</td><td>Overclocking health bar, custom crosshair, teammate healing hints</td><td><code>HE_HUDBase.uc</code></td></tr>
+<tr><td>Chat Commands</td><td>!HESys, !HEInfo, !HEBuyPerk, !HEDebug</td><td><code>HE_ChatController.uc</code></td></tr>
+<tr><td>Custom Weapons</td><td>HMTech-201 Storm, HMTech-401 BiohaZard</td><td><code>Weap_HMT*.uc</code>, <code>WeapDef_HMT*.uc</code></td></tr>
+<tr><td>Trader Integration</td><td>Dynamically loads custom weapons into trader list</td><td><code>HE_TraderManager.uc</code></td></tr>
+<tr><td>Infinite Spare Ammo</td><td>Optional infinite ammo mode</td><td><code>HE_Main.uc</code></td></tr>
+</table>
+
+<h2>Component Relationship Overview</h2>
+<div class="mermaid">
+graph LR
+  subgraph Server["Server"]
+    HE_Main["HE_Main\n(KFMutator)"]
+    HECC["HE_ChatController\n(BroadcastHandler)"]
+    TM["HE_TraderManager\n(Actor)"]
+  end
+  subgraph Client["Client"]
+    HM["HE_HUDManager\n(Actor)"]
+    HUD["HE_HUDBase\n(KFGFxHudWrapper)"]
+  end
+  subgraph Data["Data Layer"]
+    Assist["HE_Assistance\n(Object/Abstract)"]
+    W201["Weap_HMT201"]
+    W401["Weap_HMT401"]
+  end
+  HE_Main -->|Spawn & Manage| HM
+  HE_Main -->|Spawn & Initialize| HECC
+  HE_Main -->|Spawn & Sync| TM
+  HM -->|ClientSetHUD| HUD
+  HE_Main -.->|Reference struct| Assist
+  TM -.->|Load| W201
+  TM -.->|Load| W401
+  HECC -->|Command Routing| HE_Main
+</div>
+<p class="diagram-caption">Figure 1: HealingExtend Component Relationship Overview</p>
+
+<h2>Compatibility</h2>
+<div class="info-box note">
+<strong>RPW Compatible:</strong> HE_ChatController uses chained BroadcastHandler to coexist with RPW (Ranked Perks Whitelist), without overriding existing BroadcastHandler.
+</div>
+<div class="info-box warn">
+<strong>ServerExt Note:</strong> HE_HUDBase replaces KFGFxHudWrapper and may conflict with other Mutators that modify the HUD.
+</div>
+
+<h2>Acknowledgments</h2>
+<p>TK18039 (easter egg trigger <code>!TK18039</code>), all CD players who participated in testing, and Tripwire Interactive for providing the KF2 SDK.</p>
+</div>
+
+<!-- ===================== SECTION 2: ARCHITECTURE ===================== -->
+<div class="section" id="architecture">
+<h1>Architecture Overview</h1>
+<p>HealingExtend is built on KF2's Mutator framework, using a Server-Authoritative architecture. All game logic executes in the server-side <code>Tick</code> event; clients are only responsible for HUD rendering and key input.</p>
+
+<h2>KF2 Mutator Architecture Basics</h2>
+<p>KF2's Mutator system is based on UE3's <code>Mutator</code> chain. <code>HE_Main</code> extends <code>KFMutator</code> and hooks into the game lifecycle by overriding <code>NotifyLogin</code>, <code>ModifyPlayer</code>, <code>NotifyLogout</code>, <code>Tick</code>, and other hook functions.</p>
+
+<h2>Class Inheritance Hierarchy</h2>
+<div class="mermaid">
+classDiagram
+  class Object
+  class Actor
+  class Mutator
+  class KFMutator
+  class HE_Main
+  class BroadcastHandler
+  class HE_ChatController
+  class KFGFxHudWrapper
+  class HE_HUDBase
+  class HE_HUDManager
+  class HE_TraderManager
+  class HE_RepTest
+  class KFWeap_MedicBase
+  class Weap_HMT201
+  class Weap_HMT401
+  class KFWeaponDefinition
+  class WeapDef_HMT201
+  class WeapDef_HMT401
+  class HE_Assistance
+
+  Object <|-- Actor
+  Object <|-- HE_Assistance
+  Object <|-- KFWeaponDefinition
+  Actor <|-- Mutator
+  Actor <|-- BroadcastHandler
+  Actor <|-- HE_HUDManager
+  Actor <|-- HE_TraderManager
+  Actor <|-- HE_RepTest
+  Actor <|-- KFGFxHudWrapper
+  Mutator <|-- KFMutator
+  KFMutator <|-- HE_Main
+  BroadcastHandler <|-- HE_ChatController
+  KFGFxHudWrapper <|-- HE_HUDBase
+  KFWeap_MedicBase <|-- Weap_HMT201
+  KFWeap_MedicBase <|-- Weap_HMT401
+  KFWeaponDefinition <|-- WeapDef_HMT201
+  KFWeaponDefinition <|-- WeapDef_HMT401
+</div>
+<p class="diagram-caption">Figure 2: Class Inheritance Hierarchy Diagram</p>
+
+<h2>Component Ownership & Spawning Relationships</h2>
+<div class="mermaid">
+graph TD
+  KFGameInfo["KFGameInfo\n(Game Mode)"]
+  HE_Main["HE_Main\n(Core Mutator)"]
+  HECC["HE_ChatController"]
+  HEP["HEPlayer[]\n(Player Data Array)"]
+
+  subgraph Per Player
+    HM["HE_HUDManager\nOwner=KFPC"]
+    TM["HE_TraderManager\nOwner=KFPC"]
+    HUD["HE_HUDBase\nClient HUD Instance"]
+  end
+
+  KFGameInfo -->|Mutator Chain| HE_Main
+  HE_Main -->|"SetTimer → Spawn"| HECC
+  HE_Main -->|"NotifyLogin → Spawn"| HM
+  HE_Main -->|"ModifyPlayer → Spawn"| TM
+  HE_Main -->|Manage| HEP
+  HM -->|"ClientSetHUD()"| HUD
+  HECC -->|"BroadcastText → Broadcast()"| HE_Main
+</div>
+<p class="diagram-caption">Figure 3: Component Ownership & Spawning Relationships</p>
+
+<h2>Network Authority Partitioning</h2>
+<div class="mermaid">
+graph LR
+  subgraph ServerOnly["Server Only Role_Authority"]
+    S1["HE_Main.Tick()"]
+    S2["HeadshotRecover()"]
+    S3["BuyPlayerWeapon()"]
+    S4["Players[] Array Management"]
+  end
+  subgraph Replicated["Replicated Actors"]
+    R1["HE_HUDManager\nAutonomousProxy"]
+    R2["HE_TraderManager\nSimulatedProxy"]
+    R3["HE_ChatController\nSimulatedProxy"]
+  end
+  subgraph ClientOnly["Client Only"]
+    C1["HE_HUDBase.DrawHUD()"]
+    C2["Key Binding Handling"]
+    C3["Console Command exec"]
+  end
+  ServerOnly -->|reliable client| Replicated
+  Replicated -->|RPC Calls| ClientOnly
+</div>
+<p class="diagram-caption">Figure 4: Network Authority Partitioning</p>
+
+<h2>Class Reference Table</h2>
+<table>
+<tr><th>Class Name</th><th>File</th><th>Lines</th><th>Parent Class</th><th>Responsibility</th></tr>
+<tr><td>HE_Main</td><td>HE_Main.uc</td><td>1069</td><td>KFMutator</td><td>Core logic, player management, Tick loop</td></tr>
+<tr><td>HE_HUDBase</td><td>HE_HUDBase.uc</td><td>1234</td><td>KFGFxHudWrapper</td><td>Custom HUD rendering</td></tr>
+<tr><td>HE_HUDManager</td><td>HE_HUDManager.uc</td><td>280</td><td>Actor</td><td>Client bridge, key bindings</td></tr>
+<tr><td>HE_Assistance</td><td>HE_Assistance.uc</td><td>213</td><td>Object (Abstract)</td><td>Data structure definitions</td></tr>
+<tr><td>HE_TraderManager</td><td>HE_TraderManager.uc</td><td>166</td><td>Actor</td><td>Custom weapon trader sync</td></tr>
+<tr><td>HE_ChatController</td><td>HE_ChatController.uc</td><td>80</td><td>BroadcastHandler</td><td>Chat interception & command dispatch</td></tr>
+<tr><td>HE_RepTest</td><td>HE_RepTest.uc</td><td>66</td><td>Actor</td><td>Replication test utility</td></tr>
+<tr><td>Weap_HMT201</td><td>Weap_HMT201.uc</td><td>113</td><td>KFWeap_MedicBase</td><td>HMTech-201 Storm SMG</td></tr>
+<tr><td>Weap_HMT401</td><td>Weap_HMT401.uc</td><td>123</td><td>KFWeap_MedicBase</td><td>HMTech-401 BiohaZard AR</td></tr>
+<tr><td>WeapDef_HMT201</td><td>WeapDef_HMT201.uc</td><td>35</td><td>KFWeaponDefinition</td><td>HMT-201 Trader definition</td></tr>
+<tr><td>WeapDef_HMT401</td><td>WeapDef_HMT401.uc</td><td>36</td><td>KFWeaponDefinition</td><td>HMT-401 Trader definition</td></tr>
+</table>
+</div>
+
+<!-- ===================== SECTION 3: DATA STRUCTURES ===================== -->
+<div class="section" id="data-structures">
+<h1>Data Structures</h1>
+<p><code>HE_Assistance.uc</code> is an <code>abstract Object</code> class that serves solely as a container for structs, enums, and utility functions, and is never instantiated. All data structures are referenced in other classes through UnrealScript's implicit import mechanism.</p>
+
+<h2>Core Data Structures classDiagram</h2>
+<div class="mermaid">
+classDiagram
+  class HEPlayer {
+    +string UniqueID
+    +KFPlayerController KFPC
+    +KFPawn_Human KFPH
+    +KFWeapon KFWeap
+    +Pawn pShotTarget
+    +Pawn LastTarget
+    +KFPawn_Monster KFPM_Victim
+    +KFPlayerReplicationInfo KFPRI
+    +int fLastHeadshotCounts
+    +class~KFPerk~ LastPerk
+    +float HealthDecrement
+    +float ArmorDecrement
+    +float HealthRegenDelta
+    +float ArmorRegenDelta
+    +HE_HUDManager HUDManager
+    +HE_TraderManager TraderManager
+    +bool bIsEpt
+  }
+  class HEVersionInfo {
+    +string ThisMutatorName
+    +string AuthorNickname
+    +string AuthorSteamcommunityURL
+    +string Version
+    +string LastUpdate
+  }
+  class HECommand {
+    +string CommandHead
+    +string UserName
+    +string Argument
+    +string Parameter
+    +string Value
+  }
+  class RGBColor {
+    +string Firebrick
+    +string PaleVioletRed
+    +string Snow
+    +string GhostWhite
+    +string DeepCyan
+    +string LightCyan
+    +string DeepPink
+    +string HotPink
+    +string DeepOrchid
+    +string LightOrchid
+    +string HE_HUDDefaultCyan
+  }
+  class HEConfig {
+    +HEVersionInfo HEVI
+    +float fCurrentRegenRate
+    +bool bAllowOverClocking
+    +bool bInitedConfig
+    +int HealthHealingAmount
+    +int ArmourHealingAmount
+    +int BonusDosh
+    +int OverclockLimitHealth
+    +int OverclockLimitArmour
+  }
+  class WeaponInfo {
+    +class~KFWeaponDefinition~ WeapDefClass
+    +class~KFWeapon~ WeapClass
+    +byte WeapTraderIndex
+    +string WeapName
+    +int BuyPrice
+    +int AmmoPricePerMag
+  }
+  HEPlayer --> HE_HUDManager
+  HEPlayer --> HE_TraderManager
+  HEConfig --> HEVersionInfo
+</div>
+<p class="diagram-caption">Figure 5: Core Data Structure Field Definitions</p>
+
+<h2>struct HEPlayer Details</h2>
+<p>This is the most important data structure in HealingExtend. <code>HE_Main</code> uses <code>array&lt;HEPlayer&gt; Players</code> to manage all online players.</p>
+<table>
+<tr><th>Field</th><th>Type</th><th>Purpose</th></tr>
+<tr><td>UniqueID</td><td>string</td><td>Steam UID, used to identify players across waves</td></tr>
+<tr><td>KFPC</td><td>KFPlayerController</td><td>Player controller reference</td></tr>
+<tr><td>KFPH</td><td>KFPawn_Human</td><td>Player Pawn, becomes invalid after death and needs re-initialization</td></tr>
+<tr><td>KFWeap</td><td>KFWeapon</td><td>Currently held weapon, updated every Tick</td></tr>
+<tr><td>fLastHeadshotCounts</td><td>int</td><td>Last recorded headshot count, compared with PWRI.VectData1.X to detect new headshots</td></tr>
+<tr><td>LastPerk</td><td>class&lt;KFPerk&gt;</td><td>Player's current perk class, used for quick purchase</td></tr>
+<tr><td>HealthDecrement / ArmorDecrement</td><td>float</td><td>Overclock decay accumulator (sub-frame precision)</td></tr>
+<tr><td>HealthRegenDelta / ArmorRegenDelta</td><td>float</td><td>Passive regeneration accumulator (sub-frame precision)</td></tr>
+<tr><td>HUDManager</td><td>HE_HUDManager</td><td>HUD manager Actor for this player</td></tr>
+<tr><td>TraderManager</td><td>HE_TraderManager</td><td>Trader manager Actor for this player</td></tr>
+<tr><td>bIsEpt</td><td>bool</td><td>Whether this is an empty slot (Empty), skipped during Tick processing</td></tr>
+</table>
+
+<h2>Enum Types</h2>
+<h3>HUDCrosshairStatus</h3>
+<p>Enum used by the crosshair drawing state machine, set in <code>HE_HUDBase.CheckDrawASCStatus()</code>:</p>
+<table>
+<tr><th>Value</th><th>Meaning</th></tr>
+<tr><td>HE_Good</td><td>Normal state, crosshair drawing allowed</td></tr>
+<tr><td>HE_WeapNotGuns</td><td>Weapon has no Spread data (not a firearm)</td></tr>
+<tr><td>HE_Player_Closed</td><td>Player manually closed the crosshair</td></tr>
+<tr><td>HE_Player_Dead</td><td>Player is dead</td></tr>
+<tr><td>HE_Player_NoWeap</td><td>No weapon or monster Pawn</td></tr>
+<tr><td>HE_Player_Monster</td><td>Player is on the monster team</td></tr>
+<tr><td>HE_Player_UsingIronsight</td><td>Currently using iron sights</td></tr>
+<tr><td>HE_Player_SpecialMoveDontAllow</td><td>Special move does not allow crosshair</td></tr>
+<tr><td>HE_NoneInit</td><td>Initial value, uninitialized</td></tr>
+</table>
+
+<h3>AsCMode</h3>
+<table>
+<tr><th>Value</th><th>Meaning</th></tr>
+<tr><td>AsC_Default</td><td>Default cross crosshair mode</td></tr>
+<tr><td>AsC_CenterDot</td><td>Center dot + cross (removed)</td></tr>
+<tr><td>AsC_OnlyDot</td><td>Center dot only (removed)</td></tr>
+</table>
+
+<h2>PWRI Engine Struct</h2>
+<div class="info-box tip">
+<strong>Key Discovery:</strong>HealingExtend leverages KF2's internal <code>PostWaveReplicationInfo</code> (PWRI) struct to detect headshots. <code>KFPC.PWRI.VectData1.X</code> stores the cumulative headshot count for the current wave. HE detects new headshot events by comparing the difference each frame.
+</div>
+<pre><code><span class="cm">// Engine internal struct (read-only, cannot be modified)</span>
+<span class="kw">struct native</span> <span class="ty">PostWaveReplicationInfo</span>
+{
+    <span class="kw">var</span> <span class="ty">Vector</span> VectData1; <span class="cm">// X:HeadShots Y:Dosh Earned Z:Damage Dealt</span>
+    <span class="kw">var</span> <span class="ty">Vector</span> VectData2; <span class="cm">// X:Damage Taken Y:Heals Received Z:Heals Given</span>
+    <span class="kw">var</span> <span class="ty">byte</span> LargeZedKills;
+    <span class="kw">var</span> <span class="ty">bool</span> bDiedDuringWave;
+    <span class="kw">var</span> <span class="ty">class</span>&lt;KFPawn_Monster&gt; ClassKilledByLastWave;
+    <span class="cm">// ... more fields</span>
+};</code></pre>
+
+<h2>ConvertMonsterClassName Utility Function</h2>
+<p>The only function in <code>HE_Assistance</code>, converts Zed class names to readable names:</p>
+<pre><code><span class="kw">static function string</span> <span class="fn">ConvertMonsterClassName</span>(<span class="ty">class&lt;KFPawn&gt;</span> zed)
+{
+    <span class="kw">switch</span>(zed) {
+        <span class="kw">case</span> <span class="ty">class</span><span class="st">'KFPawn_ZedBloat'</span>:      <span class="kw">return</span> <span class="st">"Bloat"</span>;
+        <span class="kw">case</span> <span class="ty">class</span><span class="st">'KFPawn_ZedFleshpound'</span>: <span class="kw">return</span> <span class="st">"Fleshpound"</span>;
+        <span class="kw">case</span> <span class="ty">class</span><span class="st">'KFPawn_ZedScrake'</span>:     <span class="kw">return</span> <span class="st">"Scrake"</span>;
+        <span class="cm">// ... Clot, Crawler, Gorefast, Husk, Siren, Stalker</span>
+        <span class="kw">default</span>: <span class="kw">return</span> <span class="fn">string</span>(zed.Name);
+    }
+}</code></pre>
+</div>
+
+<!-- ===================== SECTION 4: SYSTEM INITIALIZATION ===================== -->
+<div class="section" id="system-init">
+<h1>Initialization Flow</h1>
+<p>HealingExtend's initialization is divided into 5 phases, executed sequentially using UE3's Actor lifecycle hooks.</p>
+
+<h2>Initialization Sequence Diagram</h2>
+<div class="mermaid">
+sequenceDiagram
+    participant Engine as UE3 Engine
+    participant HE as HE_Main
+    participant HECC as HE_ChatController
+    participant HM as HE_HUDManager
+    participant TM as HE_TraderManager
+    participant HUD as HE_HUDBase
+
+    Note over Engine,HUD: Phase 1 - Mutator Loading
+    Engine->>HE: PreBeginPlay()
+    HE->>HE: InitBasicMutatorValues()
+    HE->>HE: SaveConfig()
+
+    Note over Engine,HUD: Phase 2 - Game Start
+    Engine->>HE: PostBeginPlay()
+    HE->>HE: SetTimer(1.1s, SetBH)
+
+    Note over Engine,HUD: Phase 3 - BroadcastHandler Setup
+    HE->>HECC: Spawn HE_ChatController
+    HE->>HECC: InitHEClass(self)
+    HECC->>HECC: Save original BH -> PreBroadcastHandler
+    HECC->>Engine: Replace GameInfo.BroadcastHandler
+
+    Note over Engine,HUD: Phase 4 - Player Login
+    Engine->>HE: NotifyLogin(Controller)
+    HE->>HM: Spawn HE_HUDManager(Owner=KFPC)
+    HM->>HM: ClientGetKFPlayerOwner()
+    HM->>HM: Bind Alt+0~3,9 keys
+
+    Note over Engine,HUD: Phase 5 - Pawn Creation
+    Engine->>HE: ModifyPlayer(Pawn)
+    HE->>HE: ReInitPlayersArry() / AddHimIntoPlayers()
+    HE->>TM: Spawn HE_TraderManager(Owner=KFPC)
+    HE->>HM: ClientSetHUD()
+    HM->>HUD: KFPlayerOwner.ClientSetHUD(HE_HUDBase)
+    HM->>HUD: CreateHUDMovie()
+</div>
+<p class="diagram-caption">Figure 6: Complete Initialization Sequence</p>
+
+<h2>Five Phases in Detail</h2>
+
+<h3>Phase 1: PreBeginPlay — Configuration Initialization</h3>
+<p>Executed before game start. If <code>bInitedConfig</code> is false (first run), calls <code>InitBasicMutatorValues()</code> to set all default values, then <code>SaveConfig()</code> writes to the INI file.</p>
+<div class="info-box note">
+<strong>Key Dependency:</strong>If <code>bEnableHE_HUD=false</code>, then <code>bEnableHealthAndArmorOverclocking</code> is also forced to false, because the overclock health bar display depends on the custom HUD.
+</div>
+
+<h3>Phase 2: PostBeginPlay — Timer Start</h3>
+<p>Sets a 1.1-second looping timer to call <code>SetBH()</code>. The delay is used because <code>BroadcastHandler</code> may not yet be initialized.</p>
+
+<h3>Phase 3: SetBH — Chat System Hook</h3>
+<p>Spawns <code>HE_ChatController</code> and inserts it into the BroadcastHandler chain. Saves the original BH as <code>PreBroadcastHandler</code> for RPW compatibility. After success, <code>ClearTimer</code> stops the loop.</p>
+
+<h3>Phase 4: NotifyLogin — HUD Manager Creation</h3>
+<p>For each new player login, spawns an <code>HE_HUDManager</code> with Owner set to the player's Controller. The manager obtains the LocalPlayer reference on the client side and sets up key bindings.</p>
+
+<h3>Phase 5: ModifyPlayer — Full Player Registration</h3>
+<p>After Pawn creation (including each respawn), the following operations are performed:</p>
+<ol>
+<li>Set <code>HealthRegenRate</code></li>
+<li>Check if the player already exists in <code>Players[]</code> via UID matching</li>
+<li>Exists -> <code>ReInitPlayersArry()</code> updates KFPH; Not found -> <code>AddHimIntoPlayers()</code> creates a full HEPlayer</li>
+<li>Spawn <code>HE_TraderManager</code> (if <code>bEnableCustomizedWeapons</code>)</li>
+<li>Call <code>ClientSetHUD()</code> to replace the HUD class</li>
+</ol>
+
+<h2>Death/Respawn Cycle</h2>
+<div class="mermaid">
+flowchart TD
+    A["Player Alive\nPlayers[i].bIsEpt=false"] -->|"Killed by Zed"| B["Player Dead\nKFPH Invalidated"]
+    B -->|"Next wave starts"| C{"ModifyPlayer\nEngine creates new Pawn"}
+    C -->|"UID match found"| D["ReInitPlayersArry()\nUpdate KFPC + KFPH"]
+    C -->|"UID not found\n(player had disconnected)"| E["AddHimIntoPlayers()\nCreate new HEPlayer"]
+    D --> F["Display death info\n+ killer name"]
+    F --> A
+    E --> A
+    A -->|"Player disconnects"| G["NotifyPlayerExits()\nRemove from Players[]"]
+</div>
+<p class="diagram-caption">Figure 7: Death/Respawn Cycle</p>
+
+<div class="info-box tip">
+<strong>Design Detail:</strong>Steam UniqueID is used instead of Controller references to match players, because Controllers may change on respawn, but UIDs remain constant throughout the session. Death messages are converted to readable Zed names via <code>ConvertMonsterClassName(PWRI.ClassKilledByLastWave)</code>.
+</div>
+</div>
+
+<!-- ===================== SECTION 5: CORE MUTATOR ===================== -->
+<div class="section" id="core-mutator">
+<h1>Core Mutator — HE_Main</h1>
+<p><code>HE_Main.uc</code> (1069 lines) is the central hub of the entire plugin, inheriting from <code>KFMutator</code>, and handles all server-side logic including player management, headshot detection, overclock decay, quick purchase, and chat commands.</p>
+
+<h2>Configuration Variables Table</h2>
+<table>
+<tr><th>Variable</th><th>Type</th><th>Default</th><th>Description</th></tr>
+<tr><td>bEnableHE</td><td>bool</td><td>True</td><td>Master switch</td></tr>
+<tr><td>bEnableHE_HUD</td><td>bool</td><td>True</td><td>HUD switch (disabling also disables overclock)</td></tr>
+<tr><td>bEnableCustomizedWeapons</td><td>bool</td><td>False</td><td>Whether to enable custom weapons</td></tr>
+<tr><td>bEnableHealthRegen</td><td>bool</td><td>False</td><td>Passive HP regeneration</td></tr>
+<tr><td>bEnableArmourRegen</td><td>bool</td><td>False</td><td>Passive Armor regeneration</td></tr>
+<tr><td>bEnableInfiniteSpareAmmo</td><td>bool</td><td>False</td><td>Infinite spare ammo</td></tr>
+<tr><td>bEnableHealthAndArmorOverclocking</td><td>bool</td><td>True</td><td>Overclock system</td></tr>
+<tr><td>bEnableAmmoRecovering</td><td>bool</td><td>True</td><td>Headshot ammo recovery</td></tr>
+<tr><td>bEnableDoshBonus</td><td>bool</td><td>True</td><td>Headshot Dosh bonus</td></tr>
+<tr><td>bFillAllWeapAmmoAfterQuickPurchase</td><td>bool</td><td>True</td><td>Fill all weapon ammo after quick purchase</td></tr>
+<tr><td>bGsAltOneIsSPX</td><td>bool</td><td>True</td><td>Gunslinger Alt+1 buys SPX (otherwise 1911)</td></tr>
+<tr><td>fCurrentRegenRate</td><td>float</td><td>10.0</td><td>Base regeneration rate</td></tr>
+<tr><td>DecreModifier</td><td>float</td><td>0.2</td><td>Overclock decay modifier</td></tr>
+<tr><td>RegenModifier</td><td>float</td><td>1.0</td><td>Passive regeneration modifier</td></tr>
+<tr><td>HealthRegenPerSecond</td><td>float</td><td>1</td><td>HP regeneration per second</td></tr>
+<tr><td>ArmourRegenPerSecond</td><td>float</td><td>1</td><td>Armor regeneration per second</td></tr>
+<tr><td>HealthHealingAmount</td><td>float</td><td>1</td><td>HP recovery per headshot</td></tr>
+<tr><td>ArmourHealingAmount</td><td>float</td><td>1</td><td>Armor recovery per headshot</td></tr>
+<tr><td>BonusDosh</td><td>int</td><td>85</td><td>Dosh bonus per headshot</td></tr>
+<tr><td>OverclockHealthLimit</td><td>int</td><td>150</td><td>Overclock HP cap</td></tr>
+<tr><td>OverclockArmorLimit</td><td>int</td><td>175</td><td>Overclock Armor cap</td></tr>
+</table>
+
+<h2>Runtime Variables</h2>
+<table>
+<tr><th>Variable</th><th>Type</th><th>Description</th></tr>
+<tr><td>Players</td><td>array&lt;HEPlayer&gt;</td><td>All online player data</td></tr>
+<tr><td>HECC</td><td>HE_ChatController</td><td>Chat controller reference</td></tr>
+<tr><td>bInNormalTime</td><td>bool</td><td>Whether in normal time (not ZedTime)</td></tr>
+<tr><td>bCreatedBH</td><td>bool</td><td>Whether BroadcastHandler has been created</td></tr>
+</table>
+
+<h2>Function Groups</h2>
+<table>
+<tr><th>Group</th><th>Function</th><th>Description</th></tr>
+<tr><td rowspan="5">Initialization</td><td>PreBeginPlay()</td><td>Configuration initialization</td></tr>
+<tr><td>PostBeginPlay()</td><td>Start SetBH timer</td></tr>
+<tr><td>InitBasicMutatorValues()</td><td>Set all default configuration values</td></tr>
+<tr><td>SetBH()</td><td>Spawn and hook ChatController</td></tr>
+<tr><td>NotifyLogin()</td><td>Spawn HUDManager</td></tr>
+<tr><td rowspan="5">Player Management</td><td>ModifyPlayer()</td><td>Register/update player in Players[]</td></tr>
+<tr><td>AddHimIntoPlayers()</td><td>Add new player to Players[]</td></tr>
+<tr><td>ReInitPlayersArry()</td><td>Re-initialize existing player after death</td></tr>
+<tr><td>NotifyLogout() / NotifyPlayerExits()</td><td>Player exit cleanup</td></tr>
+<tr><td>GetHEP() / GetHUDManager()</td><td>Query functions</td></tr>
+<tr><td rowspan="3">Messaging</td><td>PlayerMsg()</td><td>Send message to a single player</td></tr>
+<tr><td>GlobalMsg()</td><td>Broadcast to all players</td></tr>
+<tr><td>Broadcast()</td><td>Command dispatch main entry</td></tr>
+<tr><td rowspan="2">Purchase</td><td>BuyPlayerWeapon()</td><td>Simulate trader purchase flow</td></tr>
+<tr><td>BroadcastBuyHelp()</td><td>Display perk weapon help</td></tr>
+<tr><td rowspan="3">Game Logic</td><td>Tick()</td><td>Main loop: iterate Players[] and execute all logic</td></tr>
+<tr><td>TickMutRecover()</td><td>Headshot detection + ammo recovery + Dosh bonus</td></tr>
+<tr><td>HeadshotRecover()</td><td>HP/Armor recovery (with overclock branch)</td></tr>
+</table>
+
+<h2>Tick Loop Complete Data Flow</h2>
+<div class="mermaid">
+flowchart TD
+    T["Tick(DeltaTime)"] --> LOOP["Iterate Players[i]"]
+    LOOP --> CHK1{"bIsEpt or\nKFPH == None?"}
+    CHK1 -->|Yes| SKIP["continue\nSkip this player"]
+    CHK1 -->|No| CHK2{"bEnableHE?"}
+    CHK2 -->|Yes| TMR["TickMutRecover()"]
+    CHK2 -->|No| OC_CHK
+
+    TMR --> INF{"bEnableInfiniteSpareAmmo?"}
+    INF -->|Yes| INFA["SpareAmmoCount = Capacity\nClientForceAmmoUpdate"]
+    INF -->|No| HS_CHK
+    INFA --> HS_CHK
+
+    HS_CHK{"fLastHeadshotCounts\n!= PWRI.VectData1.X?"}
+    HS_CHK -->|"Yes (new headshot)"| AMMO["Ammo Recovery\nAmmoCount += difference"]
+    AMMO --> DOSH["Dosh += BonusDosh"]
+    DOSH --> HSR["HeadshotRecover()\nHP/Armor recovery"]
+    HSR --> UPD["Update fLastHeadshotCounts"]
+    HS_CHK -->|No| OC_CHK
+
+    UPD --> OC_CHK{"HP > HealthMax?"}
+    OC_CHK -->|Yes| DEC_HP["HealthDecrement += DecreModifier * DeltaTime\nAccumulator >= 1 -> HP--"]
+    OC_CHK -->|No| OC_CHK2
+
+    DEC_HP --> OC_CHK2{"Armor > MaxArmor?"}
+    OC_CHK2 -->|Yes| DEC_AR["ArmorDecrement += DecreModifier * DeltaTime\nAccumulator >= 1 -> Armor--"]
+    OC_CHK2 -->|No| REG_CHK
+
+    DEC_AR --> REG_CHK{"bEnableHealthRegen\nand HP < HealthMax?"}
+    REG_CHK -->|Yes| REG_HP["HealthRegenDelta += RegenModifier * DeltaTime\nAccumulator >= 1 → HP++"]
+    REG_CHK -->|No| REG_CHK2
+    REG_HP --> REG_CHK2{"bEnableArmourRegen\nand Armor < MaxArmor?"}
+    REG_CHK2 -->|Yes| REG_AR["ArmorRegenDelta += RegenModifier * DeltaTime\nAccumulator >= 1 → Armor++"]
+    REG_CHK2 -->|No| NEXT["Next Player"]
+    REG_AR --> NEXT
+    SKIP --> NEXT
+    NEXT --> LOOP
+</div>
+<p class="diagram-caption">Figure 8: Tick Loop Complete Data Flow</p>
+</div>
+
+<!-- ===================== SECTION 6: HEADSHOT RECOVERY ===================== -->
+<div class="section" id="headshot">
+<h1>Headshot Recovery & Overclocking</h1>
+<p>This is the core mechanic of HealingExtend — gaining HP, Armor, Dosh, and ammo recovery through headshot kills, with support for an "Overclocked" state that exceeds normal limits.</p>
+
+<h2>Headshot Detection Mechanism</h2>
+<p>HE does not use damage event callbacks; instead, it leverages the engine's <code>PostWaveReplicationInfo</code> structure:</p>
+<pre><code><span class="cm">// Per-frame detection</span>
+<span class="kw">if</span>(Players[i].fLastHeadshotCounts != Players[i].KFPC.PWRI.VectData1.X)
+{
+    <span class="cm">// New headshot detected! Difference = number of new headshots</span>
+    <span class="kw">var int</span> newHeadshots = PWRI.VectData1.X - fLastHeadshotCounts;
+    <span class="cm">// Execute recovery...</span>
+}</code></pre>
+
+<h2>Per-Headshot Recovery Contents</h2>
+<table>
+<tr><th>Recovery Item</th><th>Amount</th><th>When Overclocked</th><th>Control Variable</th></tr>
+<tr><td>HP</td><td>+HealthHealingAmount (default 1)</td><td>2x (doubled)</td><td>Always enabled</td></tr>
+<tr><td>Armor</td><td>+ArmourHealingAmount (default 1)</td><td>2x (doubled)</td><td>Always enabled</td></tr>
+<tr><td>Dosh</td><td>+BonusDosh (default 85)</td><td>Unchanged</td><td>bEnableDoshBonus</td></tr>
+<tr><td>Ammo</td><td>+1 (current magazine)</td><td>Unchanged</td><td>bEnableAmmoRecovering</td></tr>
+</table>
+
+<div class="info-box note">
+<strong>Overclocking Double Condition:</strong> When <code>KFPH.Health > KFPH.HealthMax</code>, HP recovery becomes <code>2 * HealthHealingAmount</code>. Same applies to Armor. This encourages players to keep landing headshots while overclocked to maintain high health.
+</div>
+
+<h2>Health State Machine</h2>
+<div class="mermaid">
+graph TD
+    N["Normal State\nHP ≤ HealthMax\nArmor ≤ MaxArmor"]
+    OC["Overclocked State\nHP > HealthMax or Armor > MaxArmor"]
+    LOW["Low HP State\nHP ≤ CriticalHealthRateNotify"]
+
+    N -->|"Headshot Recovery\nExceeds HealthMax"| OC
+    OC -->|"Decay DecreModifier\nDrops to ≤ HealthMax"| N
+    OC -->|"Continuous Headshots\nMaintain Overclock"| OC
+    N -->|"Takes Damage"| LOW
+    LOW -->|"Headshot Recovery"| N
+    OC -->|"HP Cap: OverclockHealthLimit\nArmor Cap: OverclockArmorLimit"| OC
+</div>
+<p class="diagram-caption">Figure 9: Health State Machine</p>
+
+<h2>Overclock Decay Formula</h2>
+<p>Overclocking uses an "accumulator pattern" for sub-frame precision decay:</p>
+<pre><code><span class="cm">// Executed every frame (only when HP > HealthMax)</span>
+Players[i].HealthDecrement += DecreModifier * HealthHealingAmount * DeltaTime;
+<span class="kw">if</span>(Players[i].HealthDecrement >= <span class="nu">1.0</span>)
+{
+    --Players[i].KFPH.Health;
+    Players[i].HealthDecrement -= <span class="nu">1.0</span>;
+}</code></pre>
+<div class="info-box tip">
+<strong>Decay Rate Calculation:</strong> Default DecreModifier=0.2, HealthHealingAmount=1 → decays 0.2 HP per second. Decaying from OverclockHealthLimit(150) to HealthMax(100) takes 250 seconds (about 4 minutes). In actual gameplay, players continuously land headshots, creating a dynamic equilibrium.
+</div>
+
+<h2>Passive Regeneration System</h2>
+<p>Similar to Berserker's passive regen, disabled by default. Uses the same accumulator pattern:</p>
+<pre><code><span class="cm">// Only regenerates when HP < HealthMax (does not trigger overclock)</span>
+Players[i].HealthRegenDelta += RegenModifier * HealthRegenPerSecond * DeltaTime;
+<span class="kw">if</span>(Players[i].HealthRegenDelta >= <span class="nu">1.0</span>)
+{
+    ++Players[i].KFPH.Health;
+    Players[i].HealthRegenDelta -= <span class="nu">1.0</span>;
+}</code></pre>
+</div>
+
+<!-- ===================== SECTION 7: QUICK PURCHASE ===================== -->
+<div class="section" id="quick-purchase">
+<h1>Quick Purchase System</h1>
+<p>Allows players to purchase perk-specific weapons directly via Alt+Number keys between waves, without opening the trader menu.</p>
+
+<h2>Key Bindings</h2>
+<table>
+<tr><th>Key</th><th>Command</th><th>Function</th></tr>
+<tr><td>Alt+0</td><td><code>say !HEBuyPerk Help</code></td><td>Display purchasable weapon list for current perk</td></tr>
+<tr><td>Alt+1</td><td><code>say !HEBuyPerk One</code></td><td>Buy first weapon (usually cheapest)</td></tr>
+<tr><td>Alt+2</td><td><code>say !HEBuyPerk Two</code></td><td>Buy second weapon</td></tr>
+<tr><td>Alt+3</td><td><code>say !HEBuyPerk Three</code></td><td>Buy third weapon (usually most expensive)</td></tr>
+<tr><td>Alt+9</td><td><code>say !HEDebug</code></td><td>Display debug information</td></tr>
+</table>
+<p>Key bindings are set in <code>HE_HUDManager.ClientGetKFPlayerOwner()</code> via <code>PlayerInput.Bindings.AddItem()</code>.</p>
+
+<h2>6-Perk Weapon Mapping Table</h2>
+<table>
+<tr><th>Perk</th><th>Alt+1</th><th>Alt+2</th><th>Alt+3</th></tr>
+<tr><td>Sharpshooter</td><td>SPX 464 ($650) <span class="badge badge-blue">idx41</span></td><td>M14EBR ($1100) <span class="badge badge-blue">idx43</span></td><td>Railgun ($1500) <span class="badge badge-blue">idx44</span></td></tr>
+<tr><td>Commando</td><td>AK12 ($1100) <span class="badge badge-blue">idx9</span></td><td>SCAR ($1500) <span class="badge badge-blue">idx10</span></td><td>Stoner63A ($1500) <span class="badge badge-blue">idx11</span></td></tr>
+<tr><td>Field Medic</td><td>HMT-201 ($650) <span class="badge badge-blue">idx18</span></td><td>HMT-301 ($1100) <span class="badge badge-blue">idx19</span></td><td>HMT-401 ($1500) <span class="badge badge-blue">idx20</span></td></tr>
+<tr><td>Support</td><td>Double Barrel ($650) <span class="badge badge-blue">idx30</span></td><td>M4 ($1100) <span class="badge badge-blue">idx32</span></td><td>AA12 ($1500) <span class="badge badge-blue">idx33</span></td></tr>
+<tr><td>SWAT</td><td>P90 ($1100) <span class="badge badge-blue">idx50</span></td><td>HK-UMP ($1200) <span class="badge badge-blue">idx54</span></td><td>Kriss ($1500) <span class="badge badge-blue">idx51</span></td></tr>
+<tr><td>Gunslinger</td><td>SPX 464 ($650) <span class="badge badge-purple">*</span> / Dual 1911 ($650) <span class="badge badge-blue">idx24</span></td><td>Dual Deagle ($1100) <span class="badge badge-blue">idx26</span></td><td>Dual SW500 ($1500) <span class="badge badge-blue">idx28</span></td></tr>
+</table>
+<p><span class="badge badge-purple">*</span> Controlled by <code>bGsAltOneIsSPX</code>: True=SPX 464 (idx41), False=Dual 1911 (idx24)</p>
+
+<h2>Purchase Flow</h2>
+<div class="mermaid">
+flowchart TD
+    START["BuyPlayerWeapon(KFPC, ChatMsg)"] --> CHK_WAVE{"Wave in progress?\nIsWaveActive()"}
+    CHK_WAVE -->|Yes| ABORT1["return\nCannot purchase during combat"]
+    CHK_WAVE -->|No| MATCH["Match weapon KFW + price + TraderIndex\nbased on Perk + ChatMsg"]
+    MATCH --> CHK_IDX{"TraderIndex == -1?"}
+    CHK_IDX -->|Yes| ABORT2["Wrong Parameter"]
+    CHK_IDX -->|No| CHK_OWN{"Iterate InventoryChain\nAlready owns weapon?"}
+    CHK_OWN -->|Yes| ABORT3["return (silent)"]
+    CHK_OWN -->|No| CHK_DOSH{"Dosh >= WeapPrice?"}
+    CHK_DOSH -->|No| ABORT4["return (silent)"]
+    CHK_DOSH -->|Yes| SIM["Simulate Trader Flow"]
+
+    SIM --> S1["4.1 GetPurchaseHelper().Initialize()"]
+    S1 --> S2["4.2 bServerTraderMenuOpen = true"]
+    S2 --> S3{"NetMode?"}
+    S3 -->|Standalone| S3A["PlaySound TRADER_OPEN_MENU"]
+    S3 -->|DedicatedServer| S3B["ClientPlaySoundFromTheme"]
+    S3A --> S4
+    S3B --> S4
+    S4["4.4 ServerBuyWeapon(TraderIndex)"]
+    S4 --> S5["4.5 ServerCloseTraderMenu()"]
+    S5 --> S6{"bFillAmmo?"}
+    S6 -->|Yes| S7["Calculate ammo cost\nDeduct Dosh\nFill all weapon ammo"]
+    S6 -->|No| S8["UpdateHUD()"]
+    S7 --> S8
+</div>
+<p class="diagram-caption">Figure 10: Quick Purchase Complete Flow</p>
+
+<h2>Simulated Trader Details</h2>
+<div class="info-box warn">
+<strong>Clever Hack:</strong> The quick purchase system simulates the complete trader open/close flow, including opening the trader menu → purchasing → closing the menu. This is because the KF2 engine's <code>ServerBuyWeapon</code> only works properly when the trader is in the open state.
+</div>
+<p>During ammo filling, if the player doesn't have enough Dosh to pay for all ammo, the system displays <code>"Horzine Tech LTD. Helps With Your Money"</code> and deducts all remaining Dosh. If <code>bFillAllWeapAmmoAfterQuickPurchase=true</code>, it fills all weapons rather than just the newly purchased one.</p>
+</div>
+
+<!-- ===================== SECTION 8: CHAT SYSTEM ===================== -->
+<div class="section" id="chat-system">
+<h1>Chat Command System</h1>
+<p><code>HE_ChatController</code> (80 lines) extends <code>BroadcastHandler</code>, implementing a command system by intercepting chat messages.</p>
+
+<h2>BroadcastHandler Chain Structure</h2>
+<p>KF2 uses a BroadcastHandler chain to process chat messages. HE inserts itself at the head of the chain:</p>
+<pre><code><span class="kw">function</span> <span class="fn">InitHEClass</span>(HE_Main HE_MainObj) {
+    MyHEMain = HE_MainObj;
+    PreBroadcastHandler = MyHEMain.MyKFGI.BroadcastHandler; <span class="cm">// Save original BH</span>
+    MyHEMain.MyKFGI.BroadcastHandler = self;                <span class="cm">// Replace with self</span>
+}</code></pre>
+
+<h2>RPW Compatibility</h2>
+<div class="info-box tip">
+<strong>Chain Compatibility:</strong> After processing its own commands, HE_ChatController passes the message to <code>PreBroadcastHandler.BroadcastText()</code>, ensuring that other Mutators using BroadcastHandler (such as RPW) also receive the message.
+</div>
+
+<h2>Command Dispatch Flow</h2>
+<div class="mermaid">
+sequenceDiagram
+    participant P as Player
+    participant GI as KFGameInfo
+    participant CC as HE_ChatController
+    participant HE as HE_Main
+    participant Pre as PreBroadcastHandler
+
+    P->>GI: Input chat message "!HESys"
+    GI->>CC: BroadcastText(SenderPRI, Receiver, Msg)
+    CC->>CC: Check SenderPRI.Owner == Receiver
+    CC->>HE: Broadcast(SenderPRI, Receiver, "!HESys")
+    HE->>HE: ParseStringIntoArray → MsgHead="!HESys"
+    HE->>HE: switch(MsgHead) → GlobalBroadcastHESysInfo()
+    CC->>CC: StopBroadcast("!HESys") → false
+    CC->>Pre: PreBroadcastHandler.BroadcastText()
+    Pre->>P: Message displayed in chat box
+</div>
+<p class="diagram-caption">Figure 11: Command Dispatch Sequence</p>
+
+<h2>Command Table</h2>
+<table>
+<tr><th>Command</th><th>Function</th><th>Output Target</th><th>Stop Propagation</th></tr>
+<tr><td><code>!HESys</code></td><td>Display Mutator version, update date, and other system info</td><td>Global ChatBox + Console</td><td><span class="badge badge-green">No</span></td></tr>
+<tr><td><code>!HEInfo</code></td><td>Display current configuration parameter details</td><td>Global ChatBox + Console</td><td><span class="badge badge-green">No</span></td></tr>
+<tr><td><code>!HEBuyPerk [Help|One|Two|Three]</code></td><td>Quick purchase system</td><td>Personal ChatBox</td><td><span class="badge badge-red">Yes</span></td></tr>
+<tr><td><code>!HEDebug</code></td><td>Output Players[] array details to console</td><td>Personal Console</td><td><span class="badge badge-red">Yes</span></td></tr>
+<tr><td><code>!TK18039</code></td><td>Easter egg: "TK18039 Meow Meow Meow ~"</td><td>Global Center</td><td><span class="badge badge-green">No</span></td></tr>
+<tr><td><code>!Fuck / !Fvck / !Fk</code></td><td>Penalty: deduct 25,000 Dosh</td><td>Global ChatBox</td><td><span class="badge badge-green">No</span></td></tr>
+</table>
+
+<div class="info-box note">
+<strong>Stop Propagation Mechanism:</strong> Commands where <code>StopBroadcast()</code> returns true (!HEDebug, !HEBuyPerk) are not passed to PreBroadcastHandler, so other players cannot see these command texts. !HESys and !HEInfo propagate normally and are visible to all players.
+</div>
+</div>
+
+<!-- ===================== SECTION 9: HUD SYSTEM ===================== -->
+<div class="section" id="hud-system">
+<h1>HUD System</h1>
+<p>HealingExtend's HUD system is a collaboration of two classes: <code>HE_HUDManager</code> handles server-to-client bridging, while <code>HE_HUDBase</code> handles the actual Canvas rendering.</p>
+
+<h2>HE_HUDManager Responsibilities</h2>
+<table>
+<tr><th>Function</th><th>Method</th><th>Description</th></tr>
+<tr><td>Get LocalPlayer</td><td>ClientGetKFPlayerOwner()</td><td>Client-side retrieval of KFPlayerController reference</td></tr>
+<tr><td>Replace HUD Class</td><td>ClientSetHUD()</td><td>Calls ClientSetHUD(HE_HUDBase) + CreateHUDMovie()</td></tr>
+<tr><td>Key Bindings</td><td>ClientGetKFPlayerOwner()</td><td>Bind Alt+0~3, Alt+9, P key</td></tr>
+<tr><td>Chat Messages</td><td>ClientAddChatLine()</td><td>reliable client RPC, displays colored messages in chat box</td></tr>
+<tr><td>Center Messages</td><td>ClientHUDMessage()</td><td>Display message at screen center (disappears after 5 seconds)</td></tr>
+<tr><td>Play Sound</td><td>ClientPlaySoundFromTheme()</td><td>Used for trader open sound effect</td></tr>
+<tr><td>Open URL</td><td>ClientOpenURL()</td><td>Automatically opens GitHub page when player joins</td></tr>
+<tr><td>Console Output</td><td>ClientPrint()</td><td>Output message to client console</td></tr>
+</table>
+
+<h2>HE_HUDBase Rendering Pipeline</h2>
+<p><code>HE_HUDBase</code> (1234 lines) extends <code>KFGFxHudWrapper</code>, overriding <code>DrawHUD()</code> to implement custom rendering.</p>
+
+<div class="mermaid">
+flowchart TD
+    DH["DrawHUD()"] --> WH{"KFPlayerOwner.Pawn\nhas weapon?"}
+    WH -->|Yes| DW["Pawn.Weapon.DrawHUD()"]
+    WH -->|No| SO
+    DW --> SO["DrawActorOverlays()\nPlayerOwner.DrawHud()"]
+    SO --> GRI["Cache KFGRI"]
+    GRI --> CIN{"bCinematicMode?"}
+    CIN -->|Yes| RET["return"]
+    CIN -->|No| CS["DrawCrosshair()\nOriginal Crosshair"]
+
+    CS --> DBG{"bDrawDebugPI?"}
+    DBG -->|Yes| DBGD["DrawDebugHumanPlayerInfo()\n+ DrawPlayerHealthLowIcon()"]
+    DBG -->|No| CM
+    DBGD --> CM
+
+    CM{"bDrawCenterMsg?"}
+    CM -->|Yes| CMD["FuncDrawCenterMsg()\nScreen Center Text"]
+    CM -->|No| ASC
+    CMD --> ASC
+
+    ASC["CheckDrawASCStatus()\nCustom Crosshair Status Check"]
+    ASC --> TEAM{"PlayerTeam == 0?"}
+    TEAM -->|Yes| FP["Iterate All KFPawn_Human"]
+    TEAM -->|No| WRAP
+
+    FP --> VIS{"Visible and Alive?"}
+    VIS -->|Yes| MED{"Current Perk is\nField Medic?"}
+    MED -->|Yes| MHLI["Medic_DrawPlayerHealthLowIcon()\nThree-tier Healing Indicator"]
+    MED -->|No| NHLI["DrawPlayerHealthLowIcon()\nCritical Only Indicator"]
+    MHLI --> FHI["DrawFriendlyHumanPlayerInfo()\nTeammate HP/Armor Bar/Perk Icon"]
+    NHLI --> FHI
+    VIS -->|No| HID["Add to HiddenHumanPlayers"]
+    FHI --> NEXT["Next Player"]
+    HID --> NEXT
+
+    NEXT --> ICONS["CheckAndDrawHiddenPlayerIcons()\nCheckAndDrawRemainingZedIcons()\nDrawObjectiveHUD()"]
+    ICONS --> WRAP["KFGFxHudWrapper Layer\nCrosshair Color/Debug Info"]
+</div>
+<p class="diagram-caption">Figure 12: HUD Rendering Pipeline</p>
+
+<h2>Crosshair State Machine</h2>
+<div class="mermaid">
+stateDiagram-v2
+    [*] --> HE_NoneInit : Initialization
+    HE_NoneInit --> HE_Good : Normal Crosshair Enabled
+    HE_NoneInit --> HE_Player_Closed : Player Closed Crosshair
+
+    HE_Good --> HE_Player_UsingIronsight : Using Iron Sights
+    HE_Good --> HE_Player_Dead : Player Dead
+    HE_Good --> HE_Player_SpecialMoveDontAllow : Special Move
+    HE_Good --> HE_WeapNotGuns : Non-Gun Weapon
+
+    HE_Player_UsingIronsight --> HE_Good : Exit Iron Sights
+    HE_Player_Dead --> HE_NoneInit : Respawn
+    HE_Player_SpecialMoveDontAllow --> HE_Good : Move Ended
+    HE_WeapNotGuns --> HE_Good : Switch Weapon
+
+    HE_Player_Closed --> HE_Good : ToggleAsC()
+    HE_Good --> HE_Player_Closed : ToggleAsC()
+</div>
+<p class="diagram-caption">Figure 13: Crosshair State Machine</p>
+
+<h2>Custom Crosshair Drawing</h2>
+<p><code>DrawAsCAim()</code> supports two modes:</p>
+<table>
+<tr><th>Mode</th><th>Condition</th><th>Drawing Method</th></tr>
+<tr><td>UPK Texture Mode</td><td>bIsUpkUser=true and bIsUsingOldASC=false</td><td>Loads Crosshair_ss texture from HE_Contents.upk, 80x80 pixels</td></tr>
+<tr><td>Code Drawing Mode</td><td>Other cases</td><td>Canvas.DrawRect draws crosshair lines + center dot</td></tr>
+</table>
+<p>Crosshair parameters: <code>ASSAim_Length=12</code> (line length), <code>ASSAim_Space=8</code> (center gap), <code>ASSAim_Width=3</code> (line width).</p>
+
+<h2>Teammate Status Display</h2>
+<p>HE_HUDBase overrides <code>DrawFriendlyHumanPlayerInfo()</code>, adding overclocked health bar display:</p>
+<ul>
+<li>HP ≤ HealthMax → Normal green health bar</li>
+<li>HP > HealthMax → Full green bar + DeepPink overclock overlay</li>
+<li>Armor ≤ MaxArmor → Normal blue armor bar</li>
+<li>Armor > MaxArmor → Full blue bar + Snow white overclock overlay</li>
+</ul>
+
+<h2>Healing Priority Indicators (Medic Only)</h2>
+<table>
+<tr><th>HP Range</th><th>Icon Text</th><th>Color</th></tr>
+<tr><td>HP ≤ HealthMax (any missing health)</td><td>Notify</td><td>Grayish White (220,220,220)</td></tr>
+<tr><td>HP ≤ HurtHealthRateNotify (85)</td><td>Hurt</td><td>Yellow LowSeverityColor</td></tr>
+<tr><td>HP ≤ CriticalHealthRateNotify (50)</td><td>Dying</td><td>Red CriticalSeverityColor</td></tr>
+</table>
+
+<h2>Console Commands</h2>
+<table>
+<tr><th>Command</th><th>Function</th></tr>
+<tr><td><code>ToggleAsC</code> / <code>ZhunXin</code></td><td>Toggle custom crosshair</td></tr>
+<tr><td><code>ChangeAsCMode</code> / <code>HuanZhunXin</code></td><td>Switch crosshair rendering mode (UPK/code)</td></tr>
+<tr><td><code>HEDrawDebug</code></td><td>Toggle debug info rendering</td></tr>
+<tr><td><code>HEDrawDebugPI</code></td><td>Toggle debug player info</td></tr>
+</table>
+
+<h2>Zed Icon System</h2>
+<p><code>DrawZedIcon()</code> displays a location icon for the last surviving Zed. Users with UPK textures can see:</p>
+<ul>
+<li><strong>Fleshpound</strong> → Dedicated <code>HE_Contents.fleshpound</code> icon (50x50)</li>
+<li><strong>Scrake</strong> → Dedicated <code>HE_Contents.ZeddAlert</code> icon (50x50)</li>
+<li><strong>Other Zeds</strong> → Generic icon <code>HE_Contents.ZeddAlert</code> / <code>UI_PerkIcon_ZED</code> (when no UPK)</li>
+</ul>
+</div>
+
+<!-- ===================== SECTION 10: TRADER AND WEAPONS ===================== -->
+<div class="section" id="trader-weapons">
+<h1>Trader & Weapons</h1>
+<p><code>HE_TraderManager</code> (166 lines) is responsible for injecting custom weapons into KF2's trader system, enabling client/server synchronization.</p>
+
+<h2>TraderManager Architecture</h2>
+<p>KF2's trader system is based on the <code>KFGameReplicationInfo.TraderItems.SaleItems</code> array. Each weapon requires an <code>STraderItem</code> entry. HE_TraderManager's job is to dynamically build these entries and inject them.</p>
+
+<h3>CustomizedWeap Config Structure</h3>
+<pre><code><span class="kw">struct</span> <span class="ty">CustomizedWeap</span>
+{
+    <span class="kw">var</span> <span class="ty">string</span> DefClassPath;   <span class="cm">// WeaponDefinition path</span>
+    <span class="kw">var</span> <span class="ty">string</span> WeapClassPath;  <span class="cm">// Weapon class path</span>
+    <span class="kw">var</span> <span class="ty">int</span>    dItemId;        <span class="cm">// Custom ItemID</span>
+};</code></pre>
+
+<h2>Weapon Sync Flow</h2>
+<div class="mermaid">
+sequenceDiagram
+    participant HE as HE_Main
+    participant TM as HE_TraderManager
+    participant GRI as KFGameReplicationInfo
+    participant Client as Client
+
+    HE->>TM: Spawn(Owner=KFPC)
+    HE->>TM: StartSyncItem()
+
+    alt Dedicated Server
+        TM->>TM: CreateWeapon() [Server injects first]
+        TM->>GRI: SaleItems.AddItem(CustomizedTI)
+        GRI-->>Client: SaleItems auto-replicated to client
+        TM->>TM: SetTimer(1s, ClientSetSaleItems)
+        loop Waiting for replication
+            Client->>Client: ClientSetSaleItems()
+            Client->>GRI: Check SaleItems.Length > 0?
+            alt Replicated
+                Client->>Client: CreateWeapon() [Client injects]
+                Client->>Client: ClearTimer()
+            else Not replicated
+                Client->>Client: Continue waiting
+            end
+        end
+    else Standalone
+        TM->>TM: SetTimer(1s, ClientSetSaleItems)
+        TM->>TM: CreateWeapon()
+        TM->>GRI: SaleItems.AddItem(CustomizedTI)
+    end
+
+    TM->>GRI: SetItemsInfo(SaleItems)
+</div>
+<p class="diagram-caption">Figure 14: Weapon Sync Sequence</p>
+
+<h2>CreateWeapon In Detail</h2>
+<p><code>CreateWeapon()</code> performs the following steps for each CustomizedWeap config entry:</p>
+<ol>
+<li>Load WeaponDefinition and Weapon class via <code>DynamicLoadObject()</code></li>
+<li>Check if the weapon already exists in SaleItems (prevent duplicates)</li>
+<li>Build <code>STraderItem</code>: populate magazine capacity, spare ammo, inventory size, Perk association, etc.</li>
+<li>Find the current maximum ItemID, new weapon ID = max + 1</li>
+<li>Add to <code>GRI.TraderItems.SaleItems</code></li>
+<li>Call <code>SetItemsInfo()</code> to update the trader UI</li>
+</ol>
+
+<h2>Custom Weapon Attribute Comparison</h2>
+<table>
+<tr><th>Attribute</th><th>HMTech-201 Storm</th><th>HMTech-401 BiohaZard</th></tr>
+<tr><td>Class Name</td><td>Weap_HMT201</td><td>Weap_HMT401</td></tr>
+<tr><td>Parent Class</td><td>KFWeap_MedicBase</td><td>KFWeap_MedicBase</td></tr>
+<tr><td>Weapon Type</td><td>SMG (FT_SMG)</td><td>AR (FT_Assault)</td></tr>
+<tr><td>Buy Price</td><td>650 Dosh</td><td>1500 Dosh</td></tr>
+<tr><td>Magazine Capacity</td><td>40</td><td>30</td></tr>
+<tr><td>Spare Ammo Capacity</td><td>360</td><td>360</td></tr>
+<tr><td>Damage</td><td>35</td><td>50 (×1.25)</td></tr>
+<tr><td>Fire Rate (RPM)</td><td>800</td><td>700</td></tr>
+<tr><td>Heal Amount</td><td>10 HP</td><td>10 HP</td></tr>
+<tr><td>Charge Time</td><td>15s</td><td>10s</td></tr>
+<tr><td>Inventory Size</td><td>3</td><td>7</td></tr>
+<tr><td>Ammo Cost/Mag</td><td>20 Dosh</td><td>40 Dosh</td></tr>
+<tr><td>Associated Perk</td><td>Field Medic</td><td>Field Medic</td></tr>
+</table>
+</div>
+
+<!-- ===================== SECTION 11: NETWORK REPLICATION ===================== -->
+<div class="section" id="network">
+<h1>Network Replication</h1>
+<p>HealingExtend implements server-client data synchronization based on UE3's Replication system.</p>
+
+<h2>UE3 Replication Fundamentals</h2>
+<table>
+<tr><th>Concept</th><th>Description</th></tr>
+<tr><td>Role</td><td>The Actor's role on the current machine: ROLE_Authority (server), ROLE_SimulatedProxy/ROLE_AutonomousProxy (client)</td></tr>
+<tr><td>RemoteRole</td><td>The Actor's role on the remote machine</td></tr>
+<tr><td>Replication Block</td><td>Declares which variables are replicated under what conditions</td></tr>
+<tr><td>repnotify</td><td>Triggers ReplicatedEvent() on the target end after a variable is replicated</td></tr>
+<tr><td>reliable client function</td><td>RPC called by the server, guaranteed to execute on the client</td></tr>
+</table>
+
+<h2>Network Architecture</h2>
+<div class="mermaid">
+graph TB
+    subgraph Server["Server (ROLE_Authority)"]
+        HE["HE_Main\nGame Logic + Tick"]
+        CC["HE_ChatController\nMessage Interception"]
+        PA["Players[] Array"]
+    end
+
+    subgraph Rep["Replication Layer"]
+        HM_S["HE_HUDManager\n(Server Instance)"]
+        TM_S["HE_TraderManager\n(Server Instance)"]
+    end
+
+    subgraph Client["Client"]
+        HM_C["HE_HUDManager\n(Client Proxy)"]
+        TM_C["HE_TraderManager\n(Client Proxy)"]
+        HUD["HE_HUDBase\n(Client-only)"]
+    end
+
+    HE -->|"Spawn + Manage"| HM_S
+    HE -->|"Spawn + Manage"| TM_S
+    HM_S -->|"AutonomousProxy\nreliable client RPCs"| HM_C
+    TM_S -->|"SimulatedProxy\nSaleItems Replication"| TM_C
+    HM_C -->|"ClientSetHUD()"| HUD
+    CC -->|"SimulatedProxy\nbAlwaysRelevant"| Client
+</div>
+<p class="diagram-caption">Figure 15: Network Architecture Diagram</p>
+
+<h2>Actor Replication Strategy Table</h2>
+<table>
+<tr><th>Actor</th><th>RemoteRole</th><th>bAlwaysRelevant</th><th>Replicated Content</th></tr>
+<tr><td>HE_HUDManager</td><td>Role_AutonomousProxy</td><td>No (Owner-based)</td><td>bStartGame (repnotify), reliable client RPCs</td></tr>
+<tr><td>HE_TraderManager</td><td>ROLE_SimulatedProxy</td><td>No</td><td>GRI.SaleItems auto-replicated</td></tr>
+<tr><td>HE_ChatController</td><td>ROLE_SimulatedProxy</td><td>Yes</td><td>Network debug info</td></tr>
+<tr><td>HE_RepTest</td><td>ROLE_AutonomousProxy</td><td>Yes</td><td>strTest, intTest (repnotify)</td></tr>
+</table>
+
+<h2>Standalone vs Dedicated Branching</h2>
+<p>Multiple places in the code branch based on <code>WorldInfo.NetMode</code>:</p>
+<table>
+<tr><th>Scenario</th><th>NM_Standalone</th><th>NM_DedicatedServer</th></tr>
+<tr><td>HUDManager get LocalPlayer</td><td>Direct access</td><td>Inferred via Owner</td></tr>
+<tr><td>Trader sound</td><td>Direct PlaySoundFromTheme</td><td>Via ClientPlaySoundFromTheme RPC</td></tr>
+<tr><td>Custom weapon sync</td><td>Direct CreateWeapon</td><td>Server creates first + client timer waits for replication</td></tr>
+<tr><td>HUD setup</td><td>Role &lt; Authority or NM_Standalone</td><td>Client-only execution</td></tr>
+</table>
+
+<h2>HE_RepTest Tutorial Example</h2>
+<p><code>HE_RepTest.uc</code> (66 lines) is a purely educational replication test class:</p>
+<pre><code><span class="kw">var repnotify string</span> strTest;
+<span class="kw">var repnotify int</span>    intTest;
+
+<span class="ty">Replication</span>
+{
+    <span class="kw">if</span>(Role == ROLE_Authority)
+        strTest, intTest;  <span class="cm">// Server → Client</span>
+}</code></pre>
+<p>The server increments intTest every second and updates strTest. Through repnotify, these are replicated to the client, which prints the value differences between both ends in the console, visually demonstrating replication latency.</p>
+</div>
+
+<!-- ===================== SECTION 12: CONFIGURATION ===================== -->
+<div class="section" id="config-ref">
+<h1>Configuration Manual</h1>
+<p>HealingExtend uses UE3's <code>config</code> system to persist configuration to INI files.</p>
+
+<div class="info-box note">
+<strong>INI File Path:</strong><br>
+Singleplayer/Local: <code>Documents\My Games\KillingFloor2\KFGame\Config\KF&lt;ConfigName&gt;.ini</code><br>
+Dedicated Server: <code>KFGame\Config\KF&lt;ConfigName&gt;.ini</code> (under server directory)
+</div>
+
+<h2>HE_Main — config(HE_Main)</h2>
+<table>
+<tr><th>Variable</th><th>Type</th><th>Default</th><th>Description</th></tr>
+<tr><td>bEnableHE</td><td>bool</td><td>True</td><td>Mutator master switch</td></tr>
+<tr><td>bEnableHE_HUD</td><td>bool</td><td>True</td><td>Custom HUD switch (disabling also disables overclock integration)</td></tr>
+<tr><td>bEnableCustomizedWeapons</td><td>bool</td><td>False</td><td>Custom weapons switch</td></tr>
+<tr><td>bEnableHealthRegen</td><td>bool</td><td>False</td><td>Passive HP regeneration switch</td></tr>
+<tr><td>bEnableArmourRegen</td><td>bool</td><td>False</td><td>Passive Armor regeneration switch</td></tr>
+<tr><td>bEnableInfiniteSpareAmmo</td><td>bool</td><td>False</td><td>Infinite spare ammo switch</td></tr>
+<tr><td>bEnableHealthAndArmorOverclocking</td><td>bool</td><td>True</td><td>Overclock system switch</td></tr>
+<tr><td>bEnableAmmoRecovering</td><td>bool</td><td>True</td><td>Headshot ammo recovery switch</td></tr>
+<tr><td>bEnableDoshBonus</td><td>bool</td><td>True</td><td>Headshot Dosh bonus switch</td></tr>
+<tr><td>bFillAllWeapAmmoAfterQuickPurchase</td><td>bool</td><td>True</td><td>Fill all weapon ammo after quick purchase</td></tr>
+<tr><td>bGsAltOneIsSPX</td><td>bool</td><td>True</td><td>Gunslinger Alt+1 → SPX/1911</td></tr>
+<tr><td>bInitedConfig</td><td>bool</td><td>True*</td><td>Config initialized flag</td></tr>
+<tr><td>fCurrentRegenRate</td><td>float</td><td>10.0</td><td>HealthRegenRate = 1/this value</td></tr>
+<tr><td>DecreModifier</td><td>float</td><td>0.2</td><td>Overclock decay rate</td></tr>
+<tr><td>RegenModifier</td><td>float</td><td>1.0</td><td>Passive regen rate multiplier</td></tr>
+<tr><td>HealthRegenPerSecond</td><td>float</td><td>1</td><td>Passive HP regen amount/sec</td></tr>
+<tr><td>ArmourRegenPerSecond</td><td>float</td><td>1</td><td>Passive Armor regen amount/sec</td></tr>
+<tr><td>HealthHealingAmount</td><td>float</td><td>1</td><td>Headshot HP recovery amount</td></tr>
+<tr><td>ArmourHealingAmount</td><td>float</td><td>1</td><td>Headshot Armor recovery amount</td></tr>
+<tr><td>BonusDosh</td><td>int</td><td>85</td><td>Headshot Dosh bonus</td></tr>
+<tr><td>OverclockHealthLimit</td><td>int</td><td>150</td><td>Overclock HP hard cap</td></tr>
+<tr><td>OverclockArmorLimit</td><td>int</td><td>175</td><td>Overclock Armor hard cap</td></tr>
+</table>
+
+<h2>HE_HUDBase — config(HE_HUDBase)</h2>
+<table>
+<tr><th>Variable</th><th>Type</th><th>Default</th><th>Description</th></tr>
+<tr><td>ASSAim_Length</td><td>float</td><td>12.0</td><td>Crosshair line segment length</td></tr>
+<tr><td>ASSAim_Space</td><td>float</td><td>8.0</td><td>Crosshair center gap</td></tr>
+<tr><td>ASSAim_Width</td><td>float</td><td>3.0</td><td>Crosshair line segment width</td></tr>
+<tr><td>HUDMainTextScale</td><td>float</td><td>1.0</td><td>Main HUD text scale</td></tr>
+<tr><td>HUDDebugTextScale</td><td>float</td><td>1.0</td><td>Debug text scale</td></tr>
+<tr><td>HurtHealthRateNotify</td><td>int</td><td>85</td><td>Medic "Hurt" notification threshold</td></tr>
+<tr><td>CriticalHealthRateNotify</td><td>int</td><td>50</td><td>"Dying" notification threshold</td></tr>
+<tr><td>MainHUDColor</td><td>color</td><td>(255,255,0,192)</td><td>Main HUD color (yellow)</td></tr>
+<tr><td>DebugHUDColor</td><td>color</td><td>(255,192,203,192)</td><td>Debug color (pink)</td></tr>
+<tr><td>CrosshairColor</td><td>color</td><td>(255,48,48,192)</td><td>Crosshair color (red)</td></tr>
+<tr><td>OverclockedHealthColor</td><td>color</td><td>(255,20,147,192)</td><td>Overclock health bar color (DeepPink)</td></tr>
+<tr><td>OverclockedArmorColor</td><td>color</td><td>(238,233,233,192)</td><td>Overclock armor bar color (Snow)</td></tr>
+<tr><td>LowSeverityColor</td><td>color</td><td>(255,255,0,192)</td><td>Low severity notification color (yellow)</td></tr>
+<tr><td>CriticalSeverityColor</td><td>color</td><td>(255,48,48,192)</td><td>Critical severity notification color (red)</td></tr>
+</table>
+
+<h2>HE_HUDManager — config(HE_Main)</h2>
+<table>
+<tr><th>Variable</th><th>Type</th><th>Default</th><th>Description</th></tr>
+<tr><td>DefaultHUDMessageColor</td><td>string</td><td>"42bbbc"</td><td>Default chat message color (HE cyan)</td></tr>
+<tr><td>AutoOpenedURL</td><td>string</td><td>GitHub URL</td><td>URL auto-opened when joining a game</td></tr>
+<tr><td>bNotResetConfigNextTime</td><td>bool</td><td>True*</td><td>Config protection flag</td></tr>
+</table>
+
+<h2>HE_ChatController — config(HE_Main)</h2>
+<table>
+<tr><th>Variable</th><th>Type</th><th>Default</th><th>Description</th></tr>
+<tr><td>bPrintNetworkStatusInConsole</td><td>bool</td><td>False</td><td>Output network status to console on startup</td></tr>
+</table>
+
+<h2>HE_TraderManager — config(HE_Main)</h2>
+<table>
+<tr><th>Variable</th><th>Type</th><th>Default</th><th>Description</th></tr>
+<tr><td>CustomizedWeaps</td><td>array&lt;CustomizedWeap&gt;</td><td>Empty</td><td>Custom weapons config list, must be configured manually in INI</td></tr>
+</table>
+</div>
+
+<!-- ===================== SECTION 13: GLOSSARY ===================== -->
+<div class="section" id="glossary">
+<h1>Glossary</h1>
+
+<h2>Killing Floor 2 Terms</h2>
+<table>
+<tr><th>Term</th><th>Description</th></tr>
+<tr><td>Zed</td><td>General term for all monsters in the game</td></tr>
+<tr><td>Perk</td><td>Class system, such as Sharpshooter, Commando, Field Medic, etc.</td></tr>
+<tr><td>Dosh</td><td>In-game currency</td></tr>
+<tr><td>Trader</td><td>Between-wave merchant for purchasing weapons and ammo</td></tr>
+<tr><td>Wave</td><td>Game wave; the trader can be accessed after each wave ends</td></tr>
+<tr><td>CD (Controlled Difficulty)</td><td>Custom difficulty Mutator; HE is specifically optimized for it</td></tr>
+<tr><td>ZedTime</td><td>Bullet-time effect where the game enters slow motion</td></tr>
+<tr><td>Fleshpound / FP</td><td>Large Zed, high-threat target</td></tr>
+<tr><td>Scrake / SC</td><td>Large Zed, high-health melee unit</td></tr>
+<tr><td>RPW (Ranked Perks Whitelist)</td><td>Ranked whitelist Mutator; HE is compatible with it</td></tr>
+<tr><td>ServerExt</td><td>Another popular server extension Mutator</td></tr>
+</table>
+
+<h2>Unreal Engine 3 Terms</h2>
+<table>
+<tr><th>Term</th><th>Description</th></tr>
+<tr><td>Actor</td><td>The base object in UE3 that can be placed into the game world</td></tr>
+<tr><td>Pawn</td><td>An Actor that can be controlled by a Controller, representing a player or AI character</td></tr>
+<tr><td>Controller</td><td>Logic object that controls a Pawn (PlayerController / AIController)</td></tr>
+<tr><td>Mutator</td><td>Chain-based component that modifies game rules</td></tr>
+<tr><td>BroadcastHandler</td><td>Chain-based component that handles chat message broadcasting</td></tr>
+<tr><td>Replication</td><td>Server-to-client data synchronization mechanism</td></tr>
+<tr><td>RemoteRole</td><td>The Actor's role type on the remote end</td></tr>
+<tr><td>ROLE_Authority</td><td>Full server control</td></tr>
+<tr><td>ROLE_SimulatedProxy</td><td>Client-side simulation (position interpolation, etc.)</td></tr>
+<tr><td>ROLE_AutonomousProxy</td><td>Client-side autonomous control (player-controlled Actors)</td></tr>
+<tr><td>repnotify</td><td>Triggers ReplicatedEvent callback after variable replication</td></tr>
+<tr><td>reliable client function</td><td>Remote procedure call invoked by the server, guaranteed to execute on the client</td></tr>
+<tr><td>GRI (GameReplicationInfo)</td><td>Global replication info, accessible by all clients</td></tr>
+<tr><td>PRI (PlayerReplicationInfo)</td><td>Player replication info</td></tr>
+<tr><td>Canvas</td><td>2D rendering API used for HUD drawing</td></tr>
+<tr><td>exec function</td><td>Function that can be called directly from the console</td></tr>
+<tr><td>config</td><td>Config variable, persisted to INI files</td></tr>
+<tr><td>defaultproperties</td><td>UE3's default properties block, similar to a constructor</td></tr>
+<tr><td>DynamicLoadObject</td><td>Dynamically load classes/assets at runtime</td></tr>
+</table>
+
+<h2>HealingExtend-specific Terms</h2>
+<table>
+<tr><th>Term</th><th>Description</th></tr>
+<tr><td>HEPlayer</td><td>Player data structure storing controller, Pawn, HUD manager, etc.</td></tr>
+<tr><td>Overclocking</td><td>State where HP/Armor exceeds the normal maximum</td></tr>
+<tr><td>AsC (Assistant Crosshair)</td><td>HE's custom assistant crosshair system</td></tr>
+<tr><td>PWRI</td><td>PostWaveReplicationInfo, engine-internal wave statistics structure</td></tr>
+<tr><td>Quick Purchase</td><td>System for purchasing weapons directly via Alt+number keys</td></tr>
+<tr><td>HECC</td><td>Instance variable name for HE_ChatController</td></tr>
+<tr><td>PreBroadcastHandler</td><td>The original BroadcastHandler saved before HE replaces it</td></tr>
+<tr><td>UPK User</td><td>User who has installed the HE_Contents.upk asset package</td></tr>
+</table>
+
+<h2>Abbreviation Table</h2>
+<table>
+<tr><th>Abbreviation</th><th>Full Name</th></tr>
+<tr><td>HE</td><td>HealingExtend</td></tr>
+<tr><td>KF2</td><td>Killing Floor 2</td></tr>
+<tr><td>UE3</td><td>Unreal Engine 3</td></tr>
+<tr><td>KFPC</td><td>KFPlayerController</td></tr>
+<tr><td>KFPH</td><td>KFPawn_Human</td></tr>
+<tr><td>KFPRI</td><td>KFPlayerReplicationInfo</td></tr>
+<tr><td>KFGRI</td><td>KFGameReplicationInfo</td></tr>
+<tr><td>GI</td><td>GameInfo</td></tr>
+<tr><td>BH</td><td>BroadcastHandler</td></tr>
+<tr><td>GVC</td><td>GameViewportClient</td></tr>
+<tr><td>HP</td><td>Health Points</td></tr>
+<tr><td>OC</td><td>Overclocking</td></tr>
+<tr><td>FP</td><td>Fleshpound</td></tr>
+<tr><td>SC</td><td>Scrake</td></tr>
+<tr><td>RPC</td><td>Remote Procedure Call</td></tr>
+<tr><td>INI</td><td>Configuration file format</td></tr>
+<tr><td>CD</td><td>Controlled Difficulty</td></tr>
+<tr><td>RPW</td><td>Ranked Perks Whitelist</td></tr>
+</table>
+</div>
+
+</main>
+
+<!-- Mermaid.js -->
+<script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+<script>
+mermaid.initialize({
+  startOnLoad: true,
+  theme: 'dark',
+  themeVariables: {
+    darkMode: true,
+    background: '#1c2333',
+    primaryColor: '#1f6feb',
+    primaryTextColor: '#e6edf3',
+    primaryBorderColor: '#30363d',
+    lineColor: '#58a6ff',
+    secondaryColor: '#21262d',
+    tertiaryColor: '#161b22',
+    fontFamily: '-apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif',
+    fontSize: '14px'
+  },
+  flowchart: { useMaxWidth: true, htmlLabels: true, curve: 'basis' },
+  sequence: { useMaxWidth: true, actorMargin: 80 }
+});
+
+// Sidebar navigation
+function scrollToSection(id) {
+  const el = document.getElementById(id);
+  if (el) {
+    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    // Update active state
+    document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
+    event.target.classList.add('active');
+    // Close mobile sidebar
+    if (window.innerWidth <= 900) toggleSidebar();
+  }
+}
+
+function toggleGroup(el) {
+  el.parentElement.classList.toggle('collapsed');
+}
+
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebarOverlay').classList.toggle('active');
+}
+
+// Search
+function handleSearch(query) {
+  query = query.toLowerCase().trim();
+  const sections = document.querySelectorAll('.section');
+  sections.forEach(s => {
+    if (!query) { s.style.display = 'block'; return; }
+    const text = s.textContent.toLowerCase();
+    s.style.display = text.includes(query) ? 'block' : 'none';
+  });
+}
+
+// Scroll spy
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const id = entry.target.id;
+      document.querySelectorAll('.sidebar-item').forEach(item => {
+        item.classList.remove('active');
+        if (item.getAttribute('onclick')?.includes(id)) {
+          item.classList.add('active');
+        }
+      });
+    }
+  });
+}, { rootMargin: '-80px 0px -70% 0px' });
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.section').forEach(s => observer.observe(s));
+});
+</script>
+</body>
+</html>

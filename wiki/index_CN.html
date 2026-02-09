@@ -1,0 +1,1623 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HealingExtend Plus v1.1.3 - Wiki</title>
+<style>
+:root {
+  --bg-primary: #0d1117;
+  --bg-secondary: #161b22;
+  --bg-sidebar: #0d1117;
+  --bg-card: #1c2333;
+  --bg-code: #1a1f2e;
+  --text-primary: #e6edf3;
+  --text-secondary: #8b949e;
+  --text-muted: #6e7681;
+  --accent: #58a6ff;
+  --accent-dim: #1f6feb;
+  --border: #30363d;
+  --border-light: #21262d;
+  --green: #3fb950;
+  --yellow: #d29922;
+  --red: #f85149;
+  --purple: #bc8cff;
+  --sidebar-width: 280px;
+  --header-height: 56px;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+/* Header */
+.header {
+  position: fixed; top:0; left:0; right:0;
+  height: var(--header-height);
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center;
+  padding: 0 20px; z-index: 100;
+}
+.header-logo {
+  font-size: 18px; font-weight: 700;
+  color: var(--accent);
+  display: flex; align-items: center; gap: 10px;
+}
+.header-logo span.tag {
+  font-size: 11px; padding: 2px 8px;
+  background: var(--accent-dim);
+  border-radius: 12px; color: #fff;
+  font-weight: 500;
+}
+.header-logo span.deprecated {
+  background: var(--yellow);
+  color: #000;
+}
+.header-search {
+  margin-left: 40px; position: relative;
+}
+.header-search input {
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  padding: 6px 12px 6px 32px;
+  border-radius: 6px;
+  font-size: 14px; width: 300px;
+  outline: none;
+}
+.header-search input:focus { border-color: var(--accent); }
+.header-search svg {
+  position: absolute; left: 10px; top: 50%;
+  transform: translateY(-50%);
+  fill: var(--text-muted); width: 16px; height: 16px;
+}
+.menu-toggle {
+  display: none; background: none; border: none;
+  color: var(--text-primary); cursor: pointer;
+  padding: 4px; margin-right: 12px;
+}
+/* Sidebar */
+.sidebar {
+  position: fixed; top: var(--header-height); left:0;
+  width: var(--sidebar-width);
+  height: calc(100vh - var(--header-height));
+  background: var(--bg-sidebar);
+  border-right: 1px solid var(--border);
+  overflow-y: auto; padding: 16px 0;
+  z-index: 50;
+  transition: transform 0.3s ease;
+}
+.sidebar::-webkit-scrollbar { width: 4px; }
+.sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+.sidebar-group { margin-bottom: 4px; }
+.sidebar-group-title {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 6px 20px; cursor: pointer;
+  font-size: 12px; font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-secondary);
+  user-select: none;
+}
+.sidebar-group-title:hover { color: var(--text-primary); }
+.sidebar-group-title .arrow {
+  transition: transform 0.2s;
+  font-size: 10px;
+}
+.sidebar-group.collapsed .arrow { transform: rotate(-90deg); }
+.sidebar-group.collapsed .sidebar-items { display: none; }
+.sidebar-items { list-style: none; }
+.sidebar-item {
+  display: block;
+  padding: 6px 20px 6px 28px;
+  font-size: 14px;
+  color: var(--text-secondary);
+  text-decoration: none;
+  cursor: pointer;
+  border-left: 2px solid transparent;
+  transition: all 0.15s;
+}
+.sidebar-item:hover {
+  color: var(--text-primary);
+  background: var(--bg-secondary);
+}
+.sidebar-item.active {
+  color: var(--accent);
+  border-left-color: var(--accent);
+  background: rgba(88,166,255,0.05);
+}
+/* Main Content */
+.main {
+  margin-left: var(--sidebar-width);
+  margin-top: var(--header-height);
+  padding: 32px 48px 80px;
+  max-width: 960px;
+}
+.section { margin-bottom: 64px; display: block; }
+.section h1 {
+  font-size: 32px; font-weight: 700;
+  margin-bottom: 8px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+.section h2 {
+  font-size: 24px; font-weight: 600;
+  margin: 32px 0 12px;
+  color: var(--text-primary);
+}
+.section h3 {
+  font-size: 18px; font-weight: 600;
+  margin: 24px 0 8px;
+  color: var(--text-primary);
+}
+.section p { margin: 8px 0; color: var(--text-secondary); }
+.section a { color: var(--accent); text-decoration: none; }
+.section a:hover { text-decoration: underline; }
+/* Tables */
+table {
+  width: 100%; border-collapse: collapse;
+  margin: 16px 0; font-size: 14px;
+}
+th {
+  text-align: left; padding: 10px 12px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  font-weight: 600; color: var(--text-primary);
+  white-space: nowrap;
+}
+td {
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+}
+tr:hover td { background: rgba(88,166,255,0.03); }
+/* Code */
+code {
+  font-family: 'Cascadia Code', 'Fira Code', 'JetBrains Mono', monospace;
+  background: var(--bg-code);
+  padding: 2px 6px; border-radius: 4px;
+  font-size: 13px; color: var(--purple);
+}
+pre {
+  background: var(--bg-code);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px; margin: 12px 0;
+  overflow-x: auto; font-size: 13px;
+  line-height: 1.5;
+}
+pre code {
+  background: none; padding: 0;
+  color: var(--text-primary);
+}
+/* Syntax highlighting for UnrealScript */
+.kw { color: #ff7b72; } /* keywords */
+.ty { color: #79c0ff; } /* types */
+.fn { color: #d2a8ff; } /* functions */
+.cm { color: #8b949e; font-style: italic; } /* comments */
+.st { color: #a5d6ff; } /* strings */
+.nu { color: #79c0ff; } /* numbers */
+.vr { color: #ffa657; } /* variables */
+/* Info boxes */
+.info-box {
+  padding: 12px 16px; margin: 12px 0;
+  border-radius: 6px; border-left: 4px solid;
+  font-size: 14px;
+}
+.info-box.note { background: rgba(88,166,255,0.1); border-color: var(--accent); }
+.info-box.warn { background: rgba(210,153,34,0.1); border-color: var(--yellow); }
+.info-box.tip { background: rgba(63,185,80,0.1); border-color: var(--green); }
+.info-box strong { color: var(--text-primary); }
+/* Tags/Badges */
+.badge {
+  display: inline-block; padding: 2px 8px;
+  border-radius: 12px; font-size: 12px;
+  font-weight: 500;
+}
+.badge-blue { background: rgba(88,166,255,0.15); color: var(--accent); }
+.badge-green { background: rgba(63,185,80,0.15); color: var(--green); }
+.badge-yellow { background: rgba(210,153,34,0.15); color: var(--yellow); }
+.badge-red { background: rgba(248,81,73,0.15); color: var(--red); }
+.badge-purple { background: rgba(188,140,255,0.15); color: var(--purple); }
+/* Feature cards */
+.feature-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 12px; margin: 16px 0;
+}
+.feature-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px; padding: 16px;
+}
+.feature-card h4 {
+  font-size: 15px; margin-bottom: 6px;
+  color: var(--text-primary);
+}
+.feature-card p {
+  font-size: 13px; color: var(--text-secondary);
+  margin: 0;
+}
+/* Mermaid */
+.mermaid {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px; padding: 20px;
+  margin: 16px 0; text-align: center;
+  overflow-x: auto;
+}
+.diagram-caption {
+  text-align: center; font-size: 13px;
+  color: var(--text-muted); margin-top: -8px;
+  margin-bottom: 16px;
+}
+/* Responsive */
+@media (max-width: 900px) {
+  .sidebar { transform: translateX(-100%); }
+  .sidebar.open { transform: translateX(0); }
+  .main { margin-left: 0; padding: 24px 16px 60px; }
+  .menu-toggle { display: block; }
+  .header-search input { width: 180px; }
+  .feature-grid { grid-template-columns: 1fr; }
+}
+/* Overlay for mobile sidebar */
+.sidebar-overlay {
+  display: none; position: fixed;
+  top: var(--header-height); left:0; right:0; bottom:0;
+  background: rgba(0,0,0,0.5); z-index: 40;
+}
+.sidebar-overlay.active { display: block; }
+/* Scroll margin for anchors */
+.section { scroll-margin-top: calc(var(--header-height) + 16px); }
+/* Stats row */
+.stats-row {
+  display: flex; gap: 16px; margin: 16px 0; flex-wrap: wrap;
+}
+.stat-item {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px; padding: 16px 24px;
+  text-align: center; flex: 1; min-width: 120px;
+}
+.stat-item .stat-value {
+  font-size: 28px; font-weight: 700;
+  color: var(--accent);
+}
+.stat-item .stat-label {
+  font-size: 12px; color: var(--text-muted);
+  text-transform: uppercase; letter-spacing: 0.5px;
+}
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<header class="header">
+  <button class="menu-toggle" onclick="toggleSidebar()" aria-label="Toggle menu">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+  </button>
+  <div class="header-logo">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="var(--accent)"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+    HealingExtend Plus
+    <span class="tag">v1.1.3</span>
+    <span class="tag deprecated">Deprecated</span>
+  </div>
+  <div class="header-search">
+    <svg viewBox="0 0 16 16"><path d="M11.5 7a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0Zm-.82 4.74a6 6 0 1 1 1.06-1.06l3.04 3.04a.75.75 0 1 1-1.06 1.06l-3.04-3.04Z"/></svg>
+    <input type="text" id="searchInput" placeholder="搜索文档..." oninput="handleSearch(this.value)">
+  </div>
+</header>
+
+<!-- Sidebar Overlay -->
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+<!-- Sidebar -->
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-group">
+    <div class="sidebar-group-title" onclick="toggleGroup(this)">
+      概览 <span class="arrow">▼</span>
+    </div>
+    <ul class="sidebar-items">
+      <li class="sidebar-item active" onclick="scrollToSection('home')">首页</li>
+      <li class="sidebar-item" onclick="scrollToSection('architecture')">架构总览</li>
+    </ul>
+  </div>
+  <div class="sidebar-group">
+    <div class="sidebar-group-title" onclick="toggleGroup(this)">
+      数据与初始化 <span class="arrow">▼</span>
+    </div>
+    <ul class="sidebar-items">
+      <li class="sidebar-item" onclick="scrollToSection('data-structures')">数据结构</li>
+      <li class="sidebar-item" onclick="scrollToSection('system-init')">初始化流程</li>
+    </ul>
+  </div>
+  <div class="sidebar-group">
+    <div class="sidebar-group-title" onclick="toggleGroup(this)">
+      核心系统 <span class="arrow">▼</span>
+    </div>
+    <ul class="sidebar-items">
+      <li class="sidebar-item" onclick="scrollToSection('core-mutator')">核心 Mutator</li>
+      <li class="sidebar-item" onclick="scrollToSection('headshot')">爆头回复与超频</li>
+      <li class="sidebar-item" onclick="scrollToSection('quick-purchase')">快捷购买系统</li>
+      <li class="sidebar-item" onclick="scrollToSection('chat-system')">聊天命令系统</li>
+    </ul>
+  </div>
+  <div class="sidebar-group">
+    <div class="sidebar-group-title" onclick="toggleGroup(this)">
+      外围系统 <span class="arrow">▼</span>
+    </div>
+    <ul class="sidebar-items">
+      <li class="sidebar-item" onclick="scrollToSection('hud-system')">HUD 系统</li>
+      <li class="sidebar-item" onclick="scrollToSection('trader-weapons')">商人与武器</li>
+      <li class="sidebar-item" onclick="scrollToSection('network')">网络复制</li>
+    </ul>
+  </div>
+  <div class="sidebar-group">
+    <div class="sidebar-group-title" onclick="toggleGroup(this)">
+      参考 <span class="arrow">▼</span>
+    </div>
+    <ul class="sidebar-items">
+      <li class="sidebar-item" onclick="scrollToSection('config-ref')">配置手册</li>
+      <li class="sidebar-item" onclick="scrollToSection('glossary')">术语表</li>
+    </ul>
+  </div>
+</nav>
+
+<!-- Main Content -->
+<main class="main">
+
+<!-- ===================== SECTION 1: HOME ===================== -->
+<div class="section" id="home">
+<h1>HealingExtend Plus v1.1.3</h1>
+<p>Killing Floor 2 Mutator 插件 — 为 CD（Controlled Difficulty）模式量身打造的爆头回复、超频、快捷购买与自定义 HUD 解决方案。</p>
+
+<div class="stats-row">
+  <div class="stat-item"><div class="stat-value">11</div><div class="stat-label">源文件</div></div>
+  <div class="stat-item"><div class="stat-value">~3,400</div><div class="stat-label">代码行数</div></div>
+  <div class="stat-item"><div class="stat-value">7</div><div class="stat-label">核心类</div></div>
+  <div class="stat-item"><div class="stat-value">6</div><div class="stat-label">子系统</div></div>
+</div>
+
+<table>
+<tr><th>属性</th><th>值</th></tr>
+<tr><td>项目名称</td><td>HealingExtend Plus</td></tr>
+<tr><td>版本</td><td>Release 1.1.3</td></tr>
+<tr><td>作者</td><td>ArHShRn (<a href="http://steamcommunity.com/id/ArHShRn/">Steam</a>)</td></tr>
+<tr><td>最后更新</td><td>2018年1月29日</td></tr>
+<tr><td>状态</td><td><span class="badge badge-yellow">已弃用 / 功能完整</span></td></tr>
+<tr><td>启动命令</td><td><code>?Mutator=HealingExtend.HE_Main</code></td></tr>
+<tr><td>编译产物</td><td><code>HealingExtend.u</code></td></tr>
+<tr><td>资源包</td><td><code>HE_Contents.upk</code>（可选，提供自定义准星/图标纹理）</td></tr>
+</table>
+
+<h2>功能特性总览</h2>
+<table>
+<tr><th>特性</th><th>描述</th><th>主要源文件</th></tr>
+<tr><td>爆头回复 Headshot Recovery</td><td>爆头击杀时回复 HP/Armor/Dosh/Ammo</td><td><code>HE_Main.uc</code></td></tr>
+<tr><td>HP/Armor 超频 Overclocking</td><td>允许血量/护甲突破上限，逐渐衰减</td><td><code>HE_Main.uc</code></td></tr>
+<tr><td>被动回复 Passive Regen</td><td>可选的每秒 HP/Armor 自动回复</td><td><code>HE_Main.uc</code></td></tr>
+<tr><td>快捷购买 Quick Purchase</td><td>Alt+1/2/3 按键快速购买职业武器</td><td><code>HE_Main.uc</code>, <code>HE_HUDManager.uc</code></td></tr>
+<tr><td>自定义 HUD</td><td>超频血条、自定义准星、队友治疗提示</td><td><code>HE_HUDBase.uc</code></td></tr>
+<tr><td>聊天命令 Chat Commands</td><td>!HESys, !HEInfo, !HEBuyPerk, !HEDebug</td><td><code>HE_ChatController.uc</code></td></tr>
+<tr><td>自定义武器 Custom Weapons</td><td>HMTech-201 Storm, HMTech-401 BiohaZard</td><td><code>Weap_HMT*.uc</code>, <code>WeapDef_HMT*.uc</code></td></tr>
+<tr><td>商人集成 Trader Integration</td><td>动态加载自定义武器进入商人列表</td><td><code>HE_TraderManager.uc</code></td></tr>
+<tr><td>无限备弹 Infinite Spare Ammo</td><td>可选的无限弹药模式</td><td><code>HE_Main.uc</code></td></tr>
+</table>
+
+<h2>组件关系总览</h2>
+<div class="mermaid">
+graph LR
+  subgraph Server["服务端 Server"]
+    HE_Main["HE_Main\n(KFMutator)"]
+    HECC["HE_ChatController\n(BroadcastHandler)"]
+    TM["HE_TraderManager\n(Actor)"]
+  end
+  subgraph Client["客户端 Client"]
+    HM["HE_HUDManager\n(Actor)"]
+    HUD["HE_HUDBase\n(KFGFxHudWrapper)"]
+  end
+  subgraph Data["数据层"]
+    Assist["HE_Assistance\n(Object/Abstract)"]
+    W201["Weap_HMT201"]
+    W401["Weap_HMT401"]
+  end
+  HE_Main -->|Spawn & 管理| HM
+  HE_Main -->|Spawn & 初始化| HECC
+  HE_Main -->|Spawn & 同步| TM
+  HM -->|ClientSetHUD| HUD
+  HE_Main -.->|引用 struct| Assist
+  TM -.->|加载| W201
+  TM -.->|加载| W401
+  HECC -->|命令路由| HE_Main
+</div>
+<p class="diagram-caption">图 1: HealingExtend 组件关系总览</p>
+
+<h2>兼容性</h2>
+<div class="info-box note">
+<strong>RPW 兼容：</strong>HE_ChatController 通过链式 BroadcastHandler 实现与 RPW（Ranked Perks Whitelist）共存，不会覆盖已有的 BroadcastHandler。
+</div>
+<div class="info-box warn">
+<strong>ServerExt 注意：</strong>HE_HUDBase 替换了 KFGFxHudWrapper，可能与其他修改 HUD 的 Mutator 冲突。
+</div>
+
+<h2>致谢</h2>
+<p>TK18039（彩蛋触发 <code>!TK18039</code>）、所有参与测试的 CD 玩家、Tripwire Interactive 提供的 KF2 SDK。</p>
+</div>
+
+<!-- ===================== SECTION 2: ARCHITECTURE ===================== -->
+<div class="section" id="architecture">
+<h1>架构总览</h1>
+<p>HealingExtend 基于 KF2 的 Mutator 框架构建，采用服务端权威（Server-Authoritative）架构。所有游戏逻辑在服务端的 <code>Tick</code> 事件中执行，客户端仅负责 HUD 渲染和按键输入。</p>
+
+<h2>KF2 Mutator 架构基础</h2>
+<p>KF2 的 Mutator 系统基于 UE3 的 <code>Mutator</code> 链。<code>HE_Main</code> 继承自 <code>KFMutator</code>，通过覆写 <code>NotifyLogin</code>、<code>ModifyPlayer</code>、<code>NotifyLogout</code>、<code>Tick</code> 等钩子函数切入游戏生命周期。</p>
+
+<h2>类继承层次</h2>
+<div class="mermaid">
+classDiagram
+  class Object
+  class Actor
+  class Mutator
+  class KFMutator
+  class HE_Main
+  class BroadcastHandler
+  class HE_ChatController
+  class KFGFxHudWrapper
+  class HE_HUDBase
+  class HE_HUDManager
+  class HE_TraderManager
+  class HE_RepTest
+  class KFWeap_MedicBase
+  class Weap_HMT201
+  class Weap_HMT401
+  class KFWeaponDefinition
+  class WeapDef_HMT201
+  class WeapDef_HMT401
+  class HE_Assistance
+
+  Object <|-- Actor
+  Object <|-- HE_Assistance
+  Object <|-- KFWeaponDefinition
+  Actor <|-- Mutator
+  Actor <|-- BroadcastHandler
+  Actor <|-- HE_HUDManager
+  Actor <|-- HE_TraderManager
+  Actor <|-- HE_RepTest
+  Actor <|-- KFGFxHudWrapper
+  Mutator <|-- KFMutator
+  KFMutator <|-- HE_Main
+  BroadcastHandler <|-- HE_ChatController
+  KFGFxHudWrapper <|-- HE_HUDBase
+  KFWeap_MedicBase <|-- Weap_HMT201
+  KFWeap_MedicBase <|-- Weap_HMT401
+  KFWeaponDefinition <|-- WeapDef_HMT201
+  KFWeaponDefinition <|-- WeapDef_HMT401
+</div>
+<p class="diagram-caption">图 2: 类继承层次图</p>
+
+<h2>组件所有权与生成关系</h2>
+<div class="mermaid">
+graph TD
+  KFGameInfo["KFGameInfo\n(游戏模式)"]
+  HE_Main["HE_Main\n(核心 Mutator)"]
+  HECC["HE_ChatController"]
+  HEP["HEPlayer[]\n(玩家数据数组)"]
+
+  subgraph 每个玩家
+    HM["HE_HUDManager\nOwner=KFPC"]
+    TM["HE_TraderManager\nOwner=KFPC"]
+    HUD["HE_HUDBase\n客户端HUD实例"]
+  end
+
+  KFGameInfo -->|Mutator链| HE_Main
+  HE_Main -->|"SetTimer → Spawn"| HECC
+  HE_Main -->|"NotifyLogin → Spawn"| HM
+  HE_Main -->|"ModifyPlayer → Spawn"| TM
+  HE_Main -->|管理| HEP
+  HM -->|"ClientSetHUD()"| HUD
+  HECC -->|"BroadcastText → Broadcast()"| HE_Main
+</div>
+<p class="diagram-caption">图 3: 组件所有权与生成关系</p>
+
+<h2>网络权限划分</h2>
+<div class="mermaid">
+graph LR
+  subgraph ServerOnly["仅服务端 Role_Authority"]
+    S1["HE_Main.Tick()"]
+    S2["HeadshotRecover()"]
+    S3["BuyPlayerWeapon()"]
+    S4["Players[] 数组管理"]
+  end
+  subgraph Replicated["复制 Actor"]
+    R1["HE_HUDManager\nAutonomousProxy"]
+    R2["HE_TraderManager\nSimulatedProxy"]
+    R3["HE_ChatController\nSimulatedProxy"]
+  end
+  subgraph ClientOnly["仅客户端"]
+    C1["HE_HUDBase.DrawHUD()"]
+    C2["按键绑定处理"]
+    C3["控制台命令 exec"]
+  end
+  ServerOnly -->|reliable client| Replicated
+  Replicated -->|RPC 调用| ClientOnly
+</div>
+<p class="diagram-caption">图 4: 网络权限划分</p>
+
+<h2>类定位表</h2>
+<table>
+<tr><th>类名</th><th>文件</th><th>行数</th><th>父类</th><th>职责</th></tr>
+<tr><td>HE_Main</td><td>HE_Main.uc</td><td>1069</td><td>KFMutator</td><td>核心逻辑、玩家管理、Tick循环</td></tr>
+<tr><td>HE_HUDBase</td><td>HE_HUDBase.uc</td><td>1234</td><td>KFGFxHudWrapper</td><td>自定义HUD渲染</td></tr>
+<tr><td>HE_HUDManager</td><td>HE_HUDManager.uc</td><td>280</td><td>Actor</td><td>客户端桥接、按键绑定</td></tr>
+<tr><td>HE_Assistance</td><td>HE_Assistance.uc</td><td>213</td><td>Object (Abstract)</td><td>数据结构定义</td></tr>
+<tr><td>HE_TraderManager</td><td>HE_TraderManager.uc</td><td>166</td><td>Actor</td><td>自定义武器商人同步</td></tr>
+<tr><td>HE_ChatController</td><td>HE_ChatController.uc</td><td>80</td><td>BroadcastHandler</td><td>聊天拦截与命令分发</td></tr>
+<tr><td>HE_RepTest</td><td>HE_RepTest.uc</td><td>66</td><td>Actor</td><td>复制测试工具</td></tr>
+<tr><td>Weap_HMT201</td><td>Weap_HMT201.uc</td><td>113</td><td>KFWeap_MedicBase</td><td>HMTech-201 Storm SMG</td></tr>
+<tr><td>Weap_HMT401</td><td>Weap_HMT401.uc</td><td>123</td><td>KFWeap_MedicBase</td><td>HMTech-401 BiohaZard AR</td></tr>
+<tr><td>WeapDef_HMT201</td><td>WeapDef_HMT201.uc</td><td>35</td><td>KFWeaponDefinition</td><td>HMT-201 商人定义</td></tr>
+<tr><td>WeapDef_HMT401</td><td>WeapDef_HMT401.uc</td><td>36</td><td>KFWeaponDefinition</td><td>HMT-401 商人定义</td></tr>
+</table>
+</div>
+
+<!-- ===================== SECTION 3: DATA STRUCTURES ===================== -->
+<div class="section" id="data-structures">
+<h1>数据结构</h1>
+<p><code>HE_Assistance.uc</code> 是一个 <code>abstract Object</code> 类，仅作为 struct、enum 和工具函数的容器，不会被实例化。所有数据结构通过 UnrealScript 的隐式导入机制在其他类中引用。</p>
+
+<h2>核心数据结构 classDiagram</h2>
+<div class="mermaid">
+classDiagram
+  class HEPlayer {
+    +string UniqueID
+    +KFPlayerController KFPC
+    +KFPawn_Human KFPH
+    +KFWeapon KFWeap
+    +Pawn pShotTarget
+    +Pawn LastTarget
+    +KFPawn_Monster KFPM_Victim
+    +KFPlayerReplicationInfo KFPRI
+    +int fLastHeadshotCounts
+    +class~KFPerk~ LastPerk
+    +float HealthDecrement
+    +float ArmorDecrement
+    +float HealthRegenDelta
+    +float ArmorRegenDelta
+    +HE_HUDManager HUDManager
+    +HE_TraderManager TraderManager
+    +bool bIsEpt
+  }
+  class HEVersionInfo {
+    +string ThisMutatorName
+    +string AuthorNickname
+    +string AuthorSteamcommunityURL
+    +string Version
+    +string LastUpdate
+  }
+  class HECommand {
+    +string CommandHead
+    +string UserName
+    +string Argument
+    +string Parameter
+    +string Value
+  }
+  class RGBColor {
+    +string Firebrick
+    +string PaleVioletRed
+    +string Snow
+    +string GhostWhite
+    +string DeepCyan
+    +string LightCyan
+    +string DeepPink
+    +string HotPink
+    +string DeepOrchid
+    +string LightOrchid
+    +string HE_HUDDefaultCyan
+  }
+  class HEConfig {
+    +HEVersionInfo HEVI
+    +float fCurrentRegenRate
+    +bool bAllowOverClocking
+    +bool bInitedConfig
+    +int HealthHealingAmount
+    +int ArmourHealingAmount
+    +int BonusDosh
+    +int OverclockLimitHealth
+    +int OverclockLimitArmour
+  }
+  class WeaponInfo {
+    +class~KFWeaponDefinition~ WeapDefClass
+    +class~KFWeapon~ WeapClass
+    +byte WeapTraderIndex
+    +string WeapName
+    +int BuyPrice
+    +int AmmoPricePerMag
+  }
+  HEPlayer --> HE_HUDManager
+  HEPlayer --> HE_TraderManager
+  HEConfig --> HEVersionInfo
+</div>
+<p class="diagram-caption">图 5: 核心数据结构字段定义</p>
+
+<h2>struct HEPlayer 详解</h2>
+<p>这是 HealingExtend 最重要的数据结构，<code>HE_Main</code> 使用 <code>array&lt;HEPlayer&gt; Players</code> 管理所有在线玩家。</p>
+<table>
+<tr><th>字段</th><th>类型</th><th>用途</th></tr>
+<tr><td>UniqueID</td><td>string</td><td>Steam UID，用于跨波次识别玩家</td></tr>
+<tr><td>KFPC</td><td>KFPlayerController</td><td>玩家控制器引用</td></tr>
+<tr><td>KFPH</td><td>KFPawn_Human</td><td>玩家 Pawn，死亡后失效需重新初始化</td></tr>
+<tr><td>KFWeap</td><td>KFWeapon</td><td>当前手持武器，每 Tick 更新</td></tr>
+<tr><td>fLastHeadshotCounts</td><td>int</td><td>上次记录的爆头数，与 PWRI.VectData1.X 对比检测新爆头</td></tr>
+<tr><td>LastPerk</td><td>class&lt;KFPerk&gt;</td><td>玩家当前职业类，用于快捷购买</td></tr>
+<tr><td>HealthDecrement / ArmorDecrement</td><td>float</td><td>超频衰减累加器（亚帧精度）</td></tr>
+<tr><td>HealthRegenDelta / ArmorRegenDelta</td><td>float</td><td>被动回复累加器（亚帧精度）</td></tr>
+<tr><td>HUDManager</td><td>HE_HUDManager</td><td>该玩家的 HUD 管理器 Actor</td></tr>
+<tr><td>TraderManager</td><td>HE_TraderManager</td><td>该玩家的商人管理器 Actor</td></tr>
+<tr><td>bIsEpt</td><td>bool</td><td>是否为空槽位（Empty），跳过 Tick 处理</td></tr>
+</table>
+
+<h2>枚举类型</h2>
+<h3>HUDCrosshairStatus</h3>
+<p>准星绘制状态机使用的枚举，在 <code>HE_HUDBase.CheckDrawASCStatus()</code> 中设置：</p>
+<table>
+<tr><th>值</th><th>含义</th></tr>
+<tr><td>HE_Good</td><td>正常状态，允许绘制准星</td></tr>
+<tr><td>HE_WeapNotGuns</td><td>武器无 Spread 数据（非枪械）</td></tr>
+<tr><td>HE_Player_Closed</td><td>玩家手动关闭准星</td></tr>
+<tr><td>HE_Player_Dead</td><td>玩家已死亡</td></tr>
+<tr><td>HE_Player_NoWeap</td><td>无武器或怪物 Pawn</td></tr>
+<tr><td>HE_Player_Monster</td><td>玩家处于怪物队伍</td></tr>
+<tr><td>HE_Player_UsingIronsight</td><td>正在使用机瞄</td></tr>
+<tr><td>HE_Player_SpecialMoveDontAllow</td><td>特殊动作不允许准星</td></tr>
+<tr><td>HE_NoneInit</td><td>初始值，未初始化</td></tr>
+</table>
+
+<h3>AsCMode</h3>
+<table>
+<tr><th>值</th><th>含义</th></tr>
+<tr><td>AsC_Default</td><td>默认十字准星模式</td></tr>
+<tr><td>AsC_CenterDot</td><td>中心点+十字（已移除）</td></tr>
+<tr><td>AsC_OnlyDot</td><td>仅中心点（已移除）</td></tr>
+</table>
+
+<h2>PWRI 引擎结构体</h2>
+<div class="info-box tip">
+<strong>关键发现：</strong>HealingExtend 利用 KF2 引擎内部的 <code>PostWaveReplicationInfo</code>（PWRI）结构体来检测爆头。<code>KFPC.PWRI.VectData1.X</code> 存储了当前波次的累计爆头数。HE 通过每帧对比差值来检测新爆头事件。
+</div>
+<pre><code><span class="cm">// 引擎内部结构体（不可修改，仅引用）</span>
+<span class="kw">struct native</span> <span class="ty">PostWaveReplicationInfo</span>
+{
+    <span class="kw">var</span> <span class="ty">Vector</span> VectData1; <span class="cm">// X:HeadShots Y:Dosh Earned Z:Damage Dealt</span>
+    <span class="kw">var</span> <span class="ty">Vector</span> VectData2; <span class="cm">// X:Damage Taken Y:Heals Received Z:Heals Given</span>
+    <span class="kw">var</span> <span class="ty">byte</span> LargeZedKills;
+    <span class="kw">var</span> <span class="ty">bool</span> bDiedDuringWave;
+    <span class="kw">var</span> <span class="ty">class</span>&lt;KFPawn_Monster&gt; ClassKilledByLastWave;
+    <span class="cm">// ... 更多字段</span>
+};</code></pre>
+
+<h2>ConvertMonsterClassName 工具函数</h2>
+<p><code>HE_Assistance</code> 中唯一的函数，将 Zed 类名转换为可读名称：</p>
+<pre><code><span class="kw">static function string</span> <span class="fn">ConvertMonsterClassName</span>(<span class="ty">class&lt;KFPawn&gt;</span> zed)
+{
+    <span class="kw">switch</span>(zed) {
+        <span class="kw">case</span> <span class="ty">class</span><span class="st">'KFPawn_ZedBloat'</span>:      <span class="kw">return</span> <span class="st">"Bloat"</span>;
+        <span class="kw">case</span> <span class="ty">class</span><span class="st">'KFPawn_ZedFleshpound'</span>: <span class="kw">return</span> <span class="st">"Fleshpound"</span>;
+        <span class="kw">case</span> <span class="ty">class</span><span class="st">'KFPawn_ZedScrake'</span>:     <span class="kw">return</span> <span class="st">"Scrake"</span>;
+        <span class="cm">// ... Clot, Crawler, Gorefast, Husk, Siren, Stalker</span>
+        <span class="kw">default</span>: <span class="kw">return</span> <span class="fn">string</span>(zed.Name);
+    }
+}</code></pre>
+</div>
+
+<!-- ===================== SECTION 4: SYSTEM INITIALIZATION ===================== -->
+<div class="section" id="system-init">
+<h1>初始化流程</h1>
+<p>HealingExtend 的初始化分为 5 个阶段，利用 UE3 的 Actor 生命周期钩子依次执行。</p>
+
+<h2>初始化时序图</h2>
+<div class="mermaid">
+sequenceDiagram
+    participant Engine as UE3 引擎
+    participant HE as HE_Main
+    participant HECC as HE_ChatController
+    participant HM as HE_HUDManager
+    participant TM as HE_TraderManager
+    participant HUD as HE_HUDBase
+
+    Note over Engine,HUD: 阶段 1 - Mutator 加载
+    Engine->>HE: PreBeginPlay()
+    HE->>HE: InitBasicMutatorValues()
+    HE->>HE: SaveConfig()
+
+    Note over Engine,HUD: 阶段 2 - 游戏启动
+    Engine->>HE: PostBeginPlay()
+    HE->>HE: SetTimer(1.1s, SetBH)
+
+    Note over Engine,HUD: 阶段 3 - BroadcastHandler 设置
+    HE->>HECC: Spawn HE_ChatController
+    HE->>HECC: InitHEClass(self)
+    HECC->>HECC: 保存原 BH → PreBroadcastHandler
+    HECC->>Engine: 替换 GameInfo.BroadcastHandler
+
+    Note over Engine,HUD: 阶段 4 - 玩家登录
+    Engine->>HE: NotifyLogin(Controller)
+    HE->>HM: Spawn HE_HUDManager(Owner=KFPC)
+    HM->>HM: ClientGetKFPlayerOwner()
+    HM->>HM: 绑定 Alt+0~3,9 按键
+
+    Note over Engine,HUD: 阶段 5 - Pawn 创建
+    Engine->>HE: ModifyPlayer(Pawn)
+    HE->>HE: ReInitPlayersArry() / AddHimIntoPlayers()
+    HE->>TM: Spawn HE_TraderManager(Owner=KFPC)
+    HE->>HM: ClientSetHUD()
+    HM->>HUD: KFPlayerOwner.ClientSetHUD(HE_HUDBase)
+    HM->>HUD: CreateHUDMovie()
+</div>
+<p class="diagram-caption">图 6: 完整初始化时序</p>
+
+<h2>五阶段详解</h2>
+
+<h3>阶段 1: PreBeginPlay — 配置初始化</h3>
+<p>在游戏启动前执行。如果 <code>bInitedConfig</code> 为 false（首次运行），调用 <code>InitBasicMutatorValues()</code> 设置所有默认值，然后 <code>SaveConfig()</code> 写入 INI 文件。</p>
+<div class="info-box note">
+<strong>关键联动：</strong>如果 <code>bEnableHE_HUD=false</code>，则 <code>bEnableHealthAndArmorOverclocking</code> 也会被强制设为 false，因为超频血条的显示依赖自定义 HUD。
+</div>
+
+<h3>阶段 2: PostBeginPlay — 定时器启动</h3>
+<p>设置 1.1 秒循环定时器调用 <code>SetBH()</code>。使用延迟是因为 <code>BroadcastHandler</code> 可能尚未初始化。</p>
+
+<h3>阶段 3: SetBH — 聊天系统挂载</h3>
+<p>Spawn <code>HE_ChatController</code> 并插入 BroadcastHandler 链。保存原有的 BH 为 <code>PreBroadcastHandler</code>，实现 RPW 兼容。成功后 <code>ClearTimer</code> 停止循环。</p>
+
+<h3>阶段 4: NotifyLogin — HUD 管理器创建</h3>
+<p>每个新玩家登录时 Spawn 一个 <code>HE_HUDManager</code>，Owner 设为该玩家的 Controller。管理器在客户端获取 LocalPlayer 引用并设置按键绑定。</p>
+
+<h3>阶段 5: ModifyPlayer — 完整玩家注册</h3>
+<p>Pawn 创建后（包括每次重生），执行以下操作：</p>
+<ol>
+<li>设置 <code>HealthRegenRate</code></li>
+<li>通过 UID 匹配检查玩家是否在 <code>Players[]</code> 中已存在</li>
+<li>存在 → <code>ReInitPlayersArry()</code> 更新 KFPH；不存在 → <code>AddHimIntoPlayers()</code> 创建完整 HEPlayer</li>
+<li>Spawn <code>HE_TraderManager</code>（如果 <code>bEnableCustomizedWeapons</code>）</li>
+<li>调用 <code>ClientSetHUD()</code> 替换 HUD 类</li>
+</ol>
+
+<h2>死亡/重生循环</h2>
+<div class="mermaid">
+flowchart TD
+    A["玩家存活\nPlayers[i].bIsEpt=false"] -->|"被 Zed 击杀"| B["玩家死亡\nKFPH 失效"]
+    B -->|"下一波开始"| C{"ModifyPlayer\n引擎创建新 Pawn"}
+    C -->|"UID 匹配成功"| D["ReInitPlayersArry()\n更新 KFPC + KFPH"]
+    C -->|"UID 未找到\n(玩家退出过)"| E["AddHimIntoPlayers()\n创建新 HEPlayer"]
+    D --> F["显示死亡信息\n+ 击杀者名称"]
+    F --> A
+    E --> A
+    A -->|"玩家退出"| G["NotifyPlayerExits()\n从 Players[] 移除"]
+</div>
+<p class="diagram-caption">图 7: 死亡/重生循环</p>
+
+<div class="info-box tip">
+<strong>设计细节：</strong>使用 Steam UniqueID 而非 Controller 引用来匹配玩家，因为 Controller 在重生时可能改变，但 UID 在整个会话中保持不变。死亡信息通过 <code>ConvertMonsterClassName(PWRI.ClassKilledByLastWave)</code> 转换为可读的 Zed 名称。
+</div>
+</div>
+
+<!-- ===================== SECTION 5: CORE MUTATOR ===================== -->
+<div class="section" id="core-mutator">
+<h1>核心 Mutator — HE_Main</h1>
+<p><code>HE_Main.uc</code>（1069 行）是整个插件的中枢，继承自 <code>KFMutator</code>，承载了玩家管理、爆头检测、超频衰减、快捷购买、聊天命令等所有服务端逻辑。</p>
+
+<h2>配置变量表</h2>
+<table>
+<tr><th>变量名</th><th>类型</th><th>默认值</th><th>说明</th></tr>
+<tr><td>bEnableHE</td><td>bool</td><td>True</td><td>总开关</td></tr>
+<tr><td>bEnableHE_HUD</td><td>bool</td><td>True</td><td>HUD 开关（关闭则超频也关闭）</td></tr>
+<tr><td>bEnableCustomizedWeapons</td><td>bool</td><td>False</td><td>是否启用自定义武器</td></tr>
+<tr><td>bEnableHealthRegen</td><td>bool</td><td>False</td><td>被动 HP 回复</td></tr>
+<tr><td>bEnableArmourRegen</td><td>bool</td><td>False</td><td>被动 Armor 回复</td></tr>
+<tr><td>bEnableInfiniteSpareAmmo</td><td>bool</td><td>False</td><td>无限备弹</td></tr>
+<tr><td>bEnableHealthAndArmorOverclocking</td><td>bool</td><td>True</td><td>超频系统</td></tr>
+<tr><td>bEnableAmmoRecovering</td><td>bool</td><td>True</td><td>爆头回弹</td></tr>
+<tr><td>bEnableDoshBonus</td><td>bool</td><td>True</td><td>爆头奖励 Dosh</td></tr>
+<tr><td>bFillAllWeapAmmoAfterQuickPurchase</td><td>bool</td><td>True</td><td>快捷购买后填满全部武器弹药</td></tr>
+<tr><td>bGsAltOneIsSPX</td><td>bool</td><td>True</td><td>Gunslinger Alt+1 购买 SPX（否则为 1911）</td></tr>
+<tr><td>fCurrentRegenRate</td><td>float</td><td>10.0</td><td>基础回复速率</td></tr>
+<tr><td>DecreModifier</td><td>float</td><td>0.2</td><td>超频衰减修正</td></tr>
+<tr><td>RegenModifier</td><td>float</td><td>1.0</td><td>被动回复修正</td></tr>
+<tr><td>HealthRegenPerSecond</td><td>float</td><td>1</td><td>每秒 HP 回复量</td></tr>
+<tr><td>ArmourRegenPerSecond</td><td>float</td><td>1</td><td>每秒 Armor 回复量</td></tr>
+<tr><td>HealthHealingAmount</td><td>float</td><td>1</td><td>爆头 HP 回复量</td></tr>
+<tr><td>ArmourHealingAmount</td><td>float</td><td>1</td><td>爆头 Armor 回复量</td></tr>
+<tr><td>BonusDosh</td><td>int</td><td>85</td><td>爆头奖励 Dosh</td></tr>
+<tr><td>OverclockHealthLimit</td><td>int</td><td>150</td><td>超频 HP 上限</td></tr>
+<tr><td>OverclockArmorLimit</td><td>int</td><td>175</td><td>超频 Armor 上限</td></tr>
+</table>
+
+<h2>运行时变量</h2>
+<table>
+<tr><th>变量名</th><th>类型</th><th>说明</th></tr>
+<tr><td>Players</td><td>array&lt;HEPlayer&gt;</td><td>所有在线玩家数据</td></tr>
+<tr><td>HECC</td><td>HE_ChatController</td><td>聊天控制器引用</td></tr>
+<tr><td>bInNormalTime</td><td>bool</td><td>是否处于正常时间（非 ZedTime）</td></tr>
+<tr><td>bCreatedBH</td><td>bool</td><td>BroadcastHandler 是否已创建</td></tr>
+</table>
+
+<h2>函数分组</h2>
+<table>
+<tr><th>分组</th><th>函数</th><th>说明</th></tr>
+<tr><td rowspan="5">初始化</td><td>PreBeginPlay()</td><td>配置初始化</td></tr>
+<tr><td>PostBeginPlay()</td><td>启动 SetBH 定时器</td></tr>
+<tr><td>InitBasicMutatorValues()</td><td>设置所有默认配置值</td></tr>
+<tr><td>SetBH()</td><td>Spawn 并挂载 ChatController</td></tr>
+<tr><td>NotifyLogin()</td><td>Spawn HUDManager</td></tr>
+<tr><td rowspan="5">玩家管理</td><td>ModifyPlayer()</td><td>注册/更新玩家到 Players[]</td></tr>
+<tr><td>AddHimIntoPlayers()</td><td>新玩家加入 Players[]</td></tr>
+<tr><td>ReInitPlayersArry()</td><td>死亡后重新初始化已有玩家</td></tr>
+<tr><td>NotifyLogout() / NotifyPlayerExits()</td><td>玩家退出清理</td></tr>
+<tr><td>GetHEP() / GetHUDManager()</td><td>查询函数</td></tr>
+<tr><td rowspan="3">消息</td><td>PlayerMsg()</td><td>向单个玩家发消息</td></tr>
+<tr><td>GlobalMsg()</td><td>向全部玩家广播</td></tr>
+<tr><td>Broadcast()</td><td>命令分发主入口</td></tr>
+<tr><td rowspan="2">购买</td><td>BuyPlayerWeapon()</td><td>模拟商人购买流程</td></tr>
+<tr><td>BroadcastBuyHelp()</td><td>显示职业武器帮助</td></tr>
+<tr><td rowspan="3">游戏逻辑</td><td>Tick()</td><td>主循环：遍历 Players[] 执行所有逻辑</td></tr>
+<tr><td>TickMutRecover()</td><td>爆头检测 + 弹药回复 + Dosh 奖励</td></tr>
+<tr><td>HeadshotRecover()</td><td>HP/Armor 回复（含超频分支）</td></tr>
+</table>
+
+<h2>Tick 循环完整数据流</h2>
+<div class="mermaid">
+flowchart TD
+    T["Tick(DeltaTime)"] --> LOOP["遍历 Players[i]"]
+    LOOP --> CHK1{"bIsEpt 或\nKFPH == None?"}
+    CHK1 -->|是| SKIP["continue\n跳过此玩家"]
+    CHK1 -->|否| CHK2{"bEnableHE?"}
+    CHK2 -->|是| TMR["TickMutRecover()"]
+    CHK2 -->|否| OC_CHK
+
+    TMR --> INF{"bEnableInfiniteSpareAmmo?"}
+    INF -->|是| INFA["SpareAmmoCount = Capacity\nClientForceAmmoUpdate"]
+    INF -->|否| HS_CHK
+    INFA --> HS_CHK
+
+    HS_CHK{"fLastHeadshotCounts\n!= PWRI.VectData1.X?"}
+    HS_CHK -->|"是 (新爆头)"| AMMO["弹药回复\nAmmoCount += 差值"]
+    AMMO --> DOSH["Dosh += BonusDosh"]
+    DOSH --> HSR["HeadshotRecover()\nHP/Armor 回复"]
+    HSR --> UPD["更新 fLastHeadshotCounts"]
+    HS_CHK -->|否| OC_CHK
+
+    UPD --> OC_CHK{"HP > HealthMax?"}
+    OC_CHK -->|是| DEC_HP["HealthDecrement += DecreModifier * DeltaTime\n累加器 >= 1 → HP--"]
+    OC_CHK -->|否| OC_CHK2
+
+    DEC_HP --> OC_CHK2{"Armor > MaxArmor?"}
+    OC_CHK2 -->|是| DEC_AR["ArmorDecrement += DecreModifier * DeltaTime\n累加器 >= 1 → Armor--"]
+    OC_CHK2 -->|否| REG_CHK
+
+    DEC_AR --> REG_CHK{"bEnableHealthRegen\n且 HP < HealthMax?"}
+    REG_CHK -->|是| REG_HP["HealthRegenDelta += RegenModifier * DeltaTime\n累加器 >= 1 → HP++"]
+    REG_CHK -->|否| REG_CHK2
+    REG_HP --> REG_CHK2{"bEnableArmourRegen\n且 Armor < MaxArmor?"}
+    REG_CHK2 -->|是| REG_AR["ArmorRegenDelta += RegenModifier * DeltaTime\n累加器 >= 1 → Armor++"]
+    REG_CHK2 -->|否| NEXT["下一个玩家"]
+    REG_AR --> NEXT
+    SKIP --> NEXT
+    NEXT --> LOOP
+</div>
+<p class="diagram-caption">图 8: Tick 循环完整数据流</p>
+</div>
+
+<!-- ===================== SECTION 6: HEADSHOT RECOVERY ===================== -->
+<div class="section" id="headshot">
+<h1>爆头回复与超频</h1>
+<p>这是 HealingExtend 的核心机制——通过爆头击杀获得 HP、Armor、Dosh 和弹药回复，并支持超过正常上限的"超频"状态。</p>
+
+<h2>爆头检测机制</h2>
+<p>HE 不使用伤害事件回调，而是利用引擎的 <code>PostWaveReplicationInfo</code> 结构：</p>
+<pre><code><span class="cm">// 每帧检测</span>
+<span class="kw">if</span>(Players[i].fLastHeadshotCounts != Players[i].KFPC.PWRI.VectData1.X)
+{
+    <span class="cm">// 检测到新爆头！差值 = 新增爆头数</span>
+    <span class="kw">var int</span> newHeadshots = PWRI.VectData1.X - fLastHeadshotCounts;
+    <span class="cm">// 执行回复...</span>
+}</code></pre>
+
+<h2>每次爆头回复内容</h2>
+<table>
+<tr><th>回复项</th><th>数量</th><th>超频时</th><th>控制变量</th></tr>
+<tr><td>HP</td><td>+HealthHealingAmount (默认 1)</td><td>2x（翻倍）</td><td>始终启用</td></tr>
+<tr><td>Armor</td><td>+ArmourHealingAmount (默认 1)</td><td>2x（翻倍）</td><td>始终启用</td></tr>
+<tr><td>Dosh</td><td>+BonusDosh (默认 85)</td><td>不变</td><td>bEnableDoshBonus</td></tr>
+<tr><td>弹药</td><td>+1 (当前弹匣)</td><td>不变</td><td>bEnableAmmoRecovering</td></tr>
+</table>
+
+<div class="info-box note">
+<strong>超频翻倍条件：</strong>当 <code>KFPH.Health > KFPH.HealthMax</code> 时，HP 回复量变为 <code>2 * HealthHealingAmount</code>。Armor 同理。这鼓励玩家在超频状态下持续爆头以维持高血量。
+</div>
+
+<h2>生命值状态机</h2>
+<div class="mermaid">
+graph TD
+    N["Normal 状态\nHP ≤ HealthMax\nArmor ≤ MaxArmor"]
+    OC["Overclocked 超频状态\nHP > HealthMax 或 Armor > MaxArmor"]
+    LOW["Low HP 状态\nHP ≤ CriticalHealthRateNotify"]
+
+    N -->|"爆头回复\n突破 HealthMax"| OC
+    OC -->|"衰减 DecreModifier\n降至 ≤ HealthMax"| N
+    OC -->|"持续爆头\n维持超频"| OC
+    N -->|"受到伤害"| LOW
+    LOW -->|"爆头回复"| N
+    OC -->|"HP 上限: OverclockHealthLimit\nArmor 上限: OverclockArmorLimit"| OC
+</div>
+<p class="diagram-caption">图 9: 生命值状态机</p>
+
+<h2>超频衰减公式</h2>
+<p>超频使用"累加器模式"实现亚帧精度的衰减：</p>
+<pre><code><span class="cm">// 每帧执行（仅当 HP > HealthMax 时）</span>
+Players[i].HealthDecrement += DecreModifier * HealthHealingAmount * DeltaTime;
+<span class="kw">if</span>(Players[i].HealthDecrement >= <span class="nu">1.0</span>)
+{
+    --Players[i].KFPH.Health;
+    Players[i].HealthDecrement -= <span class="nu">1.0</span>;
+}</code></pre>
+<div class="info-box tip">
+<strong>衰减速率计算：</strong>默认 DecreModifier=0.2, HealthHealingAmount=1 → 每秒衰减 0.2 HP。从 OverclockHealthLimit(150) 衰减到 HealthMax(100) 需要 250 秒（约 4 分钟）。实际游戏中玩家会持续爆头，形成动态平衡。
+</div>
+
+<h2>被动回复系统</h2>
+<p>类似 Berserker 的被动回复，默认关闭。使用相同的累加器模式：</p>
+<pre><code><span class="cm">// 仅在 HP < HealthMax 时回复（不会触发超频）</span>
+Players[i].HealthRegenDelta += RegenModifier * HealthRegenPerSecond * DeltaTime;
+<span class="kw">if</span>(Players[i].HealthRegenDelta >= <span class="nu">1.0</span>)
+{
+    ++Players[i].KFPH.Health;
+    Players[i].HealthRegenDelta -= <span class="nu">1.0</span>;
+}</code></pre>
+</div>
+
+<!-- ===================== SECTION 7: QUICK PURCHASE ===================== -->
+<div class="section" id="quick-purchase">
+<h1>快捷购买系统</h1>
+<p>允许玩家在波间通过 Alt+数字键直接购买职业对应武器，无需打开商人菜单。</p>
+
+<h2>按键绑定</h2>
+<table>
+<tr><th>按键</th><th>命令</th><th>功能</th></tr>
+<tr><td>Alt+0</td><td><code>say !HEBuyPerk Help</code></td><td>显示当前职业可购买武器列表</td></tr>
+<tr><td>Alt+1</td><td><code>say !HEBuyPerk One</code></td><td>购买第一把武器（通常最便宜）</td></tr>
+<tr><td>Alt+2</td><td><code>say !HEBuyPerk Two</code></td><td>购买第二把武器</td></tr>
+<tr><td>Alt+3</td><td><code>say !HEBuyPerk Three</code></td><td>购买第三把武器（通常最贵）</td></tr>
+<tr><td>Alt+9</td><td><code>say !HEDebug</code></td><td>显示调试信息</td></tr>
+</table>
+<p>按键绑定在 <code>HE_HUDManager.ClientGetKFPlayerOwner()</code> 中通过 <code>PlayerInput.Bindings.AddItem()</code> 设置。</p>
+
+<h2>6 职业武器对应表</h2>
+<table>
+<tr><th>职业 Perk</th><th>Alt+1</th><th>Alt+2</th><th>Alt+3</th></tr>
+<tr><td>Sharpshooter</td><td>SPX 464 ($650) <span class="badge badge-blue">idx41</span></td><td>M14EBR ($1100) <span class="badge badge-blue">idx43</span></td><td>Railgun ($1500) <span class="badge badge-blue">idx44</span></td></tr>
+<tr><td>Commando</td><td>AK12 ($1100) <span class="badge badge-blue">idx9</span></td><td>SCAR ($1500) <span class="badge badge-blue">idx10</span></td><td>Stoner63A ($1500) <span class="badge badge-blue">idx11</span></td></tr>
+<tr><td>Field Medic</td><td>HMT-201 ($650) <span class="badge badge-blue">idx18</span></td><td>HMT-301 ($1100) <span class="badge badge-blue">idx19</span></td><td>HMT-401 ($1500) <span class="badge badge-blue">idx20</span></td></tr>
+<tr><td>Support</td><td>Double Barrel ($650) <span class="badge badge-blue">idx30</span></td><td>M4 ($1100) <span class="badge badge-blue">idx32</span></td><td>AA12 ($1500) <span class="badge badge-blue">idx33</span></td></tr>
+<tr><td>SWAT</td><td>P90 ($1100) <span class="badge badge-blue">idx50</span></td><td>HK-UMP ($1200) <span class="badge badge-blue">idx54</span></td><td>Kriss ($1500) <span class="badge badge-blue">idx51</span></td></tr>
+<tr><td>Gunslinger</td><td>SPX 464 ($650) <span class="badge badge-purple">*</span> / Dual 1911 ($650) <span class="badge badge-blue">idx24</span></td><td>Dual Deagle ($1100) <span class="badge badge-blue">idx26</span></td><td>Dual SW500 ($1500) <span class="badge badge-blue">idx28</span></td></tr>
+</table>
+<p><span class="badge badge-purple">*</span> 由 <code>bGsAltOneIsSPX</code> 控制：True=SPX 464 (idx41)，False=Dual 1911 (idx24)</p>
+
+<h2>购买流程</h2>
+<div class="mermaid">
+flowchart TD
+    START["BuyPlayerWeapon(KFPC, ChatMsg)"] --> CHK_WAVE{"波次进行中?\nIsWaveActive()"}
+    CHK_WAVE -->|是| ABORT1["return\n战斗中不能购买"]
+    CHK_WAVE -->|否| MATCH["根据 Perk + ChatMsg\n匹配武器 KFW + 价格 + TraderIndex"]
+    MATCH --> CHK_IDX{"TraderIndex == -1?"}
+    CHK_IDX -->|是| ABORT2["Wrong Parameter"]
+    CHK_IDX -->|否| CHK_OWN{"遍历 InventoryChain\n已拥有该武器?"}
+    CHK_OWN -->|是| ABORT3["return（静默）"]
+    CHK_OWN -->|否| CHK_DOSH{"Dosh >= WeapPrice?"}
+    CHK_DOSH -->|否| ABORT4["return（静默）"]
+    CHK_DOSH -->|是| SIM["模拟商人流程"]
+
+    SIM --> S1["4.1 GetPurchaseHelper().Initialize()"]
+    S1 --> S2["4.2 bServerTraderMenuOpen = true"]
+    S2 --> S3{"NetMode?"}
+    S3 -->|Standalone| S3A["PlaySound TRADER_OPEN_MENU"]
+    S3 -->|DedicatedServer| S3B["ClientPlaySoundFromTheme"]
+    S3A --> S4
+    S3B --> S4
+    S4["4.4 ServerBuyWeapon(TraderIndex)"]
+    S4 --> S5["4.5 ServerCloseTraderMenu()"]
+    S5 --> S6{"bFillAmmo?"}
+    S6 -->|是| S7["计算弹药费用\n扣除 Dosh\n填满全部武器弹药"]
+    S6 -->|否| S8["UpdateHUD()"]
+    S7 --> S8
+</div>
+<p class="diagram-caption">图 10: 快捷购买完整流程</p>
+
+<h2>模拟商人详解</h2>
+<div class="info-box warn">
+<strong>巧妙的 Hack：</strong>快捷购买系统模拟了完整的商人开关流程，包括打开商人菜单 → 购买 → 关闭菜单。这是因为 KF2 引擎的 <code>ServerBuyWeapon</code> 只在商人打开状态下才能正常工作。
+</div>
+<p>弹药填充时，如果玩家 Dosh 不足以支付所有弹药，系统会显示 <code>"Horzine Tech LTD. Helps With Your Money"</code> 并扣光剩余 Dosh。如果 <code>bFillAllWeapAmmoAfterQuickPurchase=true</code>，则填满所有武器而非仅新购武器。</p>
+</div>
+
+<!-- ===================== SECTION 8: CHAT SYSTEM ===================== -->
+<div class="section" id="chat-system">
+<h1>聊天命令系统</h1>
+<p><code>HE_ChatController</code>（80 行）继承自 <code>BroadcastHandler</code>，通过拦截聊天消息实现命令系统。</p>
+
+<h2>BroadcastHandler 链式结构</h2>
+<p>KF2 使用 BroadcastHandler 链处理聊天消息。HE 将自己插入链头：</p>
+<pre><code><span class="kw">function</span> <span class="fn">InitHEClass</span>(HE_Main HE_MainObj) {
+    MyHEMain = HE_MainObj;
+    PreBroadcastHandler = MyHEMain.MyKFGI.BroadcastHandler; <span class="cm">// 保存原有 BH</span>
+    MyHEMain.MyKFGI.BroadcastHandler = self;                <span class="cm">// 替换为自己</span>
+}</code></pre>
+
+<h2>RPW 兼容性</h2>
+<div class="info-box tip">
+<strong>链式兼容：</strong>HE_ChatController 处理完自己的命令后，将消息传递给 <code>PreBroadcastHandler.BroadcastText()</code>，保证 RPW 等其他使用 BroadcastHandler 的 Mutator 也能收到消息。
+</div>
+
+<h2>命令分发流程</h2>
+<div class="mermaid">
+sequenceDiagram
+    participant P as 玩家
+    participant GI as KFGameInfo
+    participant CC as HE_ChatController
+    participant HE as HE_Main
+    participant Pre as PreBroadcastHandler
+
+    P->>GI: 输入聊天消息 "!HESys"
+    GI->>CC: BroadcastText(SenderPRI, Receiver, Msg)
+    CC->>CC: 检查 SenderPRI.Owner == Receiver
+    CC->>HE: Broadcast(SenderPRI, Receiver, "!HESys")
+    HE->>HE: ParseStringIntoArray → MsgHead="!HESys"
+    HE->>HE: switch(MsgHead) → GlobalBroadcastHESysInfo()
+    CC->>CC: StopBroadcast("!HESys") → false
+    CC->>Pre: PreBroadcastHandler.BroadcastText()
+    Pre->>P: 消息显示在聊天框
+</div>
+<p class="diagram-caption">图 11: 命令分发时序</p>
+
+<h2>命令表</h2>
+<table>
+<tr><th>命令</th><th>功能</th><th>输出目标</th><th>阻止传播</th></tr>
+<tr><td><code>!HESys</code></td><td>显示 Mutator 版本、更新日期等系统信息</td><td>全局 ChatBox + Console</td><td><span class="badge badge-green">否</span></td></tr>
+<tr><td><code>!HEInfo</code></td><td>显示当前配置参数详情</td><td>全局 ChatBox + Console</td><td><span class="badge badge-green">否</span></td></tr>
+<tr><td><code>!HEBuyPerk [Help|One|Two|Three]</code></td><td>快捷购买系统</td><td>个人 ChatBox</td><td><span class="badge badge-red">是</span></td></tr>
+<tr><td><code>!HEDebug</code></td><td>输出 Players[] 数组详细信息到控制台</td><td>个人 Console</td><td><span class="badge badge-red">是</span></td></tr>
+<tr><td><code>!TK18039</code></td><td>彩蛋："TK18039 Meow Meow Meow ~"</td><td>全局 Center</td><td><span class="badge badge-green">否</span></td></tr>
+<tr><td><code>!Fuck / !Fvck / !Fk</code></td><td>惩罚：扣除 25,000 Dosh</td><td>全局 ChatBox</td><td><span class="badge badge-green">否</span></td></tr>
+</table>
+
+<div class="info-box note">
+<strong>阻止传播机制：</strong><code>StopBroadcast()</code> 返回 true 的命令（!HEDebug, !HEBuyPerk）不会传递给 PreBroadcastHandler，因此其他玩家看不到这些命令文本。!HESys 和 !HEInfo 会正常传播，所有玩家可见。
+</div>
+</div>
+
+<!-- ===================== SECTION 9: HUD SYSTEM ===================== -->
+<div class="section" id="hud-system">
+<h1>HUD 系统</h1>
+<p>HealingExtend 的 HUD 系统由两个类协作：<code>HE_HUDManager</code> 负责服务端到客户端的桥接，<code>HE_HUDBase</code> 负责实际的 Canvas 渲染。</p>
+
+<h2>HE_HUDManager 职责</h2>
+<table>
+<tr><th>功能</th><th>函数</th><th>说明</th></tr>
+<tr><td>获取 LocalPlayer</td><td>ClientGetKFPlayerOwner()</td><td>客户端获取 KFPlayerController 引用</td></tr>
+<tr><td>替换 HUD 类</td><td>ClientSetHUD()</td><td>调用 ClientSetHUD(HE_HUDBase) + CreateHUDMovie()</td></tr>
+<tr><td>按键绑定</td><td>ClientGetKFPlayerOwner()</td><td>绑定 Alt+0~3, Alt+9, P 键</td></tr>
+<tr><td>聊天消息</td><td>ClientAddChatLine()</td><td>reliable client RPC，在聊天框显示彩色消息</td></tr>
+<tr><td>中心消息</td><td>ClientHUDMessage()</td><td>在屏幕中央显示消息（5秒后消失）</td></tr>
+<tr><td>播放音效</td><td>ClientPlaySoundFromTheme()</td><td>用于商人开启音效</td></tr>
+<tr><td>打开 URL</td><td>ClientOpenURL()</td><td>玩家加入时自动打开 GitHub 页面</td></tr>
+<tr><td>控制台输出</td><td>ClientPrint()</td><td>输出消息到客户端控制台</td></tr>
+</table>
+
+<h2>HE_HUDBase 渲染管线</h2>
+<p><code>HE_HUDBase</code>（1234 行）继承 <code>KFGFxHudWrapper</code>，重写 <code>DrawHUD()</code> 函数实现自定义渲染。</p>
+
+<div class="mermaid">
+flowchart TD
+    DH["DrawHUD()"] --> WH{"KFPlayerOwner.Pawn\n有武器?"}
+    WH -->|是| DW["Pawn.Weapon.DrawHUD()"]
+    WH -->|否| SO
+    DW --> SO["DrawActorOverlays()\nPlayerOwner.DrawHud()"]
+    SO --> GRI["缓存 KFGRI"]
+    GRI --> CIN{"bCinematicMode?"}
+    CIN -->|是| RET["return"]
+    CIN -->|否| CS["DrawCrosshair()\n原版准星"]
+
+    CS --> DBG{"bDrawDebugPI?"}
+    DBG -->|是| DBGD["DrawDebugHumanPlayerInfo()\n+ DrawPlayerHealthLowIcon()"]
+    DBG -->|否| CM
+    DBGD --> CM
+
+    CM{"bDrawCenterMsg?"}
+    CM -->|是| CMD["FuncDrawCenterMsg()\n屏幕中央文字"]
+    CM -->|否| ASC
+    CMD --> ASC
+
+    ASC["CheckDrawASCStatus()\n自定义准星状态检查"]
+    ASC --> TEAM{"PlayerTeam == 0?"}
+    TEAM -->|是| FP["遍历所有 KFPawn_Human"]
+    TEAM -->|否| WRAP
+
+    FP --> VIS{"可见且存活?"}
+    VIS -->|是| MED{"当前职业是\nField Medic?"}
+    MED -->|是| MHLI["Medic_DrawPlayerHealthLowIcon()\n三级治疗提示"]
+    MED -->|否| NHLI["DrawPlayerHealthLowIcon()\n仅危急提示"]
+    MHLI --> FHI["DrawFriendlyHumanPlayerInfo()\n队友血条/甲条/Perk图标"]
+    NHLI --> FHI
+    VIS -->|否| HID["加入 HiddenHumanPlayers"]
+    FHI --> NEXT["下一个玩家"]
+    HID --> NEXT
+
+    NEXT --> ICONS["CheckAndDrawHiddenPlayerIcons()\nCheckAndDrawRemainingZedIcons()\nDrawObjectiveHUD()"]
+    ICONS --> WRAP["KFGFxHudWrapper 层\n准星颜色/调试信息"]
+</div>
+<p class="diagram-caption">图 12: HUD 渲染管线</p>
+
+<h2>准星状态机</h2>
+<div class="mermaid">
+stateDiagram-v2
+    [*] --> HE_NoneInit : 初始化
+    HE_NoneInit --> HE_Good : 正常开启准星
+    HE_NoneInit --> HE_Player_Closed : 玩家关闭准星
+
+    HE_Good --> HE_Player_UsingIronsight : 使用机瞄
+    HE_Good --> HE_Player_Dead : 玩家死亡
+    HE_Good --> HE_Player_SpecialMoveDontAllow : 特殊动作
+    HE_Good --> HE_WeapNotGuns : 非枪械武器
+
+    HE_Player_UsingIronsight --> HE_Good : 退出机瞄
+    HE_Player_Dead --> HE_NoneInit : 重生
+    HE_Player_SpecialMoveDontAllow --> HE_Good : 动作结束
+    HE_WeapNotGuns --> HE_Good : 切换武器
+
+    HE_Player_Closed --> HE_Good : ToggleAsC()
+    HE_Good --> HE_Player_Closed : ToggleAsC()
+</div>
+<p class="diagram-caption">图 13: 准星状态机</p>
+
+<h2>自定义准星绘制</h2>
+<p><code>DrawAsCAim()</code> 支持两种模式：</p>
+<table>
+<tr><th>模式</th><th>条件</th><th>绘制方式</th></tr>
+<tr><td>UPK 纹理模式</td><td>bIsUpkUser=true 且 bIsUsingOldASC=false</td><td>从 HE_Contents.upk 加载 Crosshair_ss 纹理，80x80 像素</td></tr>
+<tr><td>代码绘制模式</td><td>其他情况</td><td>Canvas.DrawRect 绘制十字线 + 中心点</td></tr>
+</table>
+<p>十字准星参数：<code>ASSAim_Length=12</code>（线段长度）、<code>ASSAim_Space=8</code>（中心间距）、<code>ASSAim_Width=3</code>（线段宽度）。</p>
+
+<h2>队友状态显示</h2>
+<p>HE_HUDBase 重写了 <code>DrawFriendlyHumanPlayerInfo()</code>，增加超频血条显示：</p>
+<ul>
+<li>HP ≤ HealthMax → 正常绿色血条</li>
+<li>HP > HealthMax → 绿色满血条 + DeepPink 超频覆盖层</li>
+<li>Armor ≤ MaxArmor → 正常蓝色甲条</li>
+<li>Armor > MaxArmor → 蓝色满甲条 + Snow 白色超频覆盖层</li>
+</ul>
+
+<h2>治疗优先级提示（Medic 专属）</h2>
+<table>
+<tr><th>HP 范围</th><th>图标文字</th><th>颜色</th></tr>
+<tr><td>HP ≤ HealthMax（任何缺血）</td><td>Notify</td><td>灰白色 (220,220,220)</td></tr>
+<tr><td>HP ≤ HurtHealthRateNotify (85)</td><td>Hurt</td><td>黄色 LowSeverityColor</td></tr>
+<tr><td>HP ≤ CriticalHealthRateNotify (50)</td><td>Dying</td><td>红色 CriticalSeverityColor</td></tr>
+</table>
+
+<h2>控制台命令</h2>
+<table>
+<tr><th>命令</th><th>功能</th></tr>
+<tr><td><code>ToggleAsC</code> / <code>ZhunXin</code></td><td>开关自定义准星</td></tr>
+<tr><td><code>ChangeAsCMode</code> / <code>HuanZhunXin</code></td><td>切换准星绘制模式（UPK/代码）</td></tr>
+<tr><td><code>HEDrawDebug</code></td><td>开关调试信息绘制</td></tr>
+<tr><td><code>HEDrawDebugPI</code></td><td>开关调试玩家信息</td></tr>
+</table>
+
+<h2>Zed 图标系统</h2>
+<p><code>DrawZedIcon()</code> 为最后存活的 Zed 显示位置图标，有 UPK 纹理用户可以看到：</p>
+<ul>
+<li><strong>Fleshpound</strong> → 专属 <code>HE_Contents.fleshpound</code> 图标（50x50）</li>
+<li><strong>Scrake</strong> → 专属 <code>HE_Contents.ZeddAlert</code> 图标（50x50）</li>
+<li><strong>其他 Zed</strong> → 通用图标 <code>HE_Contents.ZeddAlert</code> / <code>UI_PerkIcon_ZED</code>（无 UPK 时）</li>
+</ul>
+</div>
+
+<!-- ===================== SECTION 10: TRADER AND WEAPONS ===================== -->
+<div class="section" id="trader-weapons">
+<h1>商人与武器</h1>
+<p><code>HE_TraderManager</code>（166 行）负责将自定义武器注入 KF2 的商人系统，实现客户端/服务端同步。</p>
+
+<h2>TraderManager 架构</h2>
+<p>KF2 的商人系统基于 <code>KFGameReplicationInfo.TraderItems.SaleItems</code> 数组。每个武器需要一个 <code>STraderItem</code> 条目。HE_TraderManager 的工作就是动态构建这些条目并注入。</p>
+
+<h3>CustomizedWeap 配置结构</h3>
+<pre><code><span class="kw">struct</span> <span class="ty">CustomizedWeap</span>
+{
+    <span class="kw">var</span> <span class="ty">string</span> DefClassPath;   <span class="cm">// WeaponDefinition 路径</span>
+    <span class="kw">var</span> <span class="ty">string</span> WeapClassPath;  <span class="cm">// Weapon 类路径</span>
+    <span class="kw">var</span> <span class="ty">int</span>    dItemId;        <span class="cm">// 自定义 ItemID</span>
+};</code></pre>
+
+<h2>武器同步流程</h2>
+<div class="mermaid">
+sequenceDiagram
+    participant HE as HE_Main
+    participant TM as HE_TraderManager
+    participant GRI as KFGameReplicationInfo
+    participant Client as 客户端
+
+    HE->>TM: Spawn(Owner=KFPC)
+    HE->>TM: StartSyncItem()
+
+    alt Dedicated Server
+        TM->>TM: CreateWeapon() [服务端先注入]
+        TM->>GRI: SaleItems.AddItem(CustomizedTI)
+        GRI-->>Client: SaleItems 自动复制到客户端
+        TM->>TM: SetTimer(1s, ClientSetSaleItems)
+        loop 等待复制完成
+            Client->>Client: ClientSetSaleItems()
+            Client->>GRI: 检查 SaleItems.Length > 0?
+            alt 已复制
+                Client->>Client: CreateWeapon() [客户端注入]
+                Client->>Client: ClearTimer()
+            else 未复制
+                Client->>Client: 继续等待
+            end
+        end
+    else Standalone
+        TM->>TM: SetTimer(1s, ClientSetSaleItems)
+        TM->>TM: CreateWeapon()
+        TM->>GRI: SaleItems.AddItem(CustomizedTI)
+    end
+
+    TM->>GRI: SetItemsInfo(SaleItems)
+</div>
+<p class="diagram-caption">图 14: 武器同步时序</p>
+
+<h2>CreateWeapon 详解</h2>
+<p><code>CreateWeapon()</code> 为每个 CustomizedWeap 配置项执行以下步骤：</p>
+<ol>
+<li>通过 <code>DynamicLoadObject()</code> 加载 WeaponDefinition 和 Weapon 类</li>
+<li>检查武器是否已存在于 SaleItems（防止重复）</li>
+<li>构建 <code>STraderItem</code>：填充弹匣容量、备弹、库存大小、Perk 关联等</li>
+<li>查找当前最大 ItemID，新武器 ID = 最大 + 1</li>
+<li>添加到 <code>GRI.TraderItems.SaleItems</code></li>
+<li>调用 <code>SetItemsInfo()</code> 更新商人 UI</li>
+</ol>
+
+<h2>自定义武器属性对比</h2>
+<table>
+<tr><th>属性</th><th>HMTech-201 Storm</th><th>HMTech-401 BiohaZard</th></tr>
+<tr><td>类名</td><td>Weap_HMT201</td><td>Weap_HMT401</td></tr>
+<tr><td>父类</td><td>KFWeap_MedicBase</td><td>KFWeap_MedicBase</td></tr>
+<tr><td>武器类型</td><td>SMG (FT_SMG)</td><td>AR (FT_Assault)</td></tr>
+<tr><td>购买价格</td><td>650 Dosh</td><td>1500 Dosh</td></tr>
+<tr><td>弹匣容量</td><td>40</td><td>30</td></tr>
+<tr><td>备弹容量</td><td>360</td><td>360</td></tr>
+<tr><td>伤害</td><td>35</td><td>50 (×1.25)</td></tr>
+<tr><td>射速 (RPM)</td><td>800</td><td>700</td></tr>
+<tr><td>治疗量</td><td>10 HP</td><td>10 HP</td></tr>
+<tr><td>充能时间</td><td>15s</td><td>10s</td></tr>
+<tr><td>库存大小</td><td>3</td><td>7</td></tr>
+<tr><td>弹药价格/弹匣</td><td>20 Dosh</td><td>40 Dosh</td></tr>
+<tr><td>关联 Perk</td><td>Field Medic</td><td>Field Medic</td></tr>
+</table>
+</div>
+
+<!-- ===================== SECTION 11: NETWORK REPLICATION ===================== -->
+<div class="section" id="network">
+<h1>网络复制</h1>
+<p>HealingExtend 基于 UE3 的 Replication 系统实现服务端与客户端的数据同步。</p>
+
+<h2>UE3 Replication 基础概念</h2>
+<table>
+<tr><th>概念</th><th>说明</th></tr>
+<tr><td>Role</td><td>Actor 在当前机器上的角色：ROLE_Authority（服务端）、ROLE_SimulatedProxy/ROLE_AutonomousProxy（客户端）</td></tr>
+<tr><td>RemoteRole</td><td>Actor 在远程机器上的角色</td></tr>
+<tr><td>Replication Block</td><td>声明哪些变量在什么条件下复制</td></tr>
+<tr><td>repnotify</td><td>变量被复制后在目标端触发 ReplicatedEvent()</td></tr>
+<tr><td>reliable client function</td><td>服务端调用、保证在客户端执行的 RPC</td></tr>
+</table>
+
+<h2>网络架构</h2>
+<div class="mermaid">
+graph TB
+    subgraph Server["服务端 (ROLE_Authority)"]
+        HE["HE_Main\n游戏逻辑 + Tick"]
+        CC["HE_ChatController\n消息拦截"]
+        PA["Players[] 数组"]
+    end
+
+    subgraph Rep["复制层"]
+        HM_S["HE_HUDManager\n(服务端实例)"]
+        TM_S["HE_TraderManager\n(服务端实例)"]
+    end
+
+    subgraph Client["客户端"]
+        HM_C["HE_HUDManager\n(客户端代理)"]
+        TM_C["HE_TraderManager\n(客户端代理)"]
+        HUD["HE_HUDBase\n(仅客户端)"]
+    end
+
+    HE -->|"Spawn + 管理"| HM_S
+    HE -->|"Spawn + 管理"| TM_S
+    HM_S -->|"AutonomousProxy\nreliable client RPCs"| HM_C
+    TM_S -->|"SimulatedProxy\nSaleItems 复制"| TM_C
+    HM_C -->|"ClientSetHUD()"| HUD
+    CC -->|"SimulatedProxy\nbAlwaysRelevant"| Client
+</div>
+<p class="diagram-caption">图 15: 网络架构图</p>
+
+<h2>Actor 复制策略表</h2>
+<table>
+<tr><th>Actor</th><th>RemoteRole</th><th>bAlwaysRelevant</th><th>复制内容</th></tr>
+<tr><td>HE_HUDManager</td><td>Role_AutonomousProxy</td><td>否（Owner-based）</td><td>bStartGame (repnotify), reliable client RPCs</td></tr>
+<tr><td>HE_TraderManager</td><td>ROLE_SimulatedProxy</td><td>否</td><td>GRI.SaleItems 自动复制</td></tr>
+<tr><td>HE_ChatController</td><td>ROLE_SimulatedProxy</td><td>是</td><td>网络调试信息</td></tr>
+<tr><td>HE_RepTest</td><td>ROLE_AutonomousProxy</td><td>是</td><td>strTest, intTest (repnotify)</td></tr>
+</table>
+
+<h2>Standalone vs Dedicated 分支</h2>
+<p>代码中多处根据 <code>WorldInfo.NetMode</code> 进行分支：</p>
+<table>
+<tr><th>场景</th><th>NM_Standalone</th><th>NM_DedicatedServer</th></tr>
+<tr><td>HUDManager 获取 LocalPlayer</td><td>直接获取</td><td>通过 Owner 推断</td></tr>
+<tr><td>商人音效</td><td>直接 PlaySoundFromTheme</td><td>通过 ClientPlaySoundFromTheme RPC</td></tr>
+<tr><td>自定义武器同步</td><td>直接 CreateWeapon</td><td>服务端先创建 + 客户端定时器等待复制</td></tr>
+<tr><td>HUD 设置</td><td>Role &lt; Authority 或 NM_Standalone</td><td>仅客户端执行</td></tr>
+</table>
+
+<h2>HE_RepTest 教学示例</h2>
+<p><code>HE_RepTest.uc</code>（66 行）是一个纯教学性质的复制测试类：</p>
+<pre><code><span class="kw">var repnotify string</span> strTest;
+<span class="kw">var repnotify int</span>    intTest;
+
+<span class="ty">Replication</span>
+{
+    <span class="kw">if</span>(Role == ROLE_Authority)
+        strTest, intTest;  <span class="cm">// 服务端 → 客户端</span>
+}</code></pre>
+<p>服务端每秒递增 intTest 并更新 strTest，通过 repnotify 复制到客户端，客户端在控制台打印两端的值差异，直观展示复制延迟。</p>
+</div>
+
+<!-- ===================== SECTION 12: CONFIGURATION ===================== -->
+<div class="section" id="config-ref">
+<h1>配置手册</h1>
+<p>HealingExtend 使用 UE3 的 <code>config</code> 系统将配置持久化到 INI 文件。</p>
+
+<div class="info-box note">
+<strong>INI 文件路径：</strong><br>
+单人/本地：<code>Documents\My Games\KillingFloor2\KFGame\Config\KF&lt;ConfigName&gt;.ini</code><br>
+Dedicated Server：<code>KFGame\Config\KF&lt;ConfigName&gt;.ini</code>（服务器目录下）
+</div>
+
+<h2>HE_Main — config(HE_Main)</h2>
+<table>
+<tr><th>变量</th><th>类型</th><th>默认值</th><th>说明</th></tr>
+<tr><td>bEnableHE</td><td>bool</td><td>True</td><td>Mutator 总开关</td></tr>
+<tr><td>bEnableHE_HUD</td><td>bool</td><td>True</td><td>自定义 HUD 开关（关闭则超频联动关闭）</td></tr>
+<tr><td>bEnableCustomizedWeapons</td><td>bool</td><td>False</td><td>自定义武器开关</td></tr>
+<tr><td>bEnableHealthRegen</td><td>bool</td><td>False</td><td>被动 HP 回复开关</td></tr>
+<tr><td>bEnableArmourRegen</td><td>bool</td><td>False</td><td>被动 Armor 回复开关</td></tr>
+<tr><td>bEnableInfiniteSpareAmmo</td><td>bool</td><td>False</td><td>无限备弹开关</td></tr>
+<tr><td>bEnableHealthAndArmorOverclocking</td><td>bool</td><td>True</td><td>超频系统开关</td></tr>
+<tr><td>bEnableAmmoRecovering</td><td>bool</td><td>True</td><td>爆头回弹开关</td></tr>
+<tr><td>bEnableDoshBonus</td><td>bool</td><td>True</td><td>爆头 Dosh 奖励开关</td></tr>
+<tr><td>bFillAllWeapAmmoAfterQuickPurchase</td><td>bool</td><td>True</td><td>快捷购买后填满所有武器</td></tr>
+<tr><td>bGsAltOneIsSPX</td><td>bool</td><td>True</td><td>Gunslinger Alt+1 → SPX/1911</td></tr>
+<tr><td>bInitedConfig</td><td>bool</td><td>True*</td><td>配置已初始化标记</td></tr>
+<tr><td>fCurrentRegenRate</td><td>float</td><td>10.0</td><td>HealthRegenRate = 1/此值</td></tr>
+<tr><td>DecreModifier</td><td>float</td><td>0.2</td><td>超频衰减速率</td></tr>
+<tr><td>RegenModifier</td><td>float</td><td>1.0</td><td>被动回复速率倍率</td></tr>
+<tr><td>HealthRegenPerSecond</td><td>float</td><td>1</td><td>被动 HP 回复量/秒</td></tr>
+<tr><td>ArmourRegenPerSecond</td><td>float</td><td>1</td><td>被动 Armor 回复量/秒</td></tr>
+<tr><td>HealthHealingAmount</td><td>float</td><td>1</td><td>爆头 HP 回复量</td></tr>
+<tr><td>ArmourHealingAmount</td><td>float</td><td>1</td><td>爆头 Armor 回复量</td></tr>
+<tr><td>BonusDosh</td><td>int</td><td>85</td><td>爆头 Dosh 奖励</td></tr>
+<tr><td>OverclockHealthLimit</td><td>int</td><td>150</td><td>超频 HP 硬上限</td></tr>
+<tr><td>OverclockArmorLimit</td><td>int</td><td>175</td><td>超频 Armor 硬上限</td></tr>
+</table>
+
+<h2>HE_HUDBase — config(HE_HUDBase)</h2>
+<table>
+<tr><th>变量</th><th>类型</th><th>默认值</th><th>说明</th></tr>
+<tr><td>ASSAim_Length</td><td>float</td><td>12.0</td><td>准星线段长度</td></tr>
+<tr><td>ASSAim_Space</td><td>float</td><td>8.0</td><td>准星中心间距</td></tr>
+<tr><td>ASSAim_Width</td><td>float</td><td>3.0</td><td>准星线段宽度</td></tr>
+<tr><td>HUDMainTextScale</td><td>float</td><td>1.0</td><td>主 HUD 文字缩放</td></tr>
+<tr><td>HUDDebugTextScale</td><td>float</td><td>1.0</td><td>调试文字缩放</td></tr>
+<tr><td>HurtHealthRateNotify</td><td>int</td><td>85</td><td>Medic "Hurt" 提示阈值</td></tr>
+<tr><td>CriticalHealthRateNotify</td><td>int</td><td>50</td><td>"Dying" 提示阈值</td></tr>
+<tr><td>MainHUDColor</td><td>color</td><td>(255,255,0,192)</td><td>主 HUD 颜色（黄色）</td></tr>
+<tr><td>DebugHUDColor</td><td>color</td><td>(255,192,203,192)</td><td>调试颜色（粉色）</td></tr>
+<tr><td>CrosshairColor</td><td>color</td><td>(255,48,48,192)</td><td>准星颜色（红色）</td></tr>
+<tr><td>OverclockedHealthColor</td><td>color</td><td>(255,20,147,192)</td><td>超频血条颜色（DeepPink）</td></tr>
+<tr><td>OverclockedArmorColor</td><td>color</td><td>(238,233,233,192)</td><td>超频甲条颜色（Snow）</td></tr>
+<tr><td>LowSeverityColor</td><td>color</td><td>(255,255,0,192)</td><td>低危提示颜色（黄色）</td></tr>
+<tr><td>CriticalSeverityColor</td><td>color</td><td>(255,48,48,192)</td><td>危急提示颜色（红色）</td></tr>
+</table>
+
+<h2>HE_HUDManager — config(HE_Main)</h2>
+<table>
+<tr><th>变量</th><th>类型</th><th>默认值</th><th>说明</th></tr>
+<tr><td>DefaultHUDMessageColor</td><td>string</td><td>"42bbbc"</td><td>默认聊天消息颜色（HE 青色）</td></tr>
+<tr><td>AutoOpenedURL</td><td>string</td><td>GitHub URL</td><td>加入游戏时自动打开的 URL</td></tr>
+<tr><td>bNotResetConfigNextTime</td><td>bool</td><td>True*</td><td>配置保护标记</td></tr>
+</table>
+
+<h2>HE_ChatController — config(HE_Main)</h2>
+<table>
+<tr><th>变量</th><th>类型</th><th>默认值</th><th>说明</th></tr>
+<tr><td>bPrintNetworkStatusInConsole</td><td>bool</td><td>False</td><td>启动时在控制台输出网络状态</td></tr>
+</table>
+
+<h2>HE_TraderManager — config(HE_Main)</h2>
+<table>
+<tr><th>变量</th><th>类型</th><th>默认值</th><th>说明</th></tr>
+<tr><td>CustomizedWeaps</td><td>array&lt;CustomizedWeap&gt;</td><td>空</td><td>自定义武器配置列表，需手动在 INI 中配置</td></tr>
+</table>
+</div>
+
+<!-- ===================== SECTION 13: GLOSSARY ===================== -->
+<div class="section" id="glossary">
+<h1>术语表</h1>
+
+<h2>Killing Floor 2 术语</h2>
+<table>
+<tr><th>术语</th><th>说明</th></tr>
+<tr><td>Zed</td><td>游戏中的怪物总称</td></tr>
+<tr><td>Perk</td><td>职业系统，如 Sharpshooter, Commando, Field Medic 等</td></tr>
+<tr><td>Dosh</td><td>游戏内货币</td></tr>
+<tr><td>Trader</td><td>波间商人，用于购买武器和弹药</td></tr>
+<tr><td>Wave</td><td>游戏波次，每波结束后可访问商人</td></tr>
+<tr><td>CD (Controlled Difficulty)</td><td>自定义难度 Mutator，HE 专为其优化</td></tr>
+<tr><td>ZedTime</td><td>子弹时间效果，游戏进入慢动作</td></tr>
+<tr><td>Fleshpound / FP</td><td>大型 Zed，高威胁目标</td></tr>
+<tr><td>Scrake / SC</td><td>大型 Zed，高血量近战单位</td></tr>
+<tr><td>RPW (Ranked Perks Whitelist)</td><td>排位白名单 Mutator，HE 与其兼容</td></tr>
+<tr><td>ServerExt</td><td>另一个流行的服务端扩展 Mutator</td></tr>
+</table>
+
+<h2>Unreal Engine 3 术语</h2>
+<table>
+<tr><th>术语</th><th>说明</th></tr>
+<tr><td>Actor</td><td>UE3 中可放入游戏世界的基础对象</td></tr>
+<tr><td>Pawn</td><td>可被 Controller 控制的 Actor，代表玩家或 AI 角色</td></tr>
+<tr><td>Controller</td><td>控制 Pawn 的逻辑对象（PlayerController / AIController）</td></tr>
+<tr><td>Mutator</td><td>修改游戏规则的链式组件</td></tr>
+<tr><td>BroadcastHandler</td><td>处理聊天消息广播的链式组件</td></tr>
+<tr><td>Replication</td><td>服务端到客户端的数据同步机制</td></tr>
+<tr><td>RemoteRole</td><td>Actor 在远程端的角色类型</td></tr>
+<tr><td>ROLE_Authority</td><td>服务端完全控制</td></tr>
+<tr><td>ROLE_SimulatedProxy</td><td>客户端模拟（位置插值等）</td></tr>
+<tr><td>ROLE_AutonomousProxy</td><td>客户端自主控制（玩家控制的 Actor）</td></tr>
+<tr><td>repnotify</td><td>变量复制后触发 ReplicatedEvent 回调</td></tr>
+<tr><td>reliable client function</td><td>服务端调用、保证在客户端执行的远程过程调用</td></tr>
+<tr><td>GRI (GameReplicationInfo)</td><td>全局复制信息，所有客户端可访问</td></tr>
+<tr><td>PRI (PlayerReplicationInfo)</td><td>玩家复制信息</td></tr>
+<tr><td>Canvas</td><td>2D 渲染 API，用于 HUD 绘制</td></tr>
+<tr><td>exec function</td><td>可从控制台直接调用的函数</td></tr>
+<tr><td>config</td><td>配置变量，持久化到 INI 文件</td></tr>
+<tr><td>defaultproperties</td><td>UE3 的默认属性块，类似构造函数</td></tr>
+<tr><td>DynamicLoadObject</td><td>运行时动态加载类/资源</td></tr>
+</table>
+
+<h2>HealingExtend 专有术语</h2>
+<table>
+<tr><th>术语</th><th>说明</th></tr>
+<tr><td>HEPlayer</td><td>玩家数据结构，存储控制器、Pawn、HUD 管理器等</td></tr>
+<tr><td>Overclocking / 超频</td><td>HP/Armor 突破正常上限的状态</td></tr>
+<tr><td>AsC (Assistant Crosshair)</td><td>HE 自定义辅助准星系统</td></tr>
+<tr><td>PWRI</td><td>PostWaveReplicationInfo，引擎内部的波次统计结构</td></tr>
+<tr><td>Quick Purchase / 快捷购买</td><td>Alt+数字键直接购买武器的系统</td></tr>
+<tr><td>HECC</td><td>HE_ChatController 的实例变量名</td></tr>
+<tr><td>PreBroadcastHandler</td><td>HE 替换 BH 前保存的原始 BroadcastHandler</td></tr>
+<tr><td>UPK User</td><td>安装了 HE_Contents.upk 资源包的用户</td></tr>
+</table>
+
+<h2>缩写表</h2>
+<table>
+<tr><th>缩写</th><th>全称</th></tr>
+<tr><td>HE</td><td>HealingExtend</td></tr>
+<tr><td>KF2</td><td>Killing Floor 2</td></tr>
+<tr><td>UE3</td><td>Unreal Engine 3</td></tr>
+<tr><td>KFPC</td><td>KFPlayerController</td></tr>
+<tr><td>KFPH</td><td>KFPawn_Human</td></tr>
+<tr><td>KFPRI</td><td>KFPlayerReplicationInfo</td></tr>
+<tr><td>KFGRI</td><td>KFGameReplicationInfo</td></tr>
+<tr><td>GI</td><td>GameInfo</td></tr>
+<tr><td>BH</td><td>BroadcastHandler</td></tr>
+<tr><td>GVC</td><td>GameViewportClient</td></tr>
+<tr><td>HP</td><td>Health Points（生命值）</td></tr>
+<tr><td>OC</td><td>Overclocking（超频）</td></tr>
+<tr><td>FP</td><td>Fleshpound</td></tr>
+<tr><td>SC</td><td>Scrake</td></tr>
+<tr><td>RPC</td><td>Remote Procedure Call（远程过程调用）</td></tr>
+<tr><td>INI</td><td>配置文件格式</td></tr>
+<tr><td>CD</td><td>Controlled Difficulty</td></tr>
+<tr><td>RPW</td><td>Ranked Perks Whitelist</td></tr>
+</table>
+</div>
+
+</main>
+
+<!-- Mermaid.js -->
+<script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+<script>
+mermaid.initialize({
+  startOnLoad: true,
+  theme: 'dark',
+  themeVariables: {
+    darkMode: true,
+    background: '#1c2333',
+    primaryColor: '#1f6feb',
+    primaryTextColor: '#e6edf3',
+    primaryBorderColor: '#30363d',
+    lineColor: '#58a6ff',
+    secondaryColor: '#21262d',
+    tertiaryColor: '#161b22',
+    fontFamily: '-apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif',
+    fontSize: '14px'
+  },
+  flowchart: { useMaxWidth: true, htmlLabels: true, curve: 'basis' },
+  sequence: { useMaxWidth: true, actorMargin: 80 }
+});
+
+// Sidebar navigation
+function scrollToSection(id) {
+  const el = document.getElementById(id);
+  if (el) {
+    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    // Update active state
+    document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
+    event.target.classList.add('active');
+    // Close mobile sidebar
+    if (window.innerWidth <= 900) toggleSidebar();
+  }
+}
+
+function toggleGroup(el) {
+  el.parentElement.classList.toggle('collapsed');
+}
+
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebarOverlay').classList.toggle('active');
+}
+
+// Search
+function handleSearch(query) {
+  query = query.toLowerCase().trim();
+  const sections = document.querySelectorAll('.section');
+  sections.forEach(s => {
+    if (!query) { s.style.display = 'block'; return; }
+    const text = s.textContent.toLowerCase();
+    s.style.display = text.includes(query) ? 'block' : 'none';
+  });
+}
+
+// Scroll spy
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const id = entry.target.id;
+      document.querySelectorAll('.sidebar-item').forEach(item => {
+        item.classList.remove('active');
+        if (item.getAttribute('onclick')?.includes(id)) {
+          item.classList.add('active');
+        }
+      });
+    }
+  });
+}, { rootMargin: '-80px 0px -70% 0px' });
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.section').forEach(s => observer.observe(s));
+});
+</script>
+</body>
+</html>
